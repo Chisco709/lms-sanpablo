@@ -1,5 +1,4 @@
 // app/(dashboard)/(routes)/teacher/courses/[courseId]/page.tsx
-
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CircleDollarSign, LayoutDashboard, ListChecks, File } from "lucide-react";
@@ -12,12 +11,13 @@ import { ImageForm } from "./_components/image-form";
 import { CategoryForm } from "./_components/category-form";
 import { PriceForm } from "./_components/price-form";
 import { AttachmentForm } from "./_components/attachment-form";
-
-import { Course, Category, Attachment } from "@prisma/client";
 import { ChaptersForm } from "./_components/chapters-form";
+
+import { Course, Category, Attachment, Chapter } from "@prisma/client";
 
 interface CourseWithAttachments extends Course {
   attachments: Attachment[];
+  chapters: Chapter[];
 }
 
 interface CourseIdPageProps {
@@ -38,27 +38,45 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     return redirect("/");
   }
 
-  // Mover el acceso a courseId después del primer await
-  const { courseId } = params;
-
   try {
-    const [course, categories] = await Promise.all([
-      fetchCourse(userId, courseId),
-      fetchCategories()
-    ]);
+    const course = await db.course.findUnique({
+      where: {
+        id: params.courseId,
+        userId
+      },
+      include: {
+        chapters: {
+          orderBy: {
+            position: "asc"
+          }
+        },
+        attachments: {
+          orderBy: {
+            createdAt: "desc"
+          }
+        }
+      }
+    });
+
+    const categories = await db.category.findMany({
+      orderBy: {
+        name: "asc",
+      }
+    });
 
     if (!course) {
       return redirect("/");
     }
 
-
-
+    const hasPublishedChapters = course.chapters.some(chapter => chapter.isPublished);
+    
     const requiredFields = [
       course.title,
       course.description,
       course.imageUrl,
       course.price,
-      course.categoryId
+      course.categoryId,
+      hasPublishedChapters
     ];
 
     const totalFields = requiredFields.length;
@@ -72,18 +90,16 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
 
     return (
       <div className="p-6">
-        <CourseHeader
-          completionText={completionText}
-        />
-
+        <CourseHeader completionText={completionText} />
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
           <CourseCustomizationSection
             course={course}
             categoryOptions={categoryOptions}
           />
-
+          
           <div className="space-y-6">
-            <ChaptersSection course={course}/>
+            <ChaptersSection course={course} />
             <PricingSection course={course} />
             <ResourcesSection course={course} />
           </div>
@@ -92,37 +108,9 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     );
   } catch (error) {
     console.error("[COURSE_ID_PAGE]", error);
-    // Considerar un mensaje de error más amigable o una página 404
     return redirect("/teacher/courses");
   }
 }
-
-async function fetchCourse(userId: string, courseId: string): Promise<CourseWithAttachments | null> {
-  return db.course.findUnique({
-    where: {
-      id: courseId,
-      userId
-    },
-    include: {
-      attachments: {
-        orderBy: {
-          createdAt: "desc"
-        }
-      }
-    }
-  });
-}
-
-
-async function fetchCategories(): Promise<Category[]> {
-  return db.category.findMany({
-    orderBy: {
-      name: "asc",
-    }
-  });
-}
-
-
 
 interface CourseHeaderProps {
   completionText: string;
@@ -133,10 +121,10 @@ function CourseHeader({ completionText }: CourseHeaderProps) {
     <div className="flex items-center justify-between">
       <div className="flex flex-col gap-y-2">
         <h1 className="text-2xl font-medium">
-          Course Setup
+          Configuración del Curso
         </h1>
         <span className="text-sm text-slate-700">
-          Completa todos los campos {completionText}
+          Campos completados {completionText}
         </span>
       </div>
     </div>
@@ -154,7 +142,7 @@ function CourseCustomizationSection({ course, categoryOptions }: CourseCustomiza
       <div className="flex items-center gap-x-2">
         <IconBadge icon={LayoutDashboard}/>
         <h2 className="text-xl">
-          Personaliza tu curso
+          Personalización del Curso
         </h2>
       </div>
 
@@ -192,7 +180,7 @@ function ChaptersSection({ course }: ChapterSectionsProps) {
       <div className="flex items-center gap-x-2">
         <IconBadge icon={ListChecks}/>
         <h2 className="text-xl">
-          Capítulos del curso
+          Gestión de Capítulos
         </h2>
       </div>
       <ChaptersForm
@@ -213,7 +201,7 @@ function PricingSection({ course }: PricingSectionProps) {
       <div className="flex items-center gap-x-2">
         <IconBadge icon={CircleDollarSign}/>
         <h2 className="text-xl">
-          Vende tu curso
+          Configuración de Precio
         </h2>
       </div>
       <PriceForm
@@ -234,7 +222,7 @@ function ResourcesSection({ course }: ResourcesSectionProps) {
       <div className="flex items-center gap-x-2">
         <IconBadge icon={File}/>
         <h2 className="text-xl">
-          Recursos y Videos
+          Recursos Adicionales
         </h2>
       </div>
       <AttachmentForm
