@@ -130,3 +130,23 @@ body,
 }
 
 
+/* Estilos para el editor */
+.ProseMirror {
+  padding: 1rem;
+  min-height: 200px;
+  line-height: 1.5;
+}
+
+/* Guía visual para el área de escritura */
+.ProseMirror p.is-empty:first-child::before {
+  content: "Escribe aquí...";
+  color: #94a3b8;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Elimina el espacio extra de <p> */
+.ProseMirror p {
+  margin: 0;
+}

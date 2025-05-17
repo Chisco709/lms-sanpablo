@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
+  
+ 
   images: {
     domains: [
       "utfs.io",
@@ -16,11 +17,13 @@ const nextConfig = {
     ]
   },
 
-  /* config options here */
   webpack: (config) => {
-    // Esto ayuda a resolver problemas con la importación de módulos usando @/
+    // Solución para react-quill
+    config.resolve.alias.canvas = false;
+    config.resolve.alias.encoding = false;
+    
     return config;
   }
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
