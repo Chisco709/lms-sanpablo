@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 
 import { Chapter } from "@prisma/client";
 import { Editor } from "@/components/editor";
+import { Preview } from "@/components/preview";
 
 interface ChapterDescriptionFormProps {
     initialData: Chapter
@@ -88,6 +89,11 @@ export const ChapterDescriptionForm = ({
                     !initialData.description && "text-slate-500 italic"
                 )}>
                     {!initialData.description && "Sin descripción"}
+                    {initialData.description && (
+                        <Preview 
+                        value={initialData.description}
+                        />
+                    )}
                 </div>
             )}
             {isEditing && (

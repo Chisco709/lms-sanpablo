@@ -2,17 +2,18 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation"
 import Link from "next/link";
 import db from "@/lib/db"
-import { ArrowLeft, LayoutDashboard } from "lucide-react";
+import { ArrowLeft, Eye, LayoutDashboard, Video } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
+import { ChapterAccessForm } from "./_components/chapter-access-form";
+import { ChapterVideoForm } from "./_components/chapter-video-form";
 
 const ChapterIdPage = async({
     params
 }: {
     params: { courseId: string; chapterId: string }
 }) => {
-
     const { userId } = await auth();
     
     if (!userId) {
@@ -65,7 +66,8 @@ const ChapterIdPage = async({
         </section>
       </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="space-y-6">
+        {/* Sección de Personalización */}
         <article className="space-y-6">
           <header className="flex items-center gap-x-2">
             <IconBadge icon={LayoutDashboard} />
@@ -75,23 +77,48 @@ const ChapterIdPage = async({
           </header>
           
           <ChapterTitleForm 
-          initialData={chapter}
-          courseId={params.courseId}
-          chapterId={params.chapterId}
+            initialData={chapter}
+            courseId={params.courseId}
+            chapterId={params.chapterId}
           />
           <ChapterDescriptionForm 
-          initialData={chapter}
-          courseId={params.courseId}
-          chapterId={params.chapterId}
+            initialData={chapter}
+            courseId={params.courseId}
+            chapterId={params.chapterId}
           />
         </article>
 
-        {/* Segunda columna para otros componentes */}
-        <article>
-          {/* Contenido adicional */}
+        {/* Sección de Configuración de Acceso */}
+        <article className="space-y-6">
+          <header className="flex items-center gap-x-2">
+            <IconBadge icon={Eye}/>
+            <h2 className="text-xl">
+              Configuración de acceso
+            </h2>
+          </header>
+          <ChapterAccessForm 
+            initialData={chapter}
+            courseId={params.courseId}
+            chapterId={params.chapterId}
+          />
+        </article>
+
+        {/* Sección de Video */}
+        <article className="space-y-6">
+          <header className="flex items-center gap-x-2">
+            <IconBadge icon={Video}/>
+            <h2 className="text-xl">
+              Subir video
+            </h2>
+          </header>
+          <ChapterVideoForm 
+            initialData={chapter}
+            chapterId={params.chapterId}
+            courseId={params.courseId}
+          />
         </article>
       </section>
     </main>
   );
 }
-export default ChapterIdPage
+export default ChapterIdPage;
