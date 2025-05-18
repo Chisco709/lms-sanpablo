@@ -8,6 +8,9 @@ import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
+import { Banner } from "@/components/banner";
+import { ChapterActions } from "./_components/chapter-actions";
+
 
 const ChapterIdPage = async({
     params
@@ -24,9 +27,6 @@ const ChapterIdPage = async({
         where: {
             id: params.chapterId,
             courseId: params.courseId
-        },
-        include: {
-            muxData: true
         }
     })
 
@@ -42,10 +42,17 @@ const ChapterIdPage = async({
 
     const totalFields = requiredFields.length;
     const completedFields = requiredFields.filter(Boolean).length
-
     const completionText = `(${completedFields}/${totalFields})`
+    const isComplete = requiredFields.every(Boolean)
 
     return (
+      <>
+      {!chapter.isPublished && (
+        <Banner 
+          variant="warning"
+          label="Este capítulo no está publicado y no será visible en el curso"
+        />
+      )}
     <main className="p-6 max-w-6xl mx-auto">
       <header className="mb-8">
         <Link
@@ -58,12 +65,18 @@ const ChapterIdPage = async({
 
         <section className="flex flex-col gap-y-2 mb-8">
           <h1 className="text-2xl font-medium">
-            Crear capítulo
+            {chapter.title || "Nuevo capítulo"}
           </h1>
           <p className="text-sm text-slate-700">
-            Completar todos los campos {completionText}
+            Campos completados {completionText}
           </p>
         </section>
+        <ChapterActions 
+          disabled={!isComplete}
+          courseId={params.courseId}
+          chapterId={params.chapterId}
+          isPublished={chapter.isPublished}
+        />
       </header>
 
       <section className="space-y-6">
@@ -108,7 +121,7 @@ const ChapterIdPage = async({
           <header className="flex items-center gap-x-2">
             <IconBadge icon={Video}/>
             <h2 className="text-xl">
-              Subir video
+              URL del Video (YouTube)
             </h2>
           </header>
           <ChapterVideoForm 
@@ -119,6 +132,8 @@ const ChapterIdPage = async({
         </article>
       </section>
     </main>
+    </>
   );
 }
+
 export default ChapterIdPage;
