@@ -26,15 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider  afterSignOutUrl="/">
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ToastProvider />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider afterSignOutUrl="/" afterSignInUrl="/">
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <ToastProvider />
+          {children}
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
