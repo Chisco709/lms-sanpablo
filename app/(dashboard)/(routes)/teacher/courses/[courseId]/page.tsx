@@ -12,6 +12,7 @@ import { CategoryForm } from "./_components/category-form";
 import { PriceForm } from "./_components/price-form";
 import { AttachmentForm } from "./_components/attachment-form";
 import { ChaptersForm } from "./_components/chapters-form";
+import { CourseActions } from "./_components/course-actions";
 
 import { Course, Category, Attachment, Chapter } from "@prisma/client";
 
@@ -90,7 +91,14 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
 
     return (
       <div className="p-6">
-        <CourseHeader completionText={completionText} />
+        <div className="flex items-center justify-between">
+          <CourseHeader completionText={completionText} />
+          <CourseActions
+            disabled={completedFields !== totalFields}
+            courseId={params.courseId}
+            isPublished={course.isPublished}
+          />
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
           <CourseCustomizationSection

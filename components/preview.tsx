@@ -1,27 +1,15 @@
 "use client"
 
-import dynamic from "next/dynamic"
-import { useMemo } from "react"
-import "react-quill/dist/quill.bubble.css"  // <-- Usar CSS para modo preview
-
 interface PreviewProps {
-    value: string
+  value: string;
 }
 
+// Preview simple usando dangerouslySetInnerHTML, elimina ReactQuill y dependencias innecesarias
 export const Preview = ({ value }: PreviewProps) => {
-    const ReactQuill = useMemo(() => dynamic(
-        () => import("react-quill").then(mod => mod.default),
-        { 
-            ssr: false,
-            loading: () => <div className="h-[200px] bg-gray-100 animate-pulse" />
-        }
-    ), [])
-
-    return (
-        <ReactQuill 
-            theme="bubble"  // <-- Usar theme "bubble" para preview
-            value={value}
-            readOnly
-        />
-    )
-}
+  return (
+    <div
+      className="prose prose-sm max-w-none text-gray-800 bg-white p-4 rounded-md border"
+      dangerouslySetInnerHTML={{ __html: value || "<p class='italic text-slate-500'>Sin descripción</p>" }}
+    />
+  );
+};

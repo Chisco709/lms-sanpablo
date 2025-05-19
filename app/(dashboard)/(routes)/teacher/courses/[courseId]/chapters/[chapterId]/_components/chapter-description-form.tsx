@@ -59,11 +59,15 @@ export const ChapterDescriptionForm = ({
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values)
-            toast.success("Capitulo actualizada")
+            toast.success("Capítulo actualizado")
             toggleEdit()
             router.refresh()
-        } catch {
-            toast.error("Algo malo esta pasando")
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.data) {
+                toast.error(error.response.data);
+            } else {
+                toast.error("Error al actualizar el capítulo");
+            }
         }
     }
 
@@ -73,13 +77,12 @@ export const ChapterDescriptionForm = ({
                 Descripción del capítulo
                 <Button onClick={toggleEdit} variant="ghost">
                     {isEditing ? (
-                        <>Cancel</>
+                        <>Cancelar</>
                     )  : (
                         <>
                         <Pencil className="h-4 w-4 mr-2"/>
-                    Edit Description
-                    </>
-
+                        Editar descripción
+                        </>
                     )}
                 </Button>
             </div>
@@ -99,33 +102,32 @@ export const ChapterDescriptionForm = ({
             {isEditing && (
                 <Form {...form}>
                     <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4 mt-4"
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4 mt-4"
                     >
                         <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field}) => (
-                        <FormItem>
-                            <FormControl>
-                                <Editor
-                                {...field }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>    
-                        )}
+                            control={form.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Editor
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>    
+                            )}
                         />
 
                         <div className="flex items-center gap-x-2">
                             <Button
-                            disabled={!isValid || isSubmitting}
-                            type="submit"
+                                disabled={!isValid || isSubmitting}
+                                type="submit"
                             >
                                 Guardar
                             </Button>
                         </div>
-                        
                     </form>
                 </Form>
             )}

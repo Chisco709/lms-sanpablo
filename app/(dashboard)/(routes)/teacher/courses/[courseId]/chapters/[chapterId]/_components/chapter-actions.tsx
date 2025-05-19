@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 export const ChapterActions = ({
   disabled,
@@ -19,27 +20,32 @@ export const ChapterActions = ({
 
   const handlePublish = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/${isPublished ? "unpublish" : "publish"}`, {
-        method: "PATCH",
-      });
-      if (!response.ok) throw new Error("Error al publicar");
+      const response = await axios.patch(
+        `/api/courses/${courseId}/chapters/${chapterId}/${isPublished ? "unpublish" : "publish"}`
+      );
+      
       toast.success(isPublished ? "Capítulo despublicado" : "Capítulo publicado");
       router.refresh();
     } catch (error) {
-      toast.error("Error al actualizar");
+      if (axios.isAxiosError(error) && error.response?.data) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("Error al actualizar el capítulo");
+      }
     }
   };
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Error al eliminar");
+      await axios.delete(`/api/courses/${courseId}/chapters/${chapterId}`);
       toast.success("Capítulo eliminado");
       router.push(`/teacher/courses/${courseId}`);
     } catch (error) {
-      toast.error("Error al eliminar");
+      if (axios.isAxiosError(error) && error.response?.data) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("Error al eliminar el capítulo");
+      }
     }
   };
 
