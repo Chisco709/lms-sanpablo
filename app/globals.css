@@ -5,6 +5,15 @@
 html,
 body,
 :root {
+  --primary-yellow: #FFD700;
+  --primary-black: #111111;
+  --dark-black: #000000;
+  --accent-green: #4CAF50;
+  --light-yellow: #FFF8DC;
+  --dark-yellow: #DAA520;
+  --light-gray: #333333;
+  --medium-gray: #444444;
+  --white: #F5F5F5;
   height: 100%;
 }
 
@@ -154,3 +163,6 @@ body,
 .ql-container {
   font-size: 16px 
 }
+
+
+
