@@ -1,3 +1,27 @@
+/* Animaciones globales para dashboard y landing */
+@keyframes float {
+  0% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-60px) rotate(12deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+@keyframes float-slow {
+  0% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-35px) rotate(-10deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float-slow 12s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(1.05); }
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 @import "tailwindcss";
 @import "tw-animate-css";
 
