@@ -458,114 +458,134 @@ div[class*="bg-slate"] {
   animation: gradient-flow 8s ease infinite;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-html,
-body {
-  height: 100%;
-}
-
-@layer utilities {
-  /* Animaciones inspiradas en ReactBits */
-  .animate-in {
-    animation-fill-mode: both;
-  }
-
-  .fade-in {
-    animation: fadeIn 0.7s ease-out;
-  }
-
-  .zoom-in {
-    animation: zoomIn 0.5s ease-out;
-  }
-
-  .slide-in-from-left {
-    animation: slideInFromLeft 0.5s ease-out;
-  }
-
-  .slide-in-from-bottom {
-    animation: slideInFromBottom 0.5s ease-out;
-  }
-
-  .duration-300 {
-    animation-duration: 0.3s;
-  }
-
-  .duration-500 {
-    animation-duration: 0.5s;
-  }
-
-  .duration-700 {
-    animation-duration: 0.7s;
-  }
-
-  .delay-200 {
-    animation-delay: 0.2s;
-  }
-
-  .delay-300 {
-    animation-delay: 0.3s;
-  }
-
-  .delay-400 {
-    animation-delay: 0.4s;
-  }
-
-  .delay-500 {
-    animation-delay: 0.5s;
-  }
-
-  .delay-600 {
-    animation-delay: 0.6s;
-  }
-
-  .delay-700 {
-    animation-delay: 0.7s;
-  }
-}
-
-@keyframes fadeIn {
+/* Animaciones adicionales para UI minimalista */
+@keyframes orbit {
   from {
-    opacity: 0;
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
   }
   to {
+    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+  }
+}
+
+@keyframes float-up {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Clases utilitarias para efectos minimalistas */
+.glass-morphism {
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #FACC15 0%, #22C55E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.3);
+}
+
+/* Scrollbar minimalista */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FACC15 0%, #22C55E 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FACC15 20%, #22C55E 80%);
+}
+
+/* Efectos de transición suaves */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mejoras para componentes de curso */
+.course-card-hover {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Animación de carga elegante */
+@keyframes elegant-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
     opacity: 1;
   }
 }
 
-@keyframes zoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.animate-elegant-pulse {
+  animation: elegant-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Bordes gradient animados */
+.animated-border {
+  position: relative;
+  background: #1E293B;
+  border-radius: 1rem;
 }
 
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(45deg, #FACC15, #22C55E, #FACC15);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: gradient-shift 3s ease infinite;
+  background-size: 200% 200%;
+}
+
+/* Focus states mejorados */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #FACC15;
+  outline-offset: 2px;
+}
+
+/* Transiciones de página suaves */
+.page-transition {
+  animation: fadeIn 0.5s ease-out;
 }
 
 

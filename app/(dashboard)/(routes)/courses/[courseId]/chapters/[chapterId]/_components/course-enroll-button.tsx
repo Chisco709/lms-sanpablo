@@ -36,10 +36,19 @@ export const CourseEnrollButton = ({
     <Button
       onClick={onClick}
       disabled={isLoading}
-      size="sm"
-      className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700"
+      size="lg"
+      className="w-full bg-gradient-to-r from-yellow-400 to-green-400 hover:from-yellow-500 hover:to-green-500 text-slate-900 font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-0 rounded-xl h-12"
     >
-      Inscribirse por {formatPrice(price)}
+      {isLoading ? (
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
+          Procesando...
+        </div>
+      ) : (
+        <>
+          🚀 Inscribirse por {formatPrice(price)}
+        </>
+      )}
     </Button>
   )
 } 

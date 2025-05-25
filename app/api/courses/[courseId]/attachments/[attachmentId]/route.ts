@@ -2,14 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
-export async function POST(
+export async function DELETE(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: { courseId: string; attachmentId: string } }
 ) {
   try {
     const { userId } = await auth();
-    const { url } = await req.json();
-    const { courseId } = await params;
+    const { courseId, attachmentId } = await params;
     
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });
@@ -26,17 +25,16 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
-    const attachment = await db.attachment.create({
-      data: {
-        url,
-        name: url.split("/").pop() || "archivo",
+    const attachment = await db.attachment.delete({
+      where: {
+        id: attachmentId,
         courseId: courseId,
       },
     });
 
     return NextResponse.json(attachment);
   } catch (error) {
-    console.error("[CREATE_ATTACHMENT]", error);
+    console.error("[DELETE_ATTACHMENT]", error);
     return new NextResponse("Error interno", { status: 500 });
   }
-}
+} 

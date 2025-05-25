@@ -1,3 +1,6 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { MobileSidebar } from './mobile-sidebar';
 import { NavbarRoutes } from "@/components/navbar-routes";
 import { SignedOut } from "@clerk/nextjs"
@@ -6,40 +9,45 @@ import { SignInButton } from "@clerk/nextjs";
 import { Search } from "lucide-react";
 
 export const Navbar = () => {
+    const pathname = usePathname();
+    
+    // Ocultar navbar en páginas de curso
+    const isCoursePage = pathname?.includes('/courses/') && !pathname?.includes('/teacher/courses');
+    
+    if (isCoursePage) {
+        return null;
+    }
+
     return (
-        <div className="p-4 border-b border-slate-700/50 h-full flex items-center bg-slate-900 shadow-sm">
-            {/* Logo y mobile sidebar */}
-            <div className="flex items-center">
-                <MobileSidebar />
-                <div className="hidden md:flex items-center space-x-2 ml-4">
-                    <div className="w-8 h-8 bg-green-400 rounded-lg flex items-center justify-center">
-                        <span className="text-slate-900 font-bold text-lg">P</span>
+        <div className="relative z-50">
+            {/* Navbar principal con glassmorphism */}
+            <div className="fixed top-0 left-0 right-0 h-16 backdrop-blur-xl bg-[#0F172A]/80 border-b border-white/5">
+                <div className="h-full px-4 md:px-6 flex items-center justify-between">
+                    {/* Lado izquierdo */}
+                    <div className="flex items-center gap-4">
+                        <MobileSidebar />
+                        
+                        {/* Logo minimalista */}
+                        <div className="hidden md:flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center">
+                                <span className="text-black font-bold text-lg">S</span>
+                            </div>
+                            <span className="text-white font-semibold text-lg">SanPablo</span>
+                        </div>
                     </div>
-                    <span className="text-white font-bold text-xl">Platzi</span>
+
+                    {/* Lado derecho */}
+                    <div className="flex items-center gap-4">
+                        <NavbarRoutes />
+                    </div>
                 </div>
+
+                {/* Línea de gradiente decorativa */}
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent"></div>
             </div>
             
-            {/* Barra de búsqueda central */}
-            <div className="flex-1 max-w-2xl mx-8 hidden md:block">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                    <input
-                        type="text"
-                        placeholder="¿Qué quieres aprender?"
-                        className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
-                    />
-                </div>
-            </div>
-            
-            {/* Elementos del usuario */}
-            <div className="flex items-center space-x-4">
-                <NavbarRoutes />
-                <SignedOut>
-                    <Button className="bg-green-400 text-slate-900 hover:bg-green-300 font-semibold" asChild>
-                        <SignInButton>Iniciar Sesión</SignInButton>
-                    </Button>
-                </SignedOut>
-            </div>
+            {/* Espaciador para el contenido */}
+            <div className="h-16"></div>
         </div>
     )
 }

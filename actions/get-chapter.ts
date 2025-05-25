@@ -47,7 +47,8 @@ export const getChapter = async ({
     let attachments: Attachment[] = [];
     let nextChapter: Chapter | null = null;
 
-    if (purchase) {
+    // Obtener attachments si el usuario tiene acceso (compró el curso o el capítulo es gratuito)
+    if (purchase || chapter.isFree) {
       attachments = await db.attachment.findMany({
         where: {
           courseId: courseId,

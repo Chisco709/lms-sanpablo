@@ -1,24 +1,44 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Navbar } from "./_components/navbar";
 import { Sidebar } from "./_components/sidebar";
 
 const DashboardLayout = ({children} : { children: React.ReactNode }) => {
+    const pathname = usePathname();
+    
+    // Detectar si estamos en una página de curso
+    const isCoursePage = pathname?.includes('/courses/') && !pathname?.includes('/teacher/courses');
+    
     return (
         <div className="h-full bg-slate-950 min-h-screen">
-            {/* Navbar fijo */}
-            <div className="h-[80px] md:pl-56 fixed inset-y-0 w-full z-50">
-                <Navbar />
-            </div>
-            
-            {/* Sidebar */}
-            <div className="hidden md:flex h-full w-56 flex-col fixed inset-y-0 z-50">
-                <Sidebar />
-            </div>
-            
-            {/* Contenido principal */}
-            <main className="md:pl-56 pt-[80px] h-full min-h-screen bg-slate-950">
-                <div className="h-full p-6 bg-slate-950">
-                    {children}
+            {/* Navbar fijo - Solo se muestra si no es página de curso */}
+            {!isCoursePage && (
+                <div className="h-[80px] md:pl-56 fixed inset-y-0 w-full z-50">
+                    <Navbar />
                 </div>
+            )}
+            
+            {/* Sidebar - Solo se muestra si no es página de curso */}
+            {!isCoursePage && (
+                <div className="hidden md:flex h-full w-56 flex-col fixed inset-y-0 z-50">
+                    <Sidebar />
+                </div>
+            )}
+            
+            {/* Contenido principal - Padding condicional */}
+            <main className={`h-full min-h-screen bg-slate-950 ${
+                isCoursePage 
+                    ? '' // Sin padding para páginas de curso
+                    : 'md:pl-56 pt-[80px]' // Con padding para otras páginas
+            }`}>
+                {isCoursePage ? (
+                    children // Sin wrapper adicional para páginas de curso
+                ) : (
+                    <div className="h-full p-6 bg-slate-950">
+                        {children}
+                    </div>
+                )}
             </main>
         </div>
     )
