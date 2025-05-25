@@ -103,7 +103,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
               <Link
                 href="/sign-in"
-                className="px-6 py-3 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-300 text-center transform hover:-translate-y-1 hover:shadow-[0_7px_14px_rgba(255,222,0,0.3)] mb-6 md:mb-0 md:ml-8"
+                className="px-6 py-3 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-300 text-center transform hover:-translate-y-1 hover:shadow-[0_7px_14px_rgba(255,222,0,0.3)]"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Iniciar Sesión 
@@ -189,11 +189,12 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-green-500/20 rounded-2xl blur-3xl opacity-30 transform -rotate-6"></div>
               <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)] transform perspective-[1000px] rotate-1 hover:rotate-0 transition-transform duration-500 border border-white/10">
                 <Image
-                  src="/imagen-principio.jpg"
-                  alt="Banner"
+                  src="/placeholder.svg?height=600&width=800"
+                  alt="SanPablo LMS Platform"
                   width={800}
-                  height={400}
-                  className="w-full object-contain bg-black"
+                  height={600}
+                  priority
+                  className="w-full h-auto transition-transform duration-500 hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                 <div className="absolute bottom-0 left-0 w-full p-6">
@@ -301,7 +302,7 @@ export default function LandingPage() {
               <div className="grid md:grid-cols-2">
                 <div className="h-64 sm:h-80 md:h-full overflow-hidden relative">
                   <Image
-                    src="/infancia-imagen.jpg"
+                    src="/placeholder.svg?height=400&width=600"
                     alt="Early Childhood Education"
                     width={600}
                     height={400}
@@ -309,24 +310,24 @@ export default function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-transparent"></div>
                   <div className="absolute top-4 left-4 bg-yellow-400 text-black font-bold px-3 py-1 rounded-md text-sm">
-                    Popular
+                    Featured
                   </div>
                 </div>
                 <div className="p-6 sm:p-8 md:p-10">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-yellow-400 relative">
-                    Educación A La Primera Infancia
+                    Early Childhood Education
                     <div className="h-1 w-16 bg-green-500 mt-3"></div>
                   </h3>
                   <p className="text-gray-300 mb-6 leading-relaxed text-sm sm:text-base">
-                    Formación integral para educadores que trabajan con niños pequeños, que abarca el desarrollo, la planificación del plan de estudios y la gestión del aula con técnicas prácticas.
-                    y gestión del aula con técnicas prácticas.
+                    Comprehensive training for educators working with young children, covering development, curriculum
+                    planning, and classroom management with hands-on practical techniques.
                   </p>
                   <ul className="space-y-3 mb-8">
                     {[
-                      "Fundamentos sobre el desarrollo infantil",
-                      "Currículo y planificación de actividades",
-                      "Tecnicas de gestión del aula",
-                      "Habilidades de comunicación y colaboración",
+                      "Child development fundamentals",
+                      "Curriculum design techniques",
+                      "Classroom management strategies",
+                      "Parent communication skills",
                     ].map((item, index) => (
                       <li key={index} className="flex items-center text-white">
                         <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mr-3 flex-shrink-0">
@@ -340,7 +341,7 @@ export default function LandingPage() {
                     href="/sign-in"
                     className="px-6 py-3 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 transition-all duration-300 inline-flex items-center group"
                   >
-                    Entra Ahora
+                    Enroll Now
                     <ArrowRight
                       size={16}
                       className="ml-2 transition-transform duration-300 group-hover:translate-x-1"
@@ -355,7 +356,7 @@ export default function LandingPage() {
               <div className="grid md:grid-cols-2">
                 <div className="order-1 md:order-2 h-64 sm:h-80 md:h-full overflow-hidden relative">
                   <Image
-                    src="/ingles-imagen.jpg"
+                    src="/placeholder.svg?height=400&width=600"
                     alt="English Language Learning"
                     width={600}
                     height={400}
@@ -368,19 +369,19 @@ export default function LandingPage() {
                 </div>
                 <div className="order-2 md:order-1 p-6 sm:p-8 md:p-10">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-yellow-400 relative">
-                    Aprendizaje del Idioma Inglés
+                    English Language Learning
                     <div className="h-1 w-16 bg-green-500 mt-3"></div>
                   </h3>
                   <p className="text-gray-300 mb-6 leading-relaxed text-sm sm:text-base">
-                    Programas interactivos de inglés para todos los niveles, con práctica de conversación, gramática
-                    gramática, contexto cultural e itinerarios de aprendizaje personalizados.
+                    Interactive English programs for all proficiency levels, featuring conversation practice, grammar
+                    instruction, cultural context, and personalized learning paths.
                   </p>
                   <ul className="space-y-3 mb-8">
                     {[
-                      "Practica de conversaciónal",
-                      "Construcción de gramatica y vocabulario",
-                      "Modulos de ingles para negocios",
-                      "Contextos culturales y sociales",
+                      "Conversational English practice",
+                      "Grammar and vocabulary building",
+                      "Business English modules",
+                      "Cultural context and idioms",
                     ].map((item, index) => (
                       <li key={index} className="flex items-center text-white">
                         <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mr-3 flex-shrink-0">
@@ -394,7 +395,7 @@ export default function LandingPage() {
                     href="/sign-in"
                     className="px-6 py-3 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 transition-all duration-300 inline-flex items-center group"
                   >
-                    Entra Ahora
+                    Enroll Now
                     <ArrowRight
                       size={16}
                       className="ml-2 transition-transform duration-300 group-hover:translate-x-1"
@@ -416,13 +417,13 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-block mb-4 px-4 py-1.5 bg-yellow-400/10 rounded-full border border-yellow-400/20">
-              <span className="text-yellow-400 text-sm font-medium">Testimoniales</span>
+              <span className="text-yellow-400 text-sm font-medium">Testimonials</span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 relative inline-block">
-              Lo que <span className="text-yellow-400">Nuestros Estudiantes</span> Dicen
+              What Our <span className="text-yellow-400">Students</span> Say
             </h2>
             <div className="h-1 w-20 bg-gradient-to-r from-yellow-400 to-green-500 mx-auto mb-6 rounded-full"></div>
-            <p className="text-gray-300 text-base sm:text-lg px-4">Historias de exito de nuestra comunidad de estudiantes</p>
+            <p className="text-gray-300 text-base sm:text-lg px-4">Success stories from our community of learners</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -499,23 +500,23 @@ export default function LandingPage() {
 
             <div className="text-center relative">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-yellow-400 to-green-500 bg-clip-text text-transparent">
-                ¿Estas Listo para Transformar Tu Aprendizaje?
+                Ready to Transform Your Learning Journey?
               </h2>
               <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
-                Únete a miles de estudiantes y educadores que han elevado sus habilidades con SanPablo LMS. Comienza tu
-                viaje hoy y libera todo tu potencial.
+                Join thousands of students and educators who have elevated their skills with SanPablo LMS. Start your
+                journey today and unlock your full potential.
               </p>
               <Link
                 href="/sign-in"
                 className="px-8 sm:px-10 py-3 sm:py-4 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_7px_14px_rgba(255,222,0,0.3)] inline-flex items-center justify-center group text-base sm:text-lg"
               >
-                Inicia Sesión Ahora
+                Sign In Now
                 <ArrowRight size={20} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <div className="mt-6 text-sm text-gray-400">
-                Nuevo En SanPablo?{" "}
+                New to SanPablo?{" "}
                 <Link href="/sign-up" className="text-yellow-400 hover:underline">
-                  Crea una cuenta
+                  Create an account
                 </Link>
               </div>
             </div>
@@ -538,8 +539,8 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                Capacitar a educadores y alumnos con tecnología innovadora y programas de formación completos
-                diseñados para el éxito en el mundo real.
+                Empowering educators and learners with innovative technology and comprehensive training programs
+                designed for real-world success.
               </p>
               <div className="flex space-x-4">
                 {["facebook", "twitter", "instagram", "linkedin"].map((social) => (
@@ -559,13 +560,15 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:col-span-2">
               <div>
                 <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
-                  Programas
+                  Programs
                   <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
                 </h3>
                 <ul className="space-y-3">
                   {[
-                    "Educación A la Primera Infancia",
-                    "Aprendizaje del Idioma Inglés",
+                    "Early Childhood Education",
+                    "English Language Learning",
+                    "Professional Development",
+                    "Certification Courses",
                   ].map((item, index) => (
                     <li key={index}>
                       <Link
@@ -582,7 +585,7 @@ export default function LandingPage() {
 
               <div>
                 <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
-                  Compañia
+                  Company
                   <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
                 </h3>
                 <ul className="space-y-3">
@@ -600,6 +603,25 @@ export default function LandingPage() {
                 </ul>
               </div>
 
+              <div>
+                <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
+                  Resources
+                  <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
+                </h3>
+                <ul className="space-y-3">
+                  {["Blog", "Guides", "Webinars", "Support"].map((item, index) => (
+                    <li key={index}>
+                      <Link
+                        href={`/${item.toLowerCase()}`}
+                        className="text-gray-400 hover:text-yellow-400 transition-colors duration-300 pl-4 relative group"
+                      >
+                        <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-yellow-400/50 rounded-full group-hover:bg-yellow-400 transition-colors duration-300"></span>
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
 

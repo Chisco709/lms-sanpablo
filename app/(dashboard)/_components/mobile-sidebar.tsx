@@ -10,10 +10,10 @@ import {
 export const MobileSidebar = () => {
     return (
         <Sheet>
-            <SheetTrigger className="md:hidden pr-4 hover:opacity-75 transition">
+            <SheetTrigger className="md:hidden pr-4 hover:opacity-75 transition text-white">
                 <Menu />
             </SheetTrigger>     
-            <SheetContent side="left" className="p-0 bg-white">
+            <SheetContent side="left" className="p-0 bg-slate-900 border-slate-700">
                 <Sidebar/>
             </SheetContent>
         </Sheet>

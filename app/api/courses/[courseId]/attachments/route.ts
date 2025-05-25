@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server"; // <-- Cambio 1: Import desde /server
-import db from "@/lib/db";
+import { db } from "@/lib/db";
 
 export async function DELETE(
   req: Request,

@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CircleDollarSign, LayoutDashboard, ListChecks, File } from "lucide-react";
 
-import db from "@/lib/db";
+import { db } from "@/lib/db";
 import { IconBadge } from "@/components/icon-badge";
 import { TitleForm } from "./_components/title-form";
 import { DescriptionForm } from "./_components/description-form";
@@ -34,6 +34,7 @@ interface CategoryOption {
 
 export default async function CourseIdPage({ params }: CourseIdPageProps) {
   const { userId } = await auth();
+  const { courseId } = await params;
 
   if (!userId) {
     return redirect("/");
@@ -42,7 +43,7 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
   try {
     const course = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId
       },
       include: {
@@ -95,7 +96,7 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
           <CourseHeader completionText={completionText} />
           <CourseActions
             disabled={completedFields !== totalFields}
-            courseId={params.courseId}
+            courseId={courseId}
             isPublished={course.isPublished}
           />
         </div>

@@ -1,7 +1,7 @@
 // app/api/courses/[courseId]/chapters/[chapterId]/route.ts
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
 
 export async function PATCH(
   req: Request,

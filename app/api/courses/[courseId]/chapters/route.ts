@@ -1,4 +1,4 @@
-import db from "@/lib/db"
+import { db } from "@/lib/db"
 import { auth } from "@clerk/nextjs/server"; // Cambio clave aquí
 import { NextResponse } from "next/server"
 

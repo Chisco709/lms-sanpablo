@@ -34,12 +34,12 @@ export default async function Home() {
         <p className="text-gray-300 text-lg">Bienvenido a tu panel de aprendizaje</p>
       </div>
       <div className="grid gap-8 md:grid-cols-2 w-full max-w-2xl relative z-20">
-        <Link href="/search" className="group">
+        <Link href="/student" className="group">
           <div className="w-full h-36 flex flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400/10 to-green-500/10 border border-yellow-400/30 shadow-lg transition-all duration-300 hover:scale-105 hover:border-yellow-400/60 hover:shadow-[0_8px_32px_rgba(34,197,94,0.15)] cursor-pointer relative overflow-hidden">
             {/* Icono decorativo */}
             <div className="absolute -top-6 -left-6 w-16 h-16 bg-yellow-400/20 rounded-full blur-xl animate-float-slow z-0" />
             <span className="text-2xl font-semibold text-white mb-2 group-hover:text-yellow-400 transition relative z-10">Estudiante</span>
-            <span className="text-green-400 text-sm font-medium group-hover:text-yellow-300 transition relative z-10">Explora todos los cursos disponibles</span>
+            <span className="text-green-400 text-sm font-medium group-hover:text-yellow-300 transition relative z-10">Accede a tus cursos y explora nuevos</span>
           </div>
         </Link>
         <Link href="/teacher/courses" className="group">

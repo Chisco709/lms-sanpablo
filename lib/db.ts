@@ -12,10 +12,8 @@ const prismaGlobal = globalThis as typeof globalThis & {
 }
 
 // Inicialización de PrismaClient
-const db = prismaGlobal._prisma ?? new PrismaClient()
+export const db = prismaGlobal._prisma ?? new PrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
   prismaGlobal._prisma = db
 }
-
-export default db

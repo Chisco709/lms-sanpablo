@@ -1,32 +1,40 @@
 "use client";
 
-import { Layout, Compass, List, BarChart, LogOut } from "lucide-react";
+import { Layout, GraduationCap, BookOpen, Trophy, User, BarChart3 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
-const guestRoutes = [
+const studentRoutes = [
   {
     icon: Layout,
-    label: "Dashboard",
+    label: "Inicio",
     href: "/",
   },
   {
-    icon: Compass,
-    label: "Browse",
-    href: "/search",
+    icon: GraduationCap,
+    label: "Mis Rutas",
+    href: "/student",
+  },
+  {
+    icon: User,
+    label: "Mi progreso",
+    href: "/progress",
+  },
+  {
+    icon: BarChart3,
+    label: "Mis certificados",
+    href: "/certificates",
   },
 ];
 
 const teacherRoutes = [
   {
-    icon: List,
-    label: "Courses",
+    icon: BookOpen,
+    label: "Mis Cursos",
     href: "/teacher/courses",
   },
   {
-    icon: BarChart,
+    icon: Trophy,
     label: "Analytics",
     href: "/teacher/analytics",
   },
@@ -35,11 +43,10 @@ const teacherRoutes = [
 export const SidebarRoutes = () => {
   const pathname = usePathname();
   const isTeacherPage = pathname?.startsWith("/teacher");
-  const isPlayerPage = pathname?.startsWith("/player");
-  const routes = isTeacherPage ? teacherRoutes : guestRoutes;
+  const routes = isTeacherPage ? teacherRoutes : studentRoutes;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full space-y-2">
       {routes.map((route) => (
         <SidebarItem
           key={route.href}
@@ -48,21 +55,6 @@ export const SidebarRoutes = () => {
           href={route.href}
         />
       ))}
-      {/* Si NO estás en teacher o player, muestra el botón "Teacher mode" */}
-      {isTeacherPage || isPlayerPage ? (
-        <Link href="/">
-          <Button size="sm" variant="ghost">
-            <LogOut className="h-4 w-4 mr-2" />
-            Exit
-          </Button>
-        </Link>
-      ) : (
-        <Link href="/teacher/courses">
-          <Button size="sm" variant="ghost">
-            Teacher mode
-          </Button>
-        </Link>
-      )}
     </div>
   );
 };
