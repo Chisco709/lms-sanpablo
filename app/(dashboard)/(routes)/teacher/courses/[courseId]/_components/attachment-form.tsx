@@ -99,20 +99,21 @@ export const AttachmentForm = ({
 
 
     return (
-        <div className="mt-6 border bg-slate-100 rounded-md p-4">
-            <div className="font-medium flex items-center justify-between">
-                Recursos del curso
+        <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+            <div className="font-medium flex items-center justify-between text-white">
+                Recursos del Curso
                 <Button
                     onClick={isEditing ? handleCancel : toggleEdit}
                     variant="ghost"
                     disabled={isSubmitting}
+                    className="text-slate-300 hover:text-white hover:bg-slate-700"
                 >
                     {isEditing ? (
                         <>Cancelar</>
                     ) : (
                         <>
                             <PlusCircle className="h-4 w-4 mr-2"/>
-                            Añadir archivo
+                            Añadir Archivo
                         </>
                     )}
                 </Button>
@@ -121,7 +122,7 @@ export const AttachmentForm = ({
             {!isEditing && (
                 <div className="mt-4 space-y-2">
                     {currentAttachments.length === 0 && (
-                        <p className="text-sm text-slate-500 italic">
+                        <p className="text-sm text-slate-400 italic">
                             No hay archivos adjuntos
                         </p>
                     )}
@@ -130,7 +131,7 @@ export const AttachmentForm = ({
                         return (
                             <div
                                 key={attachment.id}
-                                className="flex items-center p-3 w-full bg-white border rounded-md group hover:bg-sky-50 transition-colors"
+                                className="flex items-center p-3 w-full bg-slate-700/50 border border-slate-600 rounded-md group hover:bg-slate-600/50 transition-colors"
                             >
                                 {isImage ? (
                                     <div className="relative h-12 w-12 mr-3">
@@ -142,7 +143,7 @@ export const AttachmentForm = ({
                                         />
                                     </div>
                                 ) : (
-                                    <File className="h-12 w-12 p-2 mr-3 bg-slate-100 rounded-md"/>
+                                    <File className="h-12 w-12 p-2 mr-3 bg-slate-600 text-slate-300 rounded-md"/>
                                 )}
 
                                 <div className="flex-1 min-w-0">
@@ -150,13 +151,13 @@ export const AttachmentForm = ({
                                         href={attachment.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm font-medium hover:underline"
+                                        className="text-sm font-medium text-slate-200 hover:text-white hover:underline"
                                     >
                                         {attachment.name}
                                     </a>
-                                    <p className="text-xs text-muted-foreground">
-                                        {isPDF ? 'PDF Document' :
-                                         isImage ? 'Image File' :
+                                    <p className="text-xs text-slate-400">
+                                        {isPDF ? 'Documento PDF' :
+                                         isImage ? 'Archivo de Imagen' :
                                          'Archivo adjunto'}
                                     </p>
                                 </div>
@@ -184,11 +185,11 @@ export const AttachmentForm = ({
                         endpoint="courseAttachment"
                         onChange={(url) => url && onSubmit(url)}
                     />
-                    <div className="text-xs text-muted-foreground mt-2">
+                    <div className="text-xs text-slate-400 mt-2">
                         Formatos soportados: imágenes (JPEG, PNG, GIF), PDFs
                     </div>
                     {isSubmitting && (
-                        <div className="flex items-center gap-2 mt-2 text-sm text-sky-600">
+                        <div className="flex items-center gap-2 mt-2 text-sm text-emerald-400">
                             <Loader2 className="h-4 w-4 animate-spin"/>
                             Subiendo archivo...
                         </div>

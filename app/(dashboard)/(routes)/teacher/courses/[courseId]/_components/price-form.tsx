@@ -65,16 +65,16 @@ export const PriceForm = ({
     }
 
     return(
-         <div className="mt-6 border bg-slate-100 rounded-md p-4 ">
-            <div className="font-medium flex items-center justify-between">
-                Precio del curso
-                <Button onClick={toggleEdit} variant="ghost">
+         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+            <div className="font-medium flex items-center justify-between text-white">
+                Precio del Curso
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
                     {isEditing ? (
                         <>Cancelar</>
                     )  : (
                         <>
                         <Pencil className="h-4 w-4 mr-2"/>
-                    Editar precio
+                        Editar Precio
                     </>
 
                     )}
@@ -83,11 +83,12 @@ export const PriceForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    initialData.price && "text-slate-500 italic"
+                    !initialData.price && "text-slate-400 italic",
+                    initialData.price && "text-slate-300"
                 )}>
                     {initialData.price
                     ? formatPrice(initialData.price)
-                : "No tiene precio"
+                : "Sin precio establecido"
                 }
                 </p>
             )}
@@ -120,6 +121,7 @@ export const PriceForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                                 Guardar
                             </Button>

@@ -87,22 +87,22 @@ export const ChaptersForm = ({
 
 
   return (
-    <div className="relative mt-6 border bg-slate-100 rounded-md p-4 relative">
+    <div className="relative mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
       {isUpdating && (
-        <div className="absolute h-full w-full bg-slate-500/20 top-0 right-0 rounded-m flex items-center justify-center">
-          <Loader2 className="animate-spin h-6 w-6 text-sky-700"/>
+        <div className="absolute h-full w-full bg-slate-500/20 top-0 right-0 rounded-md flex items-center justify-center">
+          <Loader2 className="animate-spin h-6 w-6 text-emerald-400"/>
         </div>
       )}
       
-      <div className="font-medium flex items-center justify-between">
-        Capítulos del curso
-        <Button onClick={() => setIsCreating(!isCreating)} variant="ghost">
+      <div className="font-medium flex items-center justify-between text-white">
+        Capítulos del Curso
+        <Button onClick={() => setIsCreating(!isCreating)} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
           {isCreating ? (
             "Cancelar"
           ) : (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Añadir capítulo
+              Añadir Capítulo
             </>
           )}
         </Button>
@@ -134,9 +134,9 @@ export const ChaptersForm = ({
             <Button
               disabled={!isValid || isSubmitting}
               type="submit"
-              className="w-full md:w-auto"
+              className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              Crear capítulo
+              Crear Capítulo
             </Button>
           </form>
         </Form>
@@ -145,11 +145,11 @@ export const ChaptersForm = ({
       {!isCreating && (
         <div className={cn(
           "text-sm mt-2",
-          !initialData.chapters.length && "text-slate-500 italic"
+          !initialData.chapters.length && "text-slate-400 italic"
         )}>
           {!initialData.chapters.length && "No hay capítulos"}
           <ChaptersList
-            onEdit={(id: string) => router.push(`/teacher/courses/${courseId}/chapters/${id}`)} // Implementación real
+            onEdit={(id: string) => router.push(`/teacher/courses/${courseId}/chapters/${id}`)}
             onReorder={onReorder}
             items={initialData.chapters || []}
           />
@@ -157,7 +157,7 @@ export const ChaptersForm = ({
       )}
 
       {!isCreating && initialData.chapters.length > 0 && (
-        <p className="text-xs text-muted-foreground mt-4"> {/* Corregido text-x5 -> text-xs */}
+        <p className="text-xs text-slate-400 mt-4">
           Arrastra y suelta para reordenar los capítulos
         </p>
       )}

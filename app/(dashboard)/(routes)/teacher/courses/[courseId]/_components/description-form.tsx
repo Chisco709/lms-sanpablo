@@ -66,16 +66,16 @@ export const DescriptionForm = ({
     }
 
     return(
-         <div className="mt-6 border bg-slate-100 rounded-md p-4 ">
-            <div className="font-medium flex items-center justify-between">
-                Course Description
-                <Button onClick={toggleEdit} variant="ghost">
+         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+            <div className="font-medium flex items-center justify-between text-white">
+                Descripción del Curso
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
                     {isEditing ? (
-                        <>Cancel</>
+                        <>Cancelar</>
                     )  : (
                         <>
                         <Pencil className="h-4 w-4 mr-2"/>
-                    Edit Description
+                        Editar Descripción
                     </>
 
                     )}
@@ -84,7 +84,8 @@ export const DescriptionForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    initialData.description && "text-slate-500 italic"
+                    !initialData.description && "text-slate-400 italic",
+                    initialData.description && "text-slate-300"
                 )}>
                     {initialData.description || "Sin descripción"}
                 </p>
@@ -116,6 +117,7 @@ export const DescriptionForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                                 Guardar
                             </Button>

@@ -1,14 +1,14 @@
 "use client"
 
 import qs from "query-string"
-import { LucideIcon } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { IconType } from "react-icons"
 import { cn } from "@/lib/utils"
 
 interface CategoryItemProps {
   label: string
   value?: string
-  icon?: LucideIcon
+  icon?: IconType
 }
 
 export const CategoryItem = ({
@@ -44,8 +44,8 @@ export const CategoryItem = ({
     <button
       onClick={onClick}
       className={cn(
-        "py-2 px-3 text-sm border border-slate-200 rounded-full flex items-center gap-x-1 hover:border-yellow-400 transition",
-        isSelected && "border-yellow-400 bg-yellow-400/10 text-yellow-600"
+        "py-2 px-3 text-sm border border-slate-700 rounded-full flex items-center gap-x-1 hover:border-yellow-400 transition",
+        isSelected && "border-yellow-400 bg-yellow-400/10 text-yellow-400"
       )}
       type="button"
     >

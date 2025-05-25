@@ -20,17 +20,25 @@ export const ChapterActions = ({
 
   const handlePublish = async () => {
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `/api/courses/${courseId}/chapters/${chapterId}/${isPublished ? "unpublish" : "publish"}`
       );
       
-      toast.success(isPublished ? "Capítulo despublicado" : "Capítulo publicado");
+      toast.success(isPublished ? "✅ Capítulo despublicado exitosamente" : "🎉 ¡Capítulo publicado! Los estudiantes ya pueden verlo");
       router.refresh();
+      
+      // Pequeño delay para asegurar que la UI se actualice
+      setTimeout(() => {
+        router.refresh();
+      }, 500);
+      
     } catch (error) {
+      console.error("Error publishing/unpublishing chapter:", error);
       if (axios.isAxiosError(error) && error.response?.data) {
-        toast.error(error.response.data);
+        toast.error(`❌ Error: ${error.response.data}`);
       } else {
-        toast.error("Error al actualizar el capítulo");
+        const action = isPublished ? "despublicar" : "publicar";
+        toast.error(`❌ Error al ${action} el capítulo. Inténtalo de nuevo.`);
       }
     }
   };

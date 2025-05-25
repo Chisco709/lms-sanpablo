@@ -65,6 +65,7 @@ model Chapter {
   title String
   description String? @db.Text
   videoUrl String? @db.Text
+  pdfUrl String? @db.Text
   position Int
   isPublished Boolean @default(false)
   isFree Boolean @default(false)
@@ -109,6 +110,7 @@ model Purchase {
   updatedAt DateTime @updatedAt()
 
   @@index([courseId])
+  @@unique([userId, courseId])
 }
 
 

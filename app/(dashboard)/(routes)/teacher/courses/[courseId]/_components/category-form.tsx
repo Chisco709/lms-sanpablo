@@ -66,16 +66,16 @@ export const CategoryForm = ({
     const selectedOption = options.find((option) => option.value === initialData.categoryId)
 
     return(
-         <div className="mt-6 border bg-slate-100 rounded-md p-4 ">
-            <div className="font-medium flex items-center justify-between">
-                Categoria del curso
-                <Button onClick={toggleEdit} variant="ghost">
+         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+            <div className="font-medium flex items-center justify-between text-white">
+                Categoría del Curso
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
                     {isEditing ? (
                         <>Cancelar</>
                     )  : (
                         <>
                         <Pencil className="h-4 w-4 mr-2"/>
-                        Editar categoria
+                        Editar Categoría
                         </>
                     )}
                 </Button>
@@ -83,9 +83,10 @@ export const CategoryForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.categoryId && "text-slate-500 italic"
+                    !initialData.categoryId && "text-slate-400 italic",
+                    initialData.categoryId && "text-slate-300"
                 )}>
-                    {selectedOption?.label || "Sin categoria"}
+                    {selectedOption?.label || "Sin categoría"}
                 </p>
             )}
             {isEditing && (
@@ -115,6 +116,7 @@ export const CategoryForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                                 Guardar
                             </Button>

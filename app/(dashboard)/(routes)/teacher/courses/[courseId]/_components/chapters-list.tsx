@@ -74,37 +74,39 @@ export const ChaptersList = ({
                 {(provided) => (
                   <div
                     className={cn(
-                      "flex items-center gap-x-2 bg-slate-200 border-slate-200 border text-slate-700 rounded-md mb-4 text-sm",
-                      chapter.isPublished && "bg-sky-100 border-sky-200 text-sky-700"
+                      "flex items-center gap-x-2 bg-slate-700/50 border-slate-600 border text-slate-200 rounded-md mb-4 text-sm hover:bg-slate-600/50 transition-colors",
+                      chapter.isPublished && "bg-emerald-500/10 border-emerald-500/30 text-emerald-200"
                     )}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                   >
                     <div
                       className={cn(
-                        "px-2 py-3 border-r border-r-slate-200 hover:bg-slate-300 rounded-l-md transition",
-                        chapter.isPublished && "border-r-sky-200 hover:bg-sky-200"
+                        "px-2 py-3 border-r border-r-slate-600 hover:bg-slate-600 rounded-l-md transition cursor-grab active:cursor-grabbing",
+                        chapter.isPublished && "border-r-emerald-500/30 hover:bg-emerald-500/20"
                       )}
                       {...provided.dragHandleProps}
                     >
-                      <GripVertical className="h-5 w-5" /> {/* Icono corregido */}
+                      <GripVertical className="h-5 w-5 text-slate-400" />
                     </div>
-                    <span className="truncate">{chapter.title}</span>
+                    <span className="truncate font-medium">{chapter.title}</span>
                     <div className="ml-auto pr-2 flex items-center gap-x-2">
                       {chapter.isFree && (
-                        <Badge variant="secondary">Gratis</Badge>
+                        <Badge className="bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                          Gratis
+                        </Badge>
                       )}
                       <Badge
                         className={cn(
-                          "bg-slate-500 text-white",
-                          chapter.isPublished && "bg-sky-700"
+                          "bg-slate-600 text-slate-200 border border-slate-500",
+                          chapter.isPublished && "bg-emerald-600 text-white border-emerald-500"
                         )}
                       >
-                        {chapter.isPublished ? "Publicado" : "Borrador"}
+                        {chapter.isPublished ? "✅ Publicado" : "📝 Borrador"}
                       </Badge>
                       <button
                         onClick={() => onEdit(chapter.id)}
-                        className="hover:opacity-75 transition"
+                        className="p-1 hover:bg-slate-600 rounded transition-colors text-slate-400 hover:text-white"
                         aria-label="Editar capítulo"
                       >
                         <Pencil className="w-4 h-4" />

@@ -40,31 +40,31 @@ export const ImageForm = ({
     }
 
     return(
-         <div className="mt-6 border bg-slate-100 rounded-md p-4">
-            <div className="font-medium flex items-center justify-between">
-                Imagen del curso
-                <Button onClick={toggleEdit} variant="ghost">
+         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+            <div className="font-medium flex items-center justify-between text-white">
+                Imagen del Curso
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
                     {isEditing && (
                         <>Cancelar</>
                     )}
                     {!isEditing && !initialData.imageUrl && (
                         <>
                             <PlusCircle className="h-4 w-4 mr-2"/>
-                            Añade una imagen
+                            Añadir Imagen
                         </>
                     )}
                     {!isEditing && initialData.imageUrl && (
                         <>
                             <Pencil className="h-4 w-4 mr-2"/>
-                            Editar imagen
+                            Editar Imagen
                         </>
                     )}
                 </Button>
             </div>
             {!isEditing && (
                 !initialData.imageUrl ? (
-                    <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-                        <ImageIcon className="h-10 w-10 text-slate-500" />
+                    <div className="flex items-center justify-center h-60 bg-slate-700/50 border border-slate-600 rounded-md">
+                        <ImageIcon className="h-10 w-10 text-slate-400" />
                     </div>
                 ) : (
                     <div className="relative h-[300px] w-full mt-2 overflow-hidden rounded-md">
@@ -87,8 +87,8 @@ export const ImageForm = ({
                             }
                         }}
                     />
-                    <div className="text-xs text-muted-foreground mt-4">
-                        16:9 aspect ratio recomendado
+                    <div className="text-xs text-slate-400 mt-4">
+                        Proporción 16:9 recomendada
                     </div>
                 </div>
             )}

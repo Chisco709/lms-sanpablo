@@ -24,12 +24,21 @@ export const columns: ColumnDef<Course>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="text-slate-300 hover:text-white hover:bg-slate-700"
         >
-          Titulo
+          Título
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
+    cell: ({ row }) => {
+      const title = row.getValue("title") as string
+      return (
+        <div className="font-medium text-white max-w-[200px] truncate">
+          {title}
+        </div>
+      )
+    }
   },
   {
     accessorKey: "price",
@@ -38,6 +47,7 @@ export const columns: ColumnDef<Course>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="text-slate-300 hover:text-white hover:bg-slate-700"
         >
           Precio
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -52,7 +62,7 @@ export const columns: ColumnDef<Course>[] = [
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(price)
-        return <div>{formatted}</div>
+        return <div className="font-medium text-green-400">{formatted}</div>
     }
   },
   {
@@ -62,19 +72,19 @@ export const columns: ColumnDef<Course>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="text-slate-300 hover:text-white hover:bg-slate-700"
         >
-          Publicado
+          Estado
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: ({row}) => {
-        // Basado en chapters-list: compara estrictamente con true
         const isPublished = row.getValue("isPublished") === true;
         return (
             <Badge className={cn(
-                "bg-slate-500 text-white",
-                isPublished && "bg-sky-700"
+                "bg-slate-600 text-slate-200 border-slate-500",
+                isPublished && "bg-green-600 text-white border-green-500"
             )}>
                 {isPublished ? "Publicado" : "Borrador"}
             </Badge>
@@ -83,22 +93,32 @@ export const columns: ColumnDef<Course>[] = [
   },
   {
     id: "actions",
+    header: "Acciones",
     cell: ({ row }) => {
         const { id } = row.original;
-        // El DropdownMenu solo se usa en client, así que useRouter está disponible
-        const router = require("next/navigation").useRouter?.() || null;
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-4 w-8 p-0">
+                    <Button 
+                      variant="ghost" 
+                      className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
+                    >
                         <span className="sr-only">Abrir menú</span>
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent 
+                  align="end" 
+                  className="bg-slate-800 border-slate-700"
+                >
+                    <DropdownMenuLabel className="text-slate-300">
+                      Acciones
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-700" />
                     <DropdownMenuItem
-                        onSelect={() => {
-                            if (router) router.push(`/teacher/courses/${id}`);
+                        className="text-slate-300 hover:bg-slate-700 hover:text-white cursor-pointer"
+                        onClick={() => {
+                            window.location.href = `/teacher/courses/${id}`;
                         }}
                     >
                         <Pencil className="h-4 w-4 mr-2" />

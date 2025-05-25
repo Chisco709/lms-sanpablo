@@ -24,6 +24,9 @@ export const ourFileRouter = {
         .onUploadComplete(() => {}),
     chapterVideo: f({ video: {maxFileCount: 1, maxFileSize: "512GB"}})
         .middleware(async () => await handleAuth())
+        .onUploadComplete(() => {}),
+    chapterPdf: f({ pdf: { maxFileSize: "16MB", maxFileCount: 1 } })
+        .middleware(async () => await handleAuth())
         .onUploadComplete(() => {})
 } 
 

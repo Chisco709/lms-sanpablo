@@ -1,9 +1,11 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import { CheckCircle, Clock, BookOpen, Trophy } from "lucide-react"
+import { CheckCircle, Clock, BookOpen, Trophy, Search, Plus } from "lucide-react"
 import { CoursesList } from "@/components/courses-list"
 import { InfoCard } from "./_components/info-card"
 import { getDashboardCourses } from "@/actions/get-dashboard-courses"
+import { getPublishedCourses } from "@/actions/get-published-courses"
+import Link from "next/link"
 
 export default async function Dashboard() {
   const { userId } = auth()
@@ -15,6 +17,8 @@ export default async function Dashboard() {
   const { completedCourses, coursesInProgress } = await getDashboardCourses(
     userId
   )
+  
+  const availableCourses = await getPublishedCourses()
 
   return (
     <div className="space-y-6">
@@ -79,15 +83,58 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      {/* Courses Section */}
+      {/* Mis Cursos Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">Mis Cursos</h2>
-          <button className="text-green-400 hover:text-green-300 text-sm font-medium">
-            Ver todos
-          </button>
+          <Link href="/search" className="text-green-400 hover:text-green-300 text-sm font-medium flex items-center gap-1">
+            <Search className="h-4 w-4" />
+            Explorar más
+          </Link>
         </div>
-        <CoursesList items={[...coursesInProgress, ...completedCourses]} />
+        {[...coursesInProgress, ...completedCourses].length > 0 ? (
+          <CoursesList items={[...coursesInProgress, ...completedCourses]} />
+        ) : (
+          <div className="bg-slate-800 rounded-lg p-8 text-center border border-slate-700">
+            <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
+              ¡Aún no tienes cursos!
+            </h3>
+            <p className="text-slate-400 mb-4">
+              Explora nuestra biblioteca de cursos y comienza tu aprendizaje
+            </p>
+            <Link 
+              href="/search"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-black font-medium rounded-lg hover:bg-green-400 transition-colors"
+            >
+              <Search className="h-4 w-4" />
+              Explorar Cursos
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Cursos Disponibles Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Cursos Disponibles</h2>
+          <Link href="/search" className="text-green-400 hover:text-green-300 text-sm font-medium">
+            Ver todos
+          </Link>
+        </div>
+        {availableCourses.length > 0 ? (
+          <CoursesList items={availableCourses.slice(0, 4)} />
+        ) : (
+          <div className="bg-slate-800 rounded-lg p-8 text-center border border-slate-700">
+            <Plus className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
+              No hay cursos disponibles
+            </h3>
+            <p className="text-slate-400">
+              Los profesores aún no han publicado cursos
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

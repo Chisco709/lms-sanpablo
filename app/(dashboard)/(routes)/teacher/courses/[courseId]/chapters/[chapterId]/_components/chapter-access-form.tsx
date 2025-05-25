@@ -67,12 +67,13 @@ export const ChapterAccessForm = ({
   };
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Configuración de acceso
+    <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
+      <div className="font-medium flex items-center justify-between text-white">
+        Configuración de Acceso
         <Button
           onClick={toggleEdit}
           variant="ghost"
+          className="text-slate-300 hover:text-white hover:bg-slate-700"
           aria-label={isEditing ? "Cancelar edición" : "Habilitar edición"}
         >
           {isEditing ? (
@@ -80,17 +81,17 @@ export const ChapterAccessForm = ({
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Editar acceso
+              Editar Acceso
             </>
           )}
         </Button>
       </div>
 
       {!isEditing && (
-        <p className="text-sm mt-2">
+        <p className="text-sm mt-2 text-slate-300">
           {initialData.isFree
-            ? "Este capítulo es gratuito"
-            : "Acceso requerido para este capítulo"}
+            ? "✅ Este capítulo es gratuito"
+            : "🔒 Acceso requerido para este capítulo"}
         </p>
       )}
 
@@ -104,17 +105,18 @@ export const ChapterAccessForm = ({
               control={form.control}
               name="isFree"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-white">
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-slate-600 p-4 bg-slate-700/50">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       aria-label="Acceso gratuito"
+                      className="border-slate-500 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormDescription>
-                      Marca esta opción para hacer el capítulo gratuito
+                    <FormDescription className="text-slate-300">
+                      Marca esta opción para hacer el capítulo gratuito para todos los estudiantes
                     </FormDescription>
                   </div>
                   <FormMessage />
@@ -127,8 +129,9 @@ export const ChapterAccessForm = ({
                 type="submit"
                 disabled={isSubmitting}
                 aria-disabled={isSubmitting}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                {isSubmitting ? "Guardando..." : "Guardar cambios"}
+                {isSubmitting ? "Guardando..." : "Guardar Cambios"}
               </Button>
             </div>
           </form>

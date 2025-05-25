@@ -36,7 +36,10 @@ export async function PATCH(
 
     return NextResponse.json(unpublishedCourse);
   } catch (error) {
-    console.log("[COURSE_UNPUBLISH]", error);
-    return new NextResponse("Error interno", { status: 500 });
+    console.error("[COURSE_UNPUBLISH]", error);
+    return new NextResponse(
+      "Error interno del servidor al despublicar el curso",
+      { status: 500 }
+    );
   }
 } 
