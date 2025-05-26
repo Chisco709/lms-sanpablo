@@ -5,10 +5,11 @@ import { NextResponse, NextRequest } from "next/server"
 
 export async function PATCH(
     req: NextRequest,
-    { params } : { params: { courseId: string }}
+    { params } : { params: Promise<{ courseId: string }> }
 ) {
     try{
         const { userId } = getAuth(req)
+        const { courseId } = await params;
         const values = await req.json()
         
         if (!userId) {
@@ -17,7 +18,7 @@ export async function PATCH(
 
         const course = await db.course.update({
             where: {
-                id: params.courseId,
+                id: courseId,
                 userId
             },
             data: {

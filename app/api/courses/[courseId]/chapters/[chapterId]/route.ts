@@ -5,10 +5,11 @@ import { db } from "@/lib/db";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
     const { userId } = await auth();
+    const { courseId, chapterId } = await params;
     const values = await req.json();
 
     if (!userId) return new NextResponse("No autorizado", { status: 401 });
@@ -16,7 +17,7 @@ export async function PATCH(
     // Verificar propiedad del curso
     const course = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId
       }
     });
@@ -26,8 +27,8 @@ export async function PATCH(
     // Actualizar capítulo
     const updatedChapter = await db.chapter.update({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId
+        id: chapterId,
+        courseId: courseId
       },
       data: {
         ...values

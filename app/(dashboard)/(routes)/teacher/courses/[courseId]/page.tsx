@@ -10,7 +10,7 @@ import { DescriptionForm } from "./_components/description-form";
 import { ImageForm } from "./_components/image-form";
 import { CategoryForm } from "./_components/category-form";
 import { PriceForm } from "./_components/price-form";
-import { AttachmentForm } from "./_components/attachment-form";
+
 import { ChaptersForm } from "./_components/chapters-form";
 import { CourseActions } from "./_components/course-actions";
 
@@ -76,7 +76,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
       course.title,
       course.description,
       course.imageUrl,
-      course.price,
       course.categoryId,
       hasPublishedChapters
     ];
@@ -198,7 +197,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
           <div className="space-y-6">
             <ChaptersSection course={course} />
             <PricingSection course={course} />
-            <ResourcesSection course={course} />
           </div>
         </div>
       </div>
@@ -309,23 +307,5 @@ function PricingSection({ course }: PricingSectionProps) {
   );
 }
 
-interface ResourcesSectionProps {
-  course: CourseWithAttachments;
-}
 
-function ResourcesSection({ course }: ResourcesSectionProps) {
-  return (
-    <div>
-      <div className="flex items-center gap-x-2">
-        <IconBadge icon={File} variant="info"/>
-        <h2 className="text-xl font-semibold text-white">
-          Recursos Adicionales
-        </h2>
-      </div>
-      <AttachmentForm
-        initialData={course}
-        courseId={course.id}
-      />
-    </div>
-  );
-}
+

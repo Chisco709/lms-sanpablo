@@ -49,7 +49,7 @@ export const Preview = ({ value }: PreviewProps) => {
   }
 
   return (
-    <div className="text-slate-300 leading-relaxed">
+    <div className="text-slate-200 leading-relaxed text-sm whitespace-pre-wrap">
       {cleanedText}
     </div>
   );

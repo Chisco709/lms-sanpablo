@@ -28,6 +28,7 @@ export const ChapterPdfForm = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tempPdfUrl, setTempPdfUrl] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const router = useRouter();
 
@@ -45,6 +46,7 @@ export const ChapterPdfForm = ({
       abortControllerRef.current.abort();
       toast.success("Subida cancelada");
     }
+    setTempPdfUrl(null);
     setIsEditing(false);
   };
 
@@ -65,6 +67,7 @@ export const ChapterPdfForm = ({
       );
       
       toast.success("📄 ¡Guía PDF subida exitosamente! Los estudiantes ya pueden descargarla");
+      setTempPdfUrl(null);
       setIsEditing(false);
       router.refresh();
       
@@ -252,20 +255,55 @@ export const ChapterPdfForm = ({
           </div>
 
           {/* Área de subida */}
-          <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 bg-slate-700/30">
-            <FileUpload
-              endpoint="chapterPdf"
-              onChange={(url) => url && onSubmit(url)}
-            />
-            
-            <div className="text-xs text-slate-400 mt-2">
-              Formatos soportados: PDF (máximo 16MB)
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 bg-slate-700/30">
+              <FileUpload
+                endpoint="chapterPdf"
+                onChange={(url) => {
+                  if (url) {
+                    setTempPdfUrl(url);
+                  }
+                }}
+              />
+              
+              <div className="text-xs text-slate-400 mt-2">
+                Formatos soportados: PDF (máximo 16MB)
+              </div>
             </div>
-            
-            {isSubmitting && (
-              <div className="flex items-center gap-2 mt-4 text-sm text-emerald-400">
-                <Loader2 className="h-4 w-4 animate-spin"/>
-                Subiendo PDF...
+
+            {tempPdfUrl && (
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <File className="h-5 w-5 text-yellow-400" />
+                    <div>
+                      <p className="text-yellow-200 font-medium">Archivo PDF listo para subir</p>
+                      <p className="text-yellow-300/70 text-sm">Confirma para guardar el archivo en el capítulo</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => setTempPdfUrl(null)}
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={() => onSubmit(tempPdfUrl)}
+                      disabled={isSubmitting}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Confirmar Subida
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

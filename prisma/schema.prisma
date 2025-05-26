@@ -151,7 +151,7 @@ model Chapter {
   position Int
   isPublished Boolean @default(false)
   isFree Boolean @default(false)
-
+  unlockDate DateTime? // Fecha de desbloqueo del capítulo
 
   courseId String
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)

@@ -29,7 +29,7 @@ interface PriceFormProps {
 }
 
 const formSchema = z.object({
-    price: z.coerce.number()
+    price: z.coerce.number().optional()
 })
 
 export const PriceForm = ({
@@ -67,7 +67,10 @@ export const PriceForm = ({
     return(
          <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
             <div className="font-medium flex items-center justify-between text-white">
-                Precio del Curso
+                <div className="flex items-center gap-2">
+                    <span>Precio del Curso</span>
+                    <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">Opcional</span>
+                </div>
                 <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
                     {isEditing ? (
                         <>Cancelar</>
@@ -88,7 +91,7 @@ export const PriceForm = ({
                 )}>
                     {initialData.price
                     ? formatPrice(initialData.price)
-                : "Sin precio establecido"
+                : "Curso gratuito - Sin precio establecido"
                 }
                 </p>
             )}

@@ -93,9 +93,13 @@ export const ChapterDescriptionForm = ({
                 )}>
                     {!initialData.description && "Sin descripción"}
                     {initialData.description && (
-                        <Preview 
-                        value={initialData.description}
-                        />
+                        <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-600/40 mt-4 shadow-lg">
+                            <div className="text-slate-200 leading-relaxed text-sm">
+                                <Preview 
+                                    value={initialData.description}
+                                />
+                            </div>
+                        </div>
                     )}
                 </div>
             )}

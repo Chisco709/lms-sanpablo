@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation"
 import Link from "next/link";
 import { db } from "@/lib/db"
-import { ArrowLeft, Eye, LayoutDashboard, Video, FileText } from "lucide-react";
+import { ArrowLeft, Eye, LayoutDashboard, Video, FileText, Calendar } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
@@ -10,6 +10,7 @@ import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
 import { ChapterPdfForm } from "./_components/chapter-pdf-form";
 import { ChapterGoogleForm } from "./_components/chapter-google-form";
+import { ChapterUnlockDateForm } from "./_components/chapter-unlock-date-form";
 import { Banner } from "@/components/banner";
 import { ChapterActions } from "./_components/chapter-actions";
 
@@ -113,6 +114,11 @@ const ChapterIdPage = async({
             </h2>
           </header>
           <ChapterAccessForm 
+            initialData={chapter}
+            courseId={courseId}
+            chapterId={chapterId}
+          />
+          <ChapterUnlockDateForm 
             initialData={chapter}
             courseId={courseId}
             chapterId={chapterId}
