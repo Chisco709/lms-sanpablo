@@ -9,6 +9,7 @@ import { ChapterDescriptionForm } from "./_components/chapter-description-form";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
 import { ChapterPdfForm } from "./_components/chapter-pdf-form";
+import { ChapterGoogleForm } from "./_components/chapter-google-form";
 import { Banner } from "@/components/banner";
 import { ChapterActions } from "./_components/chapter-actions";
 
@@ -142,6 +143,21 @@ const ChapterIdPage = async({
             </h2>
           </header>
           <ChapterPdfForm 
+            initialData={chapter}
+            chapterId={chapterId}
+            courseId={courseId}
+          />
+        </article>
+
+        {/* Sección de Google Form */}
+        <article className="space-y-6">
+          <header className="flex items-center gap-x-2">
+            <IconBadge icon={FileText} variant="info"/>
+            <h2 className="text-xl font-semibold text-white">
+              Formulario de Evaluación
+            </h2>
+          </header>
+          <ChapterGoogleForm 
             initialData={chapter}
             chapterId={chapterId}
             courseId={courseId}

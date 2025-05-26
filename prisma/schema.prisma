@@ -14,6 +14,72 @@ datasource db {
   relationMode = "prisma" 
 }
 
+// Nuevo modelo para Programas Técnicos
+model TechnicalProgram {
+  id String @id @default(uuid())
+  title String @db.Text
+  description String? @db.Text
+  imageUrl String? @db.Text
+  duration Int // Duración en meses (18 para 1.5 años)
+  price Float?
+  isActive Boolean @default(true)
+  
+  // Información específica para Colombia
+  senaCode String? // Código SENA si aplica
+  qualification String? // Título que otorga
+  modality String? // Presencial, Virtual, Mixta
+  
+  courses Course[]
+  enrollments ProgramEnrollment[]
+  academicPeriods AcademicPeriod[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Períodos académicos para control de desbloqueo
+model AcademicPeriod {
+  id String @id @default(uuid())
+  name String // "Período 1", "Período 2", etc.
+  startDate DateTime
+  endDate DateTime
+  unlockDate DateTime // Fecha cuando se desbloquea
+  isActive Boolean @default(false)
+  
+  programId String
+  program TechnicalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  courses Course[]
+  
+  @@index([programId])
+}
+
+// Inscripciones a programas técnicos
+model ProgramEnrollment {
+  id String @id @default(uuid())
+  userId String
+  
+  programId String
+  program TechnicalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  enrollmentDate DateTime @default(now())
+  startDate DateTime
+  expectedEndDate DateTime
+  status String @default("active") // active, paused, completed, dropped
+  
+  // Información del estudiante
+  studentId String? // Número de identificación
+  phone String?
+  city String?
+  department String? // Departamento de Colombia
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([programId])
+  @@unique([userId, programId])
+}
+
 model Course {
   id String @id @default(uuid())
   userId String
@@ -25,6 +91,20 @@ model Course {
 
   categoryId String?
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  // Relación con programa técnico
+  programId String?
+  program TechnicalProgram? @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  // Relación con período académico
+  periodId String?
+  period AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull)
+  
+  // Control de desbloqueo
+  unlockDate DateTime? // Fecha específica de desbloqueo
+  prerequisiteCourseId String? // Curso prerequisito
+  prerequisiteCourse Course? @relation("CoursePrerequisite", fields: [prerequisiteCourseId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  dependentCourses Course[] @relation("CoursePrerequisite")
 
   chapters Chapter[]
   attachments Attachment[]
@@ -34,8 +114,9 @@ model Course {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([programId])
+  @@index([periodId])
 }
-
 
 model Category {
   id String @id @default(uuid())
@@ -66,6 +147,7 @@ model Chapter {
   description String? @db.Text
   videoUrl String? @db.Text
   pdfUrl String? @db.Text
+  googleFormUrl String? @db.Text // URL del Google Form
   position Int
   isPublished Boolean @default(false)
   isFree Boolean @default(false)
@@ -75,6 +157,7 @@ model Chapter {
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   userProgress UserProgress[]
+  assignments Assignment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,4 +204,108 @@ model StripeCustomer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Sistema de notificaciones
+model Notification {
+  id String @id @default(uuid())
+  userId String
+  title String @db.Text
+  message String @db.Text
+  type String // course_unlock, assignment_due, program_update, etc.
+  isRead Boolean @default(false)
+  
+  // Datos adicionales según el tipo
+  relatedCourseId String?
+  relatedChapterId String?
+  relatedProgramId String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([isRead])
+}
+
+// Configuración de recordatorios automáticos
+model ReminderSettings {
+  id String @id @default(uuid())
+  userId String @unique
+  
+  // Configuraciones de recordatorios
+  emailReminders Boolean @default(true)
+  smsReminders Boolean @default(false)
+  pushNotifications Boolean @default(true)
+  
+  // Frecuencia de recordatorios
+  reminderFrequency String @default("weekly") // daily, weekly, monthly
+  
+  // Horario preferido para recordatorios
+  preferredTime String @default("09:00") // Formato HH:MM
+  timezone String @default("America/Bogota")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Asignaciones y tareas
+model Assignment {
+  id String @id @default(uuid())
+  title String @db.Text
+  description String? @db.Text
+  instructions String? @db.Text
+  
+  chapterId String
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  
+  dueDate DateTime?
+  maxScore Float @default(100)
+  isRequired Boolean @default(true)
+  
+  submissions AssignmentSubmission[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([chapterId])
+}
+
+// Entregas de asignaciones
+model AssignmentSubmission {
+  id String @id @default(uuid())
+  userId String
+  
+  assignmentId String
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  
+  content String? @db.Text
+  fileUrl String? @db.Text
+  score Float?
+  feedback String? @db.Text
+  status String @default("submitted") // submitted, graded, returned
+  
+  submittedAt DateTime @default(now())
+  gradedAt DateTime?
+  
+  @@index([assignmentId])
+  @@unique([userId, assignmentId])
+}
+
+// Certificados y logros
+model Certificate {
+  id String @id @default(uuid())
+  userId String
+  
+  programId String?
+  courseId String?
+  
+  type String // program_completion, course_completion, achievement
+  title String @db.Text
+  description String? @db.Text
+  certificateUrl String? @db.Text
+  
+  issuedAt DateTime @default(now())
+  expiresAt DateTime?
+  
+  @@index([userId])
 }

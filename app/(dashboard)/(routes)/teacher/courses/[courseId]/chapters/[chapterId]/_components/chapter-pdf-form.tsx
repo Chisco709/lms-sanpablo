@@ -1,25 +1,21 @@
 "use client";
 
-import * as z from "zod";
 import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Pencil, PlusCircle, File, X, Download, FileText, CheckCircle, Eye, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { Chapter } from "@prisma/client";
+// import { Chapter } from "@prisma/client";
 import { FileUpload } from "@/components/file-upload";
 
-const formSchema = z.object({
-  pdfUrl: z.string().min(1, "Se requiere un archivo PDF")
-});
-
-type FormValues = z.infer<typeof formSchema>;
+// Removed unused form schema and types
 
 interface ChapterPdfFormProps {
-  initialData: Chapter;
+  initialData: {
+    id: string;
+    pdfUrl?: string | null;
+  };
   courseId: string;
   chapterId: string;
 }
@@ -35,12 +31,12 @@ export const ChapterPdfForm = ({
   const abortControllerRef = useRef<AbortController | null>(null);
   const router = useRouter();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { 
-      pdfUrl: initialData.pdfUrl || "" 
-    }
-  });
+  // const form = useForm<FormValues>({
+  //   resolver: zodResolver(formSchema),
+  //   defaultValues: { 
+  //     pdfUrl: initialData.pdfUrl || "" 
+  //   }
+  // });
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
@@ -284,7 +280,7 @@ export const ChapterPdfForm = ({
                   <li>• Tamaño máximo: 16MB</li>
                   <li>• Solo archivos PDF permitidos</li>
                   <li>• El archivo será visible para todos los estudiantes del capítulo</li>
-                  <li>• Recomendado: Nombres descriptivos como "Guía_Capítulo_1.pdf"</li>
+                  <li>• Recomendado: Nombres descriptivos como &quot;Guía_Capítulo_1.pdf&quot;</li>
                 </ul>
               </div>
             </div>

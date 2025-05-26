@@ -185,6 +185,89 @@ const ChapterPage = ({
           </div>
         )}
 
+        {/* Guía PDF del capítulo */}
+        {chapter.pdfUrl && hasAccess && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-red-400" />
+              Guía de Estudio (PDF)
+            </h2>
+            <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-red-400"/>
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-lg font-medium text-white mb-1">
+                    Guía del Capítulo
+                  </h4>
+                  <p className="text-slate-400 text-sm">
+                    Material de estudio complementario para esta clase
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={chapter.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Ver PDF
+                  </Link>
+                  
+                  <Link
+                    href={chapter.pdfUrl}
+                    download
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    Descargar
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Google Form del capítulo */}
+        {chapter.googleFormUrl && hasAccess && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-400" />
+              Formulario de Evaluación
+            </h2>
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-blue-400"/>
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-lg font-medium text-white mb-1">
+                    Evaluación del Capítulo
+                  </h4>
+                  <p className="text-slate-400 text-sm">
+                    Completa este formulario para evaluar tu comprensión del tema
+                  </p>
+                </div>
+
+                <Link
+                  href={chapter.googleFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                  Completar Formulario
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Recursos de la clase */}
         {!!attachments.length && (
           <div>
