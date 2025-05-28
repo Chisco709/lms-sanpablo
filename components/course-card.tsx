@@ -46,25 +46,25 @@ export const CourseCard = ({
         <div className="relative z-10">
           {/* Imagen del curso */}
           <div className="relative aspect-video overflow-hidden rounded-t-3xl">
-            <Image
+          <Image
               src={imageUrl || "/placeholder-course.jpg"}
               alt={title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+          />
             
             {/* Overlay con gradiente */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            
+          
             {/* Badge de categoría */}
-            <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4">
               <span className="px-3 py-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-bold rounded-full shadow-lg">
                 <Star className="h-3 w-3 inline mr-1" />
-                {category}
-              </span>
-            </div>
-
+              {category}
+            </span>
+          </div>
+          
             {/* Badge de estado */}
             {isCompleted && (
               <div className="absolute top-4 right-4">
@@ -76,7 +76,7 @@ export const CourseCard = ({
             )}
 
             {isInProgress && (
-              <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4">
                 <div className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
                   <Play className="h-3 w-3" />
                   EN PROGRESO
@@ -90,23 +90,23 @@ export const CourseCard = ({
                 <Play className="h-6 w-6 text-white ml-1" />
               </div>
             </div>
-          </div>
+        </div>
 
           {/* Contenido de la tarjeta */}
-          <div className="p-6 space-y-4">
-            {/* Título */}
+        <div className="p-6 space-y-4">
+          {/* Título */}
             <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300 line-clamp-2 leading-tight">
-              {title}
-            </h3>
-
+            {title}
+          </h3>
+          
             {/* Descripción */}
-            {description && (
+          {description && (
               <p className="text-slate-400 text-sm line-clamp-2 leading-relaxed">
-                {description}
-              </p>
-            )}
+              {description}
+            </p>
+          )}
 
-            {/* Información del curso */}
+          {/* Información del curso */}
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-4 text-slate-300">
                 <div className="flex items-center gap-1">
@@ -116,9 +116,9 @@ export const CourseCard = ({
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4 text-green-400" />
                   <span className="font-medium">A tu ritmo</span>
-                </div>
-              </div>
             </div>
+              </div>
+          </div>
 
             {/* Progreso */}
             {progress !== null && (

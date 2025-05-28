@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { userId } = await auth();
     const { url } = await req.json();
-    const { courseId } = await params;
+    const { courseId  } = params;
     
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });

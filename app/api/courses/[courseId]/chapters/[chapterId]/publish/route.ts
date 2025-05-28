@@ -4,10 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
     const { userId } = await auth();
+    const { courseId, chapterId } = await params;
     
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });
@@ -15,7 +16,7 @@ export async function PATCH(
 
     const course = await db.course.findFirst({
       where: { 
-        id: params.courseId, 
+        id: courseId, 
         userId 
       }
     });
@@ -26,8 +27,8 @@ export async function PATCH(
 
     const chapter = await db.chapter.findFirst({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId
+        id: chapterId,
+        courseId: courseId
       }
     });
 
@@ -59,8 +60,8 @@ export async function PATCH(
 
     const publishedChapter = await db.chapter.update({
       where: { 
-        id: params.chapterId,
-        courseId: params.courseId
+        id: chapterId,
+        courseId: courseId
       },
       data: { 
         isPublished: true 

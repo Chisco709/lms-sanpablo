@@ -8,7 +8,7 @@ export async function DELETE(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId, attachmentId } = await params;
+    const { courseId, attachmentId  } = params;
     
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });

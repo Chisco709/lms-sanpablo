@@ -27,12 +27,15 @@ export const Navbar = () => {
                     <div className="flex items-center gap-4">
                         <MobileSidebar />
                         
-                        {/* Logo minimalista */}
-                        <div className="hidden md:flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center">
-                                <span className="text-black font-bold text-lg">S</span>
+                        {/* Logo minimalista y estable */}
+                        <div className="hidden md:flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center shadow-lg">
+                                <span className="text-black font-bold text-lg select-none">S</span>
                             </div>
-                            <span className="text-white font-semibold text-lg">SanPablo</span>
+                            <div className="flex flex-col">
+                                <span className="text-white font-semibold text-lg leading-none">SanPablo</span>
+                                <span className="text-yellow-400 text-xs font-medium leading-none">LMS</span>
+                            </div>
                         </div>
                     </div>
 

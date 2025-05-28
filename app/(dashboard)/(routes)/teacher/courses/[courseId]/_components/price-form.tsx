@@ -38,7 +38,6 @@ export const PriceForm = ({
 }: PriceFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
 
-
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const router = useRouter()
@@ -50,17 +49,16 @@ export const PriceForm = ({
         }, 
     })
 
-
     const { isSubmitting, isValid } = form.formState;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             await axios.patch(`/api/courses/${courseId}`, values)
-            toast.success("Precio actualizado")
+            toast.success("Precio actualizado exitosamente")
             toggleEdit()
             router.refresh()
         } catch {
-            toast.error("Algo malo esta pasando")
+            toast.error("Algo salió mal")
         }
     }
 
@@ -71,7 +69,7 @@ export const PriceForm = ({
                     <span>Precio del Curso</span>
                     <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">Opcional</span>
                 </div>
-                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white">
                     {isEditing ? (
                         <>Cancelar</>
                     )  : (
@@ -79,14 +77,13 @@ export const PriceForm = ({
                         <Pencil className="h-4 w-4 mr-2"/>
                         Editar Precio
                     </>
-
                     )}
                 </Button>
             </div>
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.price && "text-slate-400 italic",
+                    !initialData.price && "text-slate-500 italic",
                     initialData.price && "text-slate-300"
                 )}>
                     {initialData.price
@@ -111,7 +108,8 @@ export const PriceForm = ({
                                 type="number"
                                 step="0.01"
                                 disabled={isSubmitting}
-                                placeholder="e.g 'Escribe el precio de tu curso...'"
+                                placeholder="Ej: '50000' (en pesos colombianos)"
+                                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-yellow-400"
                                 {...field }
                                 />
                             </FormControl>
@@ -124,7 +122,7 @@ export const PriceForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
                             >
                                 Guardar
                             </Button>
@@ -135,5 +133,4 @@ export const PriceForm = ({
             )}
         </div>
     ) 
-        
 }

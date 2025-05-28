@@ -18,10 +18,10 @@ import { ChapterActions } from "./_components/chapter-actions";
 const ChapterIdPage = async({
     params
 }: {
-    params: { courseId: string; chapterId: string }
+    params: Promise<{ courseId: string; chapterId: string }>
 }) => {
     const { userId } = await auth();
-    const { courseId, chapterId } = await params;
+    const { courseId, chapterId  } = await params;
     
     if (!userId) {
         return redirect("/")

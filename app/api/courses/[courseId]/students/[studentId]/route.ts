@@ -8,7 +8,7 @@ export async function PATCH(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId, studentId } = await params;
+    const { courseId, studentId  } = params;
     const { status, notes } = await req.json();
 
     if (!userId) {
@@ -53,7 +53,7 @@ export async function DELETE(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId, studentId } = await params;
+    const { courseId, studentId  } = params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

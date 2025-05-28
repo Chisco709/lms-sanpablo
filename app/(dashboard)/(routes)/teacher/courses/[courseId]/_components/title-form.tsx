@@ -28,7 +28,7 @@ interface TitleFormProps {
 
 const formSchema = z.object({
     title: z.string().min(1, {
-        message: "El titulo es requerido",
+        message: "El título es requerido",
     })
 })
 
@@ -37,7 +37,6 @@ export const TitleForm = ({
     courseId
 }: TitleFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
-
 
     const toggleEdit = () => setIsEditing((current) => !current);
 
@@ -48,17 +47,16 @@ export const TitleForm = ({
         defaultValues: initialData, 
     })
 
-
     const { isSubmitting, isValid } = form.formState;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             await axios.patch(`/api/courses/${courseId}`, values)
-            toast.success("Curso creado")
+            toast.success("Título actualizado exitosamente")
             toggleEdit()
             router.refresh()
         } catch {
-            toast.error("Algo malo esta pasando")
+            toast.error("Algo salió mal")
         }
     }
 
@@ -66,7 +64,7 @@ export const TitleForm = ({
          <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
             <div className="font-medium flex items-center justify-between text-white">
                 Título del Curso
-                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white">
                     {isEditing ? (
                         <>Cancelar</>
                     )  : (
@@ -74,7 +72,6 @@ export const TitleForm = ({
                         <Pencil className="h-4 w-4 mr-2"/>
                         Editar Título
                     </>
-
                     )}
                 </Button>
             </div>
@@ -97,7 +94,8 @@ export const TitleForm = ({
                             <FormControl>
                                 <Input 
                                 disabled={isSubmitting}
-                                placeholder="e.g 'Primera Infancia'"
+                                placeholder="Ej: 'Primera Infancia'"
+                                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-yellow-400"
                                 {...field }
                                 />
                             </FormControl>
@@ -110,7 +108,7 @@ export const TitleForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
                             >
                                 Guardar
                             </Button>
@@ -121,5 +119,4 @@ export const TitleForm = ({
             )}
         </div>
     ) 
-        
 }

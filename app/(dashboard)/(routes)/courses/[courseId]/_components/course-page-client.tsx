@@ -49,7 +49,7 @@ export const CoursePageClient = ({
     setMounted(true);
     // Verificar si hay historial de navegación solo en el cliente
     if (typeof window !== 'undefined') {
-      setCanGoBack(window.history.length > 1);
+    setCanGoBack(window.history.length > 1);
     }
   }, []);
 
@@ -132,111 +132,111 @@ export const CoursePageClient = ({
               <p className="text-slate-400 text-lg">
                 {course.chapters.length} {course.chapters.length === 1 ? 'clase disponible' : 'clases disponibles'}
               </p>
-            </div>
+          </div>
+
+                <div className="space-y-4">
+          {visibleChapters.map((chapter: any, index: number) => {
+            const isCompleted = !!chapter.userProgress?.[0]?.isCompleted;
+            const isLocked = isChapterLocked(chapter);
+            const unlockDateFormatted = formatUnlockDate(chapter.unlockDate);
             
-            <div className="space-y-4">
-              {visibleChapters.map((chapter: any, index: number) => {
-                const isCompleted = !!chapter.userProgress?.[0]?.isCompleted;
-                const isLocked = isChapterLocked(chapter);
-                const unlockDateFormatted = formatUnlockDate(chapter.unlockDate);
-                
-                return (
-                  <div
-                    key={chapter.id}
+            return (
+              <div
+                key={chapter.id}
                     className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/30 via-slate-800/20 to-slate-800/30 hover:from-slate-700/40 hover:via-slate-700/30 hover:to-slate-700/40 border border-slate-700/30 hover:border-slate-600/50 transition-all duration-300 backdrop-blur-sm"
-                  >
+              >
                     {/* Efecto de brillo */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
-                    <Link 
-                      href={isLocked ? '#' : `/courses/${courseId}/chapters/${chapter.id}`}
+                <Link 
+                  href={isLocked ? '#' : `/courses/${courseId}/chapters/${chapter.id}`}
                       className={`relative z-10 flex items-center gap-6 p-6 ${
                         isLocked ? 'cursor-not-allowed opacity-60' : 'transition-all duration-300'
-                      }`}
-                    >
+                  }`}
+                >
                       {/* Número/Estado - MÁS HERMOSO */}
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-lg ${
-                        isLocked 
-                          ? 'bg-slate-700/40 text-slate-500' 
-                          : isCompleted 
+                    isLocked 
+                      ? 'bg-slate-700/40 text-slate-500' 
+                      : isCompleted 
                             ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-green-500/25' 
                             : 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-black shadow-yellow-400/25 group-hover:shadow-yellow-400/40'
-                      }`}>
-                        {isLocked ? (
+                  }`}>
+                    {isLocked ? (
                           <Lock size={20} />
-                        ) : isCompleted ? (
+                    ) : isCompleted ? (
                           <CheckCircle size={20} />
-                        ) : (
+                    ) : (
                           <span className="text-lg">{index + 1}</span>
-                        )}
-                      </div>
+                    )}
+                  </div>
 
-                      {/* Contenido */}
-                      <div className="flex-1 min-w-0">
+                  {/* Contenido */}
+                  <div className="flex-1 min-w-0">
                         <h3 className={`text-xl font-bold mb-3 ${
                           isLocked ? 'text-slate-500' : 'text-white group-hover:text-yellow-400'
                         } transition-colors duration-300`}>
-                          {chapter.title}
-                        </h3>
+                      {chapter.title}
+                    </h3>
                         <div className="flex items-center gap-4 text-sm">
                           <span className="text-slate-400 font-medium">Clase {index + 1}</span>
-                          {isCompleted && (
+                      {isCompleted && (
                             <span className="px-3 py-1 bg-green-500/20 text-green-400 font-bold rounded-full border border-green-500/30">
                               ✓ COMPLETADO
                             </span>
-                          )}
-                          {isLocked && unlockDateFormatted && (
+                      )}
+                      {isLocked && unlockDateFormatted && (
                             <span className="px-3 py-1 bg-yellow-400/20 text-yellow-400 font-bold rounded-full border border-yellow-400/30 flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              Se desbloquea: {unlockDateFormatted}
-                            </span>
-                          )}
-                          {isLocked && !unlockDateFormatted && (
+                          Se desbloquea: {unlockDateFormatted}
+                        </span>
+                      )}
+                      {isLocked && !unlockDateFormatted && (
                             <span className="px-3 py-1 bg-red-500/20 text-red-400 font-bold rounded-full border border-red-500/30">
                               🔒 BLOQUEADO
                             </span>
-                          )}
-                          {chapter.isFree && !hasAccess && (
+                      )}
+                      {chapter.isFree && !hasAccess && (
                             <span className="px-3 py-1 bg-blue-500/20 text-blue-400 font-bold rounded-full border border-blue-500/30">
                               👁️ VISTA PREVIA
                             </span>
-                          )}
-                        </div>
-                      </div>
+                      )}
+                    </div>
+                  </div>
 
                       {/* Icono de acción - MÁS HERMOSO */}
-                      {!isLocked && (
+                  {!isLocked && (
                         <div className="w-12 h-12 bg-slate-700/30 group-hover:bg-gradient-to-br group-hover:from-green-400/20 group-hover:to-green-500/20 rounded-xl flex items-center justify-center transition-all duration-300 border border-slate-600/30 group-hover:border-green-400/50">
                           <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-green-400 group-hover:translate-x-1 transition-all duration-300" />
-                        </div>
-                      )}
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
+                    </div>
+                  )}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
 
             {/* Botón para mostrar más capítulos - MÁS HERMOSO */}
-            {hasMoreChapters && (
+        {hasMoreChapters && (
               <div className="mt-8 text-center">
-                <button
-                  onClick={() => setShowAllChapters(!showAllChapters)}
+            <button
+              onClick={() => setShowAllChapters(!showAllChapters)}
                   className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/60 hover:to-slate-600/60 text-white hover:text-yellow-400 rounded-2xl border border-slate-600/50 hover:border-yellow-400/50 transition-all duration-300 font-bold shadow-lg backdrop-blur-sm"
-                >
-                  {showAllChapters ? (
-                    <>
+            >
+              {showAllChapters ? (
+                <>
                       <ChevronUp className="h-5 w-5" />
                       MOSTRAR MENOS
-                    </>
-                  ) : (
-                    <>
+                </>
+              ) : (
+                <>
                       <ChevronDown className="h-5 w-5" />
                       VER TODAS LAS CLASES ({course.chapters.length - 5} más)
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
+                </>
+              )}
+            </button>
+          </div>
+        )}
           </div>
 
           {/* Panel lateral - MÁS HERMOSO */}

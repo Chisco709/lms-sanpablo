@@ -39,7 +39,6 @@ export const DescriptionForm = ({
 }: DescriptionFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
 
-
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const router = useRouter()
@@ -51,17 +50,16 @@ export const DescriptionForm = ({
         }, 
     })
 
-
     const { isSubmitting, isValid } = form.formState;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             await axios.patch(`/api/courses/${courseId}`, values)
-            toast.success("Descripción actualizada")
+            toast.success("Descripción actualizada exitosamente")
             toggleEdit()
             router.refresh()
         } catch {
-            toast.error("Algo malo esta pasando")
+            toast.error("Algo salió mal")
         }
     }
 
@@ -69,7 +67,7 @@ export const DescriptionForm = ({
          <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
             <div className="font-medium flex items-center justify-between text-white">
                 Descripción del Curso
-                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
+                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white">
                     {isEditing ? (
                         <>Cancelar</>
                     )  : (
@@ -77,14 +75,13 @@ export const DescriptionForm = ({
                         <Pencil className="h-4 w-4 mr-2"/>
                         Editar Descripción
                     </>
-
                     )}
                 </Button>
             </div>
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.description && "text-slate-400 italic",
+                    !initialData.description && "text-slate-500 italic",
                     initialData.description && "text-slate-300"
                 )}>
                     {initialData.description || "Sin descripción"}
@@ -104,7 +101,8 @@ export const DescriptionForm = ({
                             <FormControl>
                                 <Textarea 
                                 disabled={isSubmitting}
-                                placeholder="e.g 'Este curso se trata sobre...'"
+                                placeholder="Ej: 'Este curso se trata sobre...'"
+                                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-yellow-400 resize-none"
                                 {...field }
                                 />
                             </FormControl>
@@ -117,7 +115,7 @@ export const DescriptionForm = ({
                             <Button
                             disabled={!isValid || isSubmitting}
                             type="submit"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
                             >
                                 Guardar
                             </Button>
@@ -128,5 +126,4 @@ export const DescriptionForm = ({
             )}
         </div>
     ) 
-        
 }

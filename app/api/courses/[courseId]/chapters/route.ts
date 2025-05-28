@@ -8,7 +8,7 @@ export async function POST(
 ) {
     try {
         const { userId } = await auth(); // Añadir await aquí
-        const { title } = await req.json()
+        const { title, pensumTopicId } = await req.json()
 
         if(!userId) {
             return new NextResponse("Unauthorized", { status: 401 })
@@ -40,7 +40,8 @@ export async function POST(
             data: {
                 title,
                 courseId: params.courseId,
-                position: newPosition
+                position: newPosition,
+                pensumTopicId: pensumTopicId || null
             }
         })
 

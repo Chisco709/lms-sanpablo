@@ -8,7 +8,7 @@ export async function POST(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId } = await params;
+    const { courseId  } = params;
     const { userEmail, paymentType, amount, notes } = await req.json();
 
     if (!userId) {
@@ -81,7 +81,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId } = await params;
+    const { courseId  } = params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

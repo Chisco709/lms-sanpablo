@@ -8,7 +8,7 @@ export async function PATCH(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId } = await params;
+    const { courseId  } = await params;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });
@@ -33,7 +33,6 @@ export async function PATCH(
     if (!course.title) missingFields.push("título");
     if (!course.description) missingFields.push("descripción");
     if (!course.imageUrl) missingFields.push("imagen");
-    if (!course.categoryId) missingFields.push("categoría");
 
     if (missingFields.length > 0) {
       return new NextResponse(

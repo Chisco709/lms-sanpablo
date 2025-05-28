@@ -1,12 +1,11 @@
-import { getAuth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
 
 
 export async function POST(req: NextRequest) {
   try {
-    // Ahora req es NextRequest y getAuth(req) es válido
-    const { userId } = getAuth(req);
+    const { userId } = await auth();
     const { title } = await req.json();
 
     if (!userId) {

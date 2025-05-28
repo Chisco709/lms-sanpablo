@@ -29,7 +29,7 @@ export default async function Dashboard() {
           </div>
           <h1 className="text-4xl font-bold text-white">
             Instituto San Pablo
-          </h1>
+        </h1>
         </div>
         <p className="text-xl text-gray-300 max-w-2xl mx-auto">
           Bienvenido a tu plataforma de aprendizaje. Aquí puedes ver y acceder a todos tus cursos de manera fácil y rápida.
@@ -42,7 +42,7 @@ export default async function Dashboard() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white mb-2">MIS CURSOS</h2>
             <p className="text-gray-400">Continúa donde lo dejaste</p>
-          </div>
+            </div>
           
           <div className="bg-gradient-to-r from-green-500/10 to-yellow-400/10 rounded-2xl p-6 border border-green-500/20">
             <CoursesList items={[...coursesInProgress, ...completedCourses]} />
@@ -59,7 +59,7 @@ export default async function Dashboard() {
           <p className="text-gray-400">
             Técnico en Primera Infancia • Técnico en Inglés
           </p>
-        </div>
+            </div>
         
         {availableCourses.length > 0 ? (
           <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-6 border border-blue-500/20">
@@ -70,8 +70,8 @@ export default async function Dashboard() {
             <div className="max-w-md mx-auto space-y-6">
               <div className="p-4 bg-yellow-400/10 rounded-full w-fit mx-auto">
                 <BookOpen className="h-16 w-16 text-yellow-400" />
-              </div>
-              <div>
+            </div>
+            <div>
                 <h3 className="text-2xl font-bold text-white mb-3">
                   ¡Próximamente!
                 </h3>
@@ -82,7 +82,7 @@ export default async function Dashboard() {
             </div>
           </div>
         )}
-      </div>
+        </div>
 
       {/* Si no tiene cursos - MENSAJE SÚPER CLARO */}
       {[...coursesInProgress, ...completedCourses].length === 0 && (
@@ -112,13 +112,13 @@ export default async function Dashboard() {
 
       {/* Botón de explorar más - SÚPER VISIBLE */}
       <div className="text-center py-8">
-        <Link 
-          href="/search"
+            <Link 
+              href="/search"
           className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-400 text-black font-bold text-lg rounded-xl hover:bg-yellow-300 transition-all duration-300 hover:scale-105"
         >
           <Search className="h-6 w-6" />
           EXPLORAR TODOS LOS CURSOS
-        </Link>
+          </Link>
       </div>
     </div>
   )

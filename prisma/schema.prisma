@@ -107,6 +107,7 @@ model Course {
   dependentCourses Course[] @relation("CoursePrerequisite")
 
   chapters Chapter[]
+  pensumTopics PensumTopic[] // Temas del pensum
   attachments Attachment[]
   purchases Purchase[]
 
@@ -156,6 +157,10 @@ model Chapter {
   courseId String
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  // Relación con tema del pensum
+  pensumTopicId String?
+  pensumTopic PensumTopic? @relation(fields: [pensumTopicId], references: [id], onDelete: SetNull)
+
   userProgress UserProgress[]
   assignments Assignment[]
 
@@ -163,8 +168,27 @@ model Chapter {
   updatedAt DateTime @updatedAt
 
   @@index([courseId])
+  @@index([pensumTopicId])
 }
 
+// Nuevo modelo para Temas del Pensum
+model PensumTopic {
+  id String @id @default(uuid())
+  title String @db.Text // Ej: "Neurodidáctica (Pedagógica, Psicológica y Didáctica)"
+  description String? @db.Text
+  position Int // Orden dentro del curso
+  isPublished Boolean @default(false)
+  
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  chapters Chapter[] // Las clases que pertenecen a este tema
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([courseId])
+}
 
 model UserProgress {
   id String @id @default(uuid())

@@ -7,9 +7,14 @@ import {
   ChevronRight,
   Lock,
   Play,
-  ArrowRight,
-  Calendar,
-  FileText
+  CheckCircle,
+  Download,
+  BookOpen,
+  Home,
+  FileText,
+  ExternalLink,
+  ClipboardList,
+  Star
 } from "lucide-react";
 
 import { Preview } from "@/components/preview";
@@ -53,12 +58,21 @@ const ChapterPage = ({
   purchase,
   userId
 }: ChapterPageProps) => {
+  
   if (!chapter || !course) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-xl font-semibold text-white mb-2">Clase no disponible</h1>
-          <p className="text-slate-400">Esta clase aún no está disponible o no existe.</p>
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center p-4">
+        <div className="text-center max-w-lg mx-auto bg-white/10 rounded-3xl p-12 border border-white/20">
+          <div className="text-8xl mb-6">😕</div>
+          <h1 className="text-4xl font-bold text-white mb-6">¡Ups!</h1>
+          <p className="text-white text-2xl mb-8">Esta clase no está disponible</p>
+          <Link 
+            href="/student"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-3xl text-2xl transition-all duration-300 hover:scale-105"
+          >
+            <Home className="h-8 w-8" />
+            Volver al Inicio
+          </Link>
         </div>
       </div>
     );
@@ -70,67 +84,59 @@ const ChapterPage = ({
   const isCompleted = !!userProgress?.isCompleted;
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Header limpio */}
-      <div className="border-b border-slate-800/20 sticky top-0 z-50 bg-slate-950/98 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[#0F172A]">
+      
+      {/* HEADER SÚPER SIMPLE */}
+      <div className="bg-white/5 border-b border-white/10 p-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
             <Link 
               href={`/courses/${course.id}`}
-              className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="font-medium">{course.title}</span>
+            className="flex items-center gap-4 text-white hover:text-yellow-400 transition-all duration-300 group"
+          >
+            <div className="w-16 h-16 bg-white/10 group-hover:bg-yellow-400/20 rounded-3xl flex items-center justify-center transition-all duration-300">
+              <ChevronLeft className="h-8 w-8" />
+            </div>
+            <div>
+              <span className="text-white/60 text-lg block">← Volver</span>
+              <span className="font-bold text-2xl text-white">{course.title}</span>
+            </div>
             </Link>
             
-            {nextChapter && (
-              <Link
-                href={`/courses/${course.id}/chapters/${nextChapter.id}`}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-green-400 hover:from-yellow-500 hover:to-green-500 text-slate-900 font-medium rounded-lg transition-all duration-300"
-              >
-                <span>Siguiente clase</span>
-                <ChevronRight className="h-4 w-4" />
-              </Link>
+          {isCompleted && (
+            <div className="flex items-center gap-3 px-6 py-3 bg-green-500/20 rounded-3xl border border-green-500/30">
+              <CheckCircle className="h-8 w-8 text-green-400" />
+              <span className="text-green-400 font-bold text-xl">¡Completada!</span>
+            </div>
             )}
-          </div>
         </div>
       </div>
 
-      {/* Contenido principal */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Título de la clase */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            {chapter.position && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-slate-800/50 rounded-full">
-                <Calendar className="h-4 w-4 text-yellow-400" />
-                <span className="text-slate-300 text-sm font-medium">Semana {chapter.position}</span>
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        
+        {/* TÍTULO SÚPER GRANDE Y CLARO */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-4 px-8 py-4 bg-blue-500/20 rounded-3xl mb-8 border border-blue-500/30">
+            <div className="text-6xl">📚</div>
+            <div>
+              <span className="text-blue-400 font-bold text-2xl block">Clase {chapter.position || '1'}</span>
+              {isCompleted && <span className="text-green-400 font-bold text-xl">✅ Ya la terminé</span>}
               </div>
-            )}
-            {isCompleted && (
-              <div className="px-3 py-1 bg-green-400/20 text-green-400 rounded-full text-sm font-medium">
-                ✓ Completada
-              </div>
-            )}
           </div>
-          <h1 className="text-3xl font-bold text-white leading-tight">
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight">
             {chapter.title}
           </h1>
         </div>
 
-        {/* Video principal */}
-        <div className="mb-8">
-          <div className="bg-black rounded-xl overflow-hidden shadow-2xl" style={{ aspectRatio: '16/9' }}>
+        {/* VIDEO - LO MÁS IMPORTANTE Y GRANDE */}
+        <div className="mb-16">
+          <div className="bg-white/5 rounded-3xl overflow-hidden border border-white/10" style={{ aspectRatio: '16/9' }}>
             {isLocked ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                <div className="w-20 h-20 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6">
-                  <Lock className="h-10 w-10 text-yellow-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Clase bloqueada
-                </h3>
-                <p className="text-slate-400">
-                  Esta clase se desbloqueará según el cronograma del programa técnico
+              <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-yellow-500/10">
+                <div className="text-8xl mb-8">🔒</div>
+                <h3 className="text-4xl font-bold text-white mb-6">Clase Bloqueada</h3>
+                <p className="text-white text-2xl max-w-2xl">
+                  Primero debes completar las clases anteriores para desbloquear esta
                 </p>
               </div>
             ) : embedUrl ? (
@@ -143,23 +149,17 @@ const ChapterPage = ({
                 style={{ border: 'none' }}
               />
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                <div className="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center mb-6">
-                  <Play className="h-10 w-10 text-slate-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Clase próximamente
-                </h3>
-                <p className="text-slate-400">
-                  El contenido de esta clase estará disponible pronto
-                </p>
+              <div className="h-full flex flex-col items-center justify-center text-center p-12">
+                <div className="text-8xl mb-8">📹</div>
+                <h3 className="text-4xl font-bold text-white mb-6">Video Próximamente</h3>
+                <p className="text-white text-2xl">El video estará disponible muy pronto</p>
               </div>
             )}
           </div>
 
-          {/* Botón de completar clase */}
+          {/* BOTÓN DE COMPLETAR - MUY GRANDE Y VISIBLE */}
           {hasAccess && (
-            <div className="mt-6">
+            <div className="mt-8 text-center">
               <CourseProgressButton
                 chapterId={chapter.id}
                 courseId={course.id}
@@ -170,117 +170,103 @@ const ChapterPage = ({
           )}
         </div>
 
-        {/* Descripción de la clase */}
+        {/* SECCIONES SÚPER SIMPLES EN TARJETAS GRANDES */}
+        <div className="grid gap-8 md:grid-cols-2">
+          
+          {/* GUÍA PDF - SÚPER SIMPLE */}
+        {chapter.pdfUrl && hasAccess && (
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/10">
+              <div className="text-center">
+                <div className="text-8xl mb-6">📄</div>
+                <h2 className="text-3xl font-bold text-white mb-4">Guía de Trabajo</h2>
+                <p className="text-white text-xl mb-8">
+                  Descarga esta guía para seguir la clase
+                  </p>
+
+                <div className="space-y-4">
+                  <a
+                    href={chapter.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full px-8 py-6 bg-red-500 hover:bg-red-400 text-white font-bold rounded-3xl text-2xl transition-all duration-300 hover:scale-105"
+                  >
+                    👀 Ver Guía
+                  </a>
+                  
+                  <a
+                    href={chapter.pdfUrl}
+                    download
+                    className="block w-full px-8 py-6 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-3xl text-2xl transition-all duration-300 hover:scale-105"
+                  >
+                    📥 Descargar
+                  </a>
+                </div>
+                
+                <div className="mt-6 p-4 bg-yellow-500/20 rounded-2xl border border-yellow-500/30">
+                  <p className="text-yellow-400 font-bold text-lg">
+                    💡 Lee la guía antes de ver el video
+                  </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+          {/* FORMULARIO DE GOOGLE - SÚPER SIMPLE */}
+        {chapter.googleFormUrl && hasAccess && (
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/10">
+              <div className="text-center">
+                <div className="text-8xl mb-6">📝</div>
+                <h2 className="text-3xl font-bold text-white mb-4">Entrega tu Trabajo</h2>
+                <p className="text-white text-xl mb-8">
+                  Completa este formulario cuando termines
+                  </p>
+                
+                <a
+                  href={chapter.googleFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-8 py-6 bg-purple-500 hover:bg-purple-400 text-white font-bold rounded-3xl text-2xl transition-all duration-300 hover:scale-105"
+                >
+                  📋 Abrir Formulario
+                </a>
+                
+                <div className="mt-6 p-4 bg-green-500/20 rounded-2xl border border-green-500/30">
+                  <p className="text-green-400 font-bold text-lg">
+                    ✅ Complétalo después del video
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* DESCRIPCIÓN - SOLO SI EXISTE */}
         {chapter.description && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-yellow-400" />
-              Contenido de la clase
-            </h2>
-            <div className="bg-slate-900/30 rounded-xl p-6 border border-slate-800/30">
-              <div className="prose prose-slate prose-invert max-w-none">
+          <div className="mt-12">
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/10">
+              <div className="text-center mb-8">
+                <div className="text-6xl mb-4">📖</div>
+                <h2 className="text-3xl font-bold text-white">¿Qué aprenderás?</h2>
+              </div>
+              <div className="prose prose-xl max-w-none text-white prose-headings:text-white prose-strong:text-white prose-em:text-white">
                 <Preview value={chapter.description} />
               </div>
             </div>
           </div>
         )}
 
-        {/* Guía PDF del capítulo */}
-        {chapter.pdfUrl && hasAccess && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-red-400" />
-              Guía de Estudio (PDF)
-            </h2>
-            <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-red-400"/>
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-lg font-medium text-white mb-1">
-                    Guía del Capítulo
-                  </h4>
-                  <p className="text-slate-400 text-sm">
-                    Material de estudio complementario para esta clase
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link
-                    href={chapter.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Ver PDF
-                  </Link>
-                  
-                  <Link
-                    href={chapter.pdfUrl}
-                    download
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                    Descargar
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Google Form del capítulo */}
-        {chapter.googleFormUrl && hasAccess && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-400" />
-              Formulario de Evaluación
-            </h2>
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-blue-400"/>
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-lg font-medium text-white mb-1">
-                    Evaluación del Capítulo
-                  </h4>
-                  <p className="text-slate-400 text-sm">
-                    Completa este formulario para evaluar tu comprensión del tema
-                  </p>
-                </div>
-
-                <Link
-                  href={chapter.googleFormUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                  Completar Formulario
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Recursos de la clase */}
+        {/* MATERIAL DE APOYO - SÚPER SIMPLE */}
         {!!attachments.length && (
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <ArrowRight className="h-5 w-5 text-green-400" />
-              Material de apoyo
-            </h2>
-            <div className="grid gap-3">
+          <div className="mt-12">
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/10">
+              <div className="text-center mb-8">
+                <div className="text-6xl mb-4">📎</div>
+                <h2 className="text-3xl font-bold text-white">Material Extra</h2>
+              </div>
+              <div className="space-y-6">
               {attachments.map((attachment) => {
                 const fileExtension = attachment.name.split('.').pop()?.toLowerCase();
                 const isPDF = fileExtension === 'pdf';
-                const isDoc = ['doc', 'docx'].includes(fileExtension || '');
-                const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension || '');
                 
                 return (
                   <a 
@@ -288,30 +274,54 @@ const ChapterPage = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     key={attachment.id}
-                    className="flex items-center gap-4 p-4 bg-slate-900/30 rounded-xl hover:bg-slate-900/50 transition-all duration-300 group border border-slate-800/30 hover:border-slate-700/50"
+                      className="flex items-center gap-6 p-6 bg-white/5 hover:bg-white/10 rounded-3xl transition-all duration-300 group border border-white/10"
                   >
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-sm ${
-                      isPDF ? 'bg-red-400/20 text-red-400' :
-                      isDoc ? 'bg-blue-400/20 text-blue-400' :
-                      isImage ? 'bg-purple-400/20 text-purple-400' :
-                      'bg-gray-400/20 text-gray-400'
-                    }`}>
-                      {isPDF ? 'PDF' : 
-                       isDoc ? 'DOC' :
-                       isImage ? 'IMG' : 'FILE'}
+                      <div className="text-6xl">
+                        {isPDF ? '📄' : '📁'}
                     </div>
                     <div className="flex-1">
-                      <p className="text-white group-hover:text-yellow-400 transition-colors font-medium">
+                        <p className="text-white font-bold text-2xl mb-2">
                         {attachment.name}
                       </p>
-                      <p className="text-slate-400 text-sm">
-                        {fileExtension?.toUpperCase() || 'Archivo'}
+                        <p className="text-white/60 text-lg">
+                          Haz clic para descargar
                       </p>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 transition-colors" />
+                      <div className="w-16 h-16 bg-blue-500/20 rounded-3xl flex items-center justify-center">
+                        <Download className="h-8 w-8 text-blue-400" />
+                      </div>
                   </a>
                 );
               })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SIGUIENTE CLASE - SÚPER SIMPLE */}
+        {nextChapter && hasAccess && (
+          <div className="mt-12 text-center">
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/10">
+              <div className="text-6xl mb-6">🎯</div>
+              <h3 className="text-3xl font-bold text-white mb-4">
+                ¿Ya terminaste?
+              </h3>
+              <p className="text-white text-xl mb-8">
+                Continúa con la siguiente clase
+              </p>
+              
+              <div className="mb-6">
+                <p className="text-white/60 text-lg mb-2">Siguiente:</p>
+                <p className="text-white font-bold text-2xl">{nextChapter.title}</p>
+              </div>
+              
+              <Link
+                href={`/courses/${course.id}/chapters/${nextChapter.id}`}
+                className="inline-flex items-center gap-4 px-8 py-6 bg-green-500 hover:bg-green-400 text-white font-bold rounded-3xl text-2xl transition-all duration-300 hover:scale-105"
+              >
+                <span>Siguiente Clase</span>
+                <ChevronRight className="h-8 w-8" />
+              </Link>
             </div>
           </div>
         )}
