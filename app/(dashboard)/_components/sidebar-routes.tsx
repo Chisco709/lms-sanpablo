@@ -35,7 +35,7 @@ const teacherRoutes = [
   },
   {
     icon: Trophy,
-    label: "Analytics",
+    label: "Estadísticas",
     href: "/teacher/analytics",
   },
 ];

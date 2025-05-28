@@ -3,16 +3,23 @@ const nextConfig = {
   
  
   images: {
-    domains: [
-      "utfs.io",
-      "localhost"
-    ],
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        pathname: "/**",
+      },
       {
         protocol: "http",
         hostname: "localhost",
         port: "3000",
         pathname: "/uploads/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/**",
       }
     ]
   },

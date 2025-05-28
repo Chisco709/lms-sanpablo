@@ -22,13 +22,6 @@ export const NavbarRoutes = () => {
             <Home className="h-5 w-5" />
             <span>Inicio</span>
           </Link>
-          <Link 
-            href="/search"
-            className="flex items-center gap-3 w-full p-3 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200"
-          >
-            <Search className="h-5 w-5" />
-            <span>Explorar Cursos</span>
-          </Link>
         </div>
       )}
 
@@ -83,7 +76,7 @@ export const NavbarRoutes = () => {
             isCoursePage ? 'w-full justify-center' : ''
           }`}>
             <Crown className="h-4 w-4" />
-            <span className="text-sm">Modo Profesor</span>
+            <span className="text-sm">Soy Profesor</span>
           </button>
         </Link>
       )}

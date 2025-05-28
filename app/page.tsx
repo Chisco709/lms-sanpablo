@@ -1,6 +1,3 @@
-
-
-
 import { auth } from "@clerk/nextjs/server";
 import LandingPage from "../components/landing-page";
 import Link from "next/link";
@@ -27,11 +24,11 @@ export default async function Home() {
 
       <div className="w-full max-w-2xl mx-auto text-center mb-12 relative z-20">
         <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white relative inline-block">
-          Dashboard <span className="text-yellow-400">San Pablo</span>
+          Instituto <span className="text-yellow-400">San Pablo</span>
           <span className="absolute left-0 bottom-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-green-500 rounded-full opacity-70" />
         </h1>
         <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 to-green-500 mx-auto mb-4 rounded-full"></div>
-        <p className="text-gray-300 text-lg">Bienvenido a tu panel de aprendizaje</p>
+        <p className="text-gray-300 text-lg">Bienvenido a tu plataforma de aprendizaje</p>
       </div>
       <div className="grid gap-8 md:grid-cols-2 w-full max-w-2xl relative z-20">
         <Link href="/student" className="group">
@@ -46,7 +43,7 @@ export default async function Home() {
           <div className="w-full h-36 flex flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-green-500/10 to-yellow-400/10 border border-green-500/30 shadow-lg transition-all duration-300 hover:scale-105 hover:border-green-500/60 hover:shadow-[0_8px_32px_rgba(250,204,21,0.15)] cursor-pointer relative overflow-hidden">
             {/* Icono decorativo */}
             <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-green-500/20 rounded-full blur-xl animate-float z-0" />
-            <span className="text-2xl font-semibold text-white mb-2 group-hover:text-green-400 transition relative z-10">Modo Profesor</span>
+            <span className="text-2xl font-semibold text-white mb-2 group-hover:text-green-400 transition relative z-10">Soy Profesor</span>
             <span className="text-yellow-400 text-sm font-medium group-hover:text-green-300 transition relative z-10">Gestiona tus cursos y capítulos</span>
           </div>
         </Link>

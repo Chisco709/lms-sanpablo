@@ -1,8 +1,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import { CheckCircle, Clock, BookOpen, Trophy, Search, Plus } from "lucide-react"
+import { BookOpen, Play, Search, GraduationCap } from "lucide-react"
 import { CoursesList } from "@/components/courses-list"
-import { InfoCard } from "./_components/info-card"
 import { getDashboardCourses } from "@/actions/get-dashboard-courses"
 import { getPublishedCourses } from "@/actions/get-published-courses"
 import Link from "next/link"
@@ -21,120 +20,105 @@ export default async function Dashboard() {
   const availableCourses = await getPublishedCourses()
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-white">
-          Juan Jose, continúa aprendiendo
-        </h1>
-        <p className="text-slate-400">
-          Explora nuevos cursos y continúa con tu progreso
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Header súper simple */}
+      <div className="text-center space-y-4 py-8">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="p-3 bg-yellow-400 rounded-full">
+            <GraduationCap className="h-8 w-8 text-black" />
+          </div>
+          <h1 className="text-4xl font-bold text-white">
+            Instituto San Pablo
+          </h1>
+        </div>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Bienvenido a tu plataforma de aprendizaje. Aquí puedes ver y acceder a todos tus cursos de manera fácil y rápida.
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Clock className="h-5 w-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">En Progreso</p>
-              <p className="text-xl font-bold text-white">{coursesInProgress.length}</p>
-            </div>
+      {/* Mis Cursos - LO MÁS IMPORTANTE ARRIBA */}
+      {[...coursesInProgress, ...completedCourses].length > 0 && (
+        <div className="space-y-6">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-2">MIS CURSOS</h2>
+            <p className="text-gray-400">Continúa donde lo dejaste</p>
+          </div>
+          
+          <div className="bg-gradient-to-r from-green-500/10 to-yellow-400/10 rounded-2xl p-6 border border-green-500/20">
+            <CoursesList items={[...coursesInProgress, ...completedCourses]} />
           </div>
         </div>
+      )}
 
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Completados</p>
-              <p className="text-xl font-bold text-white">{completedCourses.length}</p>
-            </div>
-          </div>
+      {/* Cursos Disponibles - SÚPER VISIBLE */}
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            CURSOS DISPONIBLES
+          </h2>
+          <p className="text-gray-400">
+            Técnico en Primera Infancia • Técnico en Inglés
+          </p>
         </div>
-
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <BookOpen className="h-5 w-5 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Total Cursos</p>
-              <p className="text-xl font-bold text-white">{coursesInProgress.length + completedCourses.length}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Trophy className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Puntos</p>
-              <p className="text-xl font-bold text-white">1,289</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mis Cursos Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Mis Cursos</h2>
-          <Link href="/search" className="text-green-400 hover:text-green-300 text-sm font-medium flex items-center gap-1">
-            <Search className="h-4 w-4" />
-            Explorar más
-          </Link>
-        </div>
-        {[...coursesInProgress, ...completedCourses].length > 0 ? (
-          <CoursesList items={[...coursesInProgress, ...completedCourses]} />
-        ) : (
-          <div className="bg-slate-800 rounded-lg p-8 text-center border border-slate-700">
-            <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
-              ¡Aún no tienes cursos!
-            </h3>
-            <p className="text-slate-400 mb-4">
-              Explora nuestra biblioteca de cursos y comienza tu aprendizaje
-            </p>
-            <Link 
-              href="/search"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-black font-medium rounded-lg hover:bg-green-400 transition-colors"
-            >
-              <Search className="h-4 w-4" />
-              Explorar Cursos
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* Cursos Disponibles Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Cursos Disponibles</h2>
-          <Link href="/search" className="text-green-400 hover:text-green-300 text-sm font-medium">
-            Ver todos
-          </Link>
-        </div>
+        
         {availableCourses.length > 0 ? (
-          <CoursesList items={availableCourses.slice(0, 4)} />
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-6 border border-blue-500/20">
+            <CoursesList items={availableCourses} />
+          </div>
         ) : (
-          <div className="bg-slate-800 rounded-lg p-8 text-center border border-slate-700">
-            <Plus className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
-              No hay cursos disponibles
-            </h3>
-            <p className="text-slate-400">
-              Los profesores aún no han publicado cursos
-            </p>
+          <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">
+            <div className="max-w-md mx-auto space-y-6">
+              <div className="p-4 bg-yellow-400/10 rounded-full w-fit mx-auto">
+                <BookOpen className="h-16 w-16 text-yellow-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-3">
+                  ¡Próximamente!
+                </h3>
+                <p className="text-gray-400 text-lg">
+                  Estamos preparando los cursos de Técnico en Primera Infancia y Técnico en Inglés para ti.
+                </p>
+              </div>
+            </div>
           </div>
         )}
+      </div>
+
+      {/* Si no tiene cursos - MENSAJE SÚPER CLARO */}
+      {[...coursesInProgress, ...completedCourses].length === 0 && (
+        <div className="bg-gradient-to-r from-green-500/10 to-yellow-400/10 rounded-2xl p-12 text-center border border-green-500/20">
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="p-4 bg-green-500/20 rounded-full w-fit mx-auto">
+              <Play className="h-16 w-16 text-green-400" />
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white mb-4">
+                ¡Comienza tu aprendizaje!
+              </h3>
+              <p className="text-gray-300 text-lg mb-6">
+                Aún no tienes cursos. Explora nuestros programas técnicos y comienza tu formación profesional.
+              </p>
+              <Link 
+                href="/search"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-green-500 text-black font-bold text-lg rounded-xl hover:bg-green-400 transition-all duration-300 hover:scale-105"
+              >
+                <Search className="h-6 w-6" />
+                VER CURSOS DISPONIBLES
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Botón de explorar más - SÚPER VISIBLE */}
+      <div className="text-center py-8">
+        <Link 
+          href="/search"
+          className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-400 text-black font-bold text-lg rounded-xl hover:bg-yellow-300 transition-all duration-300 hover:scale-105"
+        >
+          <Search className="h-6 w-6" />
+          EXPLORAR TODOS LOS CURSOS
+        </Link>
       </div>
     </div>
   )

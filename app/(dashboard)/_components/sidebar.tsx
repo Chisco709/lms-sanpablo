@@ -1,18 +1,25 @@
 import { Logo } from "./logo"
 import { SidebarRoutes } from "./sidebar-routes"
+import Image from "next/image"
 
 export const Sidebar = () => {
     return (
-        <div className="h-full flex flex-col bg-[#0F172A] border-r border-white/5">
+        <div className="h-full flex flex-col bg-[#0F172A] border-r border-white/5" data-tutorial="sidebar">
             {/* Logo Section */}
             <div className="p-6 border-b border-white/5">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center shadow-lg shadow-yellow-400/20">
-                        <span className="text-black font-bold text-xl">S</span>
+                    <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-yellow-400/20">
+                        <Image 
+                            src="/logo-sanpablo.jpg"
+                            alt="Instituto San Pablo"
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                     <div>
                         <h1 className="text-white font-bold text-xl">SanPablo</h1>
-                        <p className="text-gray-500 text-xs">Learning Platform</p>
+                        <p className="text-gray-500 text-xs">Plataforma Educativa</p>
                     </div>
                 </div>
             </div>

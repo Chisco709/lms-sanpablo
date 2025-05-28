@@ -50,7 +50,7 @@ const GoalsPage = async () => {
           className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors mt-6"
         >
           <BookOpen className="h-4 w-4 mr-2" />
-          Volver al Dashboard
+          Volver al Inicio
         </a>
       </div>
     </div>

@@ -15,24 +15,24 @@ interface CoursesListProps {
 export const CoursesList = ({ items }: CoursesListProps) => {
   return (
     <div>
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {items.map((item) => (
           <CourseCard
             key={item.id}
             id={item.id}
             title={item.title}
-            imageUrl={item.imageUrl!}
+            imageUrl={item.imageUrl || "/placeholder-course.jpg"}
             chaptersLength={item.chapters.length}
-            price={item.price!}
+            price={item.price || 0}
             progress={item.progress}
-            category={item?.category?.name!}
+            category={item?.category?.name || "Sin categoría"}
             isPurchased={item.isPurchased}
           />
         ))}
       </div>
       {items.length === 0 && (
-        <div className="text-center text-sm text-muted-foreground mt-10">
-          No se encontraron cursos
+        <div className="text-center text-lg text-gray-400 mt-12 py-8">
+          <p className="font-medium">No se encontraron cursos disponibles</p>
         </div>
       )}
     </div>
