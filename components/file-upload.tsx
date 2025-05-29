@@ -18,10 +18,24 @@ export const FileUpload = ({
         <UploadDropzone 
         endpoint={endpoint}
         onClientUploadComplete={(res) => {
-            onChange(res?.[0].ufsUrl)
+            console.log("📂 FileUpload Response:", res);
+            
+            // Intentar diferentes propiedades que podría devolver UploadThing
+            const fileUrl = res?.[0]?.url || res?.[0]?.ufsUrl || res?.[0]?.fileUrl;
+            
+            console.log("📎 URL extraída:", fileUrl);
+            
+            if (fileUrl) {
+                toast.success("✅ Archivo subido exitosamente");
+                onChange(fileUrl);
+            } else {
+                console.error("❌ No se encontró URL en la respuesta:", res);
+                toast.error("Error: No se pudo obtener la URL del archivo");
+            }
         }}
         onUploadError={(error: Error) => {
-            toast.error(`${error?.message}`)
+            console.error("❌ Error de subida:", error);
+            toast.error(`Error de subida: ${error?.message}`);
         }}
         />
     )

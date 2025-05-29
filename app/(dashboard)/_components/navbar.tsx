@@ -30,7 +30,7 @@ export const Navbar = () => {
                         {/* Logo minimalista y estable */}
                         <div className="hidden md:flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center shadow-lg">
-                                <span className="text-black font-bold text-lg select-none">S</span>
+                                <span className="text-black font-bold text-lg select-none" suppressHydrationWarning={true}>S</span>
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-white font-semibold text-lg leading-none">SanPablo</span>

@@ -36,6 +36,31 @@ const CourseIdPage = async ({
         orderBy: {
           position: "asc"
         }
+      },
+      pensumTopics: {
+        where: {
+          isPublished: true,
+        },
+        include: {
+          chapters: {
+            where: {
+              isPublished: true,
+            },
+            include: {
+              userProgress: {
+                where: {
+                  userId,
+                }
+              }
+            },
+            orderBy: {
+              position: "asc"
+            }
+          }
+        },
+        orderBy: {
+          position: "asc"
+        }
       }
     }
   });
@@ -57,12 +82,32 @@ const CourseIdPage = async ({
   const isFreeCoure = !course.price || course.price === 0;
   const hasAccess = purchase || isFreeCoure;
 
-  // Si no hay capítulos, redirigir al dashboard
-  if (course.chapters.length === 0) {
+  // ✅ SOPORTE PARA CURSOS CON Y SIN TEMAS DEL PENSUM
+  let allChapters = [];
+  
+  if (course.pensumTopics && course.pensumTopics.length > 0) {
+    // Si tiene temas del pensum, usar esos capítulos
+    allChapters = course.pensumTopics.flatMap(topic => topic.chapters);
+  } else {
+    // Si NO tiene temas del pensum, usar capítulos directos
+    allChapters = course.chapters;
+    
+    // Crear un tema virtual para mantener la UI consistente
+    course.pensumTopics = [{
+      id: 'virtual-topic',
+      title: 'Contenido del Curso',
+      description: 'Todas las clases del curso',
+      position: 1,
+      isPublished: true,
+      chapters: course.chapters
+    }];
+  }
+
+  if (allChapters.length === 0) {
     return redirect("/student");
   }
 
-  const completedChapters = course.chapters.filter(ch => ch.userProgress?.[0]?.isCompleted).length;
+  const completedChapters = allChapters.filter(ch => ch.userProgress?.[0]?.isCompleted).length;
 
   return (
     <CoursePageClient 

@@ -7,7 +7,7 @@ import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 // import { Chapter } from "@prisma/client";
-import { FileUpload } from "@/components/file-upload";
+import { SimplePdfUpload } from "@/components/simple-pdf-upload";
 
 // Removed unused form schema and types
 
@@ -128,7 +128,7 @@ export const ChapterPdfForm = ({
           ) : (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Agregar Guía PDF
+              Subir PDF
             </>
           )}
         </Button>
@@ -150,7 +150,7 @@ export const ChapterPdfForm = ({
               </p>
               <Button 
                 onClick={toggleEdit}
-                className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
               >
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Subir Guía PDF
@@ -226,7 +226,7 @@ export const ChapterPdfForm = ({
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <X className="w-4 h-4 mr-2" />
+                      <X className="w-4 w-4 mr-2" />
                       Eliminar
                     </>
                   )}
@@ -257,51 +257,67 @@ export const ChapterPdfForm = ({
           {/* Área de subida */}
           <div className="space-y-4">
             <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 bg-slate-700/30">
-              <FileUpload
-                endpoint="chapterPdf"
+              <SimplePdfUpload
                 onChange={(url) => {
                   if (url) {
                     setTempPdfUrl(url);
+                    console.log("📎 PDF URL obtenida:", url);
                   }
                 }}
               />
-              
-              <div className="text-xs text-slate-400 mt-2">
-                Formatos soportados: PDF (máximo 16MB)
+            </div>
+
+            {/* BOTÓN SIEMPRE VISIBLE - IMPORTANTE */}
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <File className="h-5 w-5 text-green-400" />
+                  <div>
+                    <p className="text-green-200 font-medium">
+                      {tempPdfUrl ? "¡Archivo listo! Haz clic en GUARDAR" : "Sube tu archivo y haz clic en GUARDAR"}
+                    </p>
+                    <p className="text-green-300/70 text-sm">
+                      {tempPdfUrl ? "PDF subido correctamente, confirma para guardarlo" : "El botón GUARDAR se activará cuando subas un archivo"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={() => onSubmit(tempPdfUrl)}
+                    disabled={isSubmitting || !tempPdfUrl}
+                    className={`font-medium ${
+                      tempPdfUrl 
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                        : 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                    )}
+                    {isSubmitting ? "Guardando..." : "GUARDAR PDF"}
+                  </Button>
+                </div>
               </div>
             </div>
 
+            {/* Confirmación visual cuando el archivo está listo */}
             {tempPdfUrl && (
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <File className="h-5 w-5 text-yellow-400" />
-                    <div>
-                      <p className="text-yellow-200 font-medium">Archivo PDF listo para subir</p>
-                      <p className="text-yellow-300/70 text-sm">Confirma para guardar el archivo en el capítulo</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => setTempPdfUrl(null)}
-                      variant="outline"
-                      size="sm"
-                      className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      onClick={() => onSubmit(tempPdfUrl)}
-                      disabled={isSubmitting}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                      )}
-                      Confirmar Subida
-                    </Button>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-yellow-400" />
+                  <div>
+                    <p className="text-yellow-200 font-medium">✅ Archivo PDF cargado exitosamente</p>
+                    <p className="text-yellow-300/70 text-sm">Ahora haz clic en "GUARDAR PDF" para guardarlo en el capítulo</p>
                   </div>
                 </div>
               </div>

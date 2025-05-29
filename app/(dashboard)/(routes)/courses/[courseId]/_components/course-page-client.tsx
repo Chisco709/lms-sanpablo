@@ -15,7 +15,9 @@ import {
   ArrowLeft,
   Home,
   Star,
-  Clock
+  Clock,
+  Menu,
+  X
 } from "lucide-react";
 
 interface CoursePageClientProps {
@@ -35,23 +37,26 @@ export const CoursePageClient = ({
   isFreeCoure,
   courseId
 }: CoursePageClientProps) => {
-  const [showAllChapters, setShowAllChapters] = useState(false);
+  const [expandedTopics, setExpandedTopics] = useState<Record<string, boolean>>({});
   const [canGoBack, setCanGoBack] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
   
-  // Mostrar solo los primeros 5 capítulos inicialmente
-  const visibleChapters = showAllChapters ? course.chapters : course.chapters.slice(0, 5);
-  const hasMoreChapters = course.chapters.length > 5;
+  // Obtener todos los capítulos de todos los temas
+  const allChapters = course.pensumTopics?.flatMap((topic: any) => topic.chapters) || [];
+  const totalTopics = course.pensumTopics?.length || 0;
 
   useEffect(() => {
-    // Marcar como montado para evitar errores de hidratación
     setMounted(true);
-    // Verificar si hay historial de navegación solo en el cliente
     if (typeof window !== 'undefined') {
-    setCanGoBack(window.history.length > 1);
+      setCanGoBack(window.history.length > 1);
     }
-  }, []);
+    // Expandir el primer tema por defecto
+    if (course.pensumTopics?.length > 0) {
+      setExpandedTopics({ [course.pensumTopics[0].id]: true });
+    }
+  }, [course.pensumTopics]);
 
   const handleBackNavigation = () => {
     if (canGoBack) {
@@ -61,13 +66,20 @@ export const CoursePageClient = ({
     }
   };
 
+  const toggleTopic = (topicId: string) => {
+    setExpandedTopics(prev => ({
+      ...prev,
+      [topicId]: !prev[topicId]
+    }));
+  };
+
   const formatUnlockDate = (unlockDate: string | Date | null) => {
     if (!unlockDate) return null;
     
     const date = new Date(unlockDate);
     const now = new Date();
     
-    if (date <= now) return null; // Ya está desbloqueado
+    if (date <= now) return null;
     
     return date.toLocaleDateString('es-CO', {
       day: 'numeric',
@@ -77,241 +89,293 @@ export const CoursePageClient = ({
   };
 
   const isChapterLocked = (chapter: any) => {
-    if (hasAccess) return false; // Si tiene acceso al curso, no hay bloqueos
-    if (chapter.isFree) return false; // Capítulos gratuitos nunca están bloqueados
+    if (hasAccess) return false;
+    if (chapter.isFree) return false;
     
-    // Si hay fecha de desbloqueo, verificar
     if (chapter.unlockDate) {
       const unlockDate = new Date(chapter.unlockDate);
       const now = new Date();
       return unlockDate > now;
     }
     
-    return !hasAccess; // Por defecto, bloqueado si no tiene acceso
+    return !hasAccess;
+  };
+
+  const getTopicProgress = (topic: any) => {
+    const topicChapters = topic.chapters || [];
+    const completed = topicChapters.filter((ch: any) => ch.userProgress?.[0]?.isCompleted).length;
+    return { completed, total: topicChapters.length };
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header con navegación inteligente - MÁS HERMOSO */}
-      <div className="bg-gradient-to-r from-slate-900/80 via-slate-800/60 to-slate-900/80 backdrop-blur-xl border-b border-slate-700/50">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Header MÓVIL MEJORADO */}
+      <div className="bg-gradient-to-r from-slate-900/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            {/* Lado izquierdo - MÓVIL OPTIMIZADO */}
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={handleBackNavigation}
-                className="flex items-center gap-3 px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 group border border-slate-700/30"
+                className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 group border border-slate-700/30"
               >
-                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                <span className="font-medium">{canGoBack ? 'Volver' : 'Mis Cursos'}</span>
+                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 group-hover:-translate-x-1 transition-transform" />
+                <span className="font-medium text-sm sm:text-base hidden xs:inline">{canGoBack ? 'Volver' : 'Mis Cursos'}</span>
               </button>
-              <div className="h-6 w-px bg-gradient-to-b from-transparent via-slate-600 to-transparent"></div>
-              <span className="text-slate-400 text-sm font-medium">Curso</span>
+              <div className="h-4 w-px bg-gradient-to-b from-transparent via-slate-600 to-transparent hidden sm:block"></div>
+              <span className="text-slate-400 text-xs sm:text-sm font-medium hidden sm:inline">Curso</span>
             </div>
             
-            {/* Botón directo al inicio */}
-            <Link 
-              href="/student"
-              className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30"
-            >
-              <Home className="h-5 w-5" />
-              <span className="hidden sm:inline font-medium">Inicio</span>
-            </Link>
+            {/* Lado derecho - MÓVIL OPTIMIZADO */}
+            <div className="flex items-center gap-2">
+              {/* Botón móvil de menú */}
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="lg:hidden flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30"
+              >
+                {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+              
+              {/* Botón inicio - Desktop */}
+              <Link 
+                href="/student"
+                className="hidden lg:flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30"
+              >
+                <Home className="h-5 w-5" />
+                <span className="font-medium">Inicio</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Contenido principal - Solo clases y progreso */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* CONTENIDO DEL CURSO - INMEDIATAMENTE VISIBLE */}
-          <div className="lg:col-span-3 space-y-6">
+      {/* MENÚ MÓVIL DESLIZABLE */}
+      {showMobileMenu && (
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)}>
+          <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/50 p-6">
+            <div className="space-y-4">
+              <Link 
+                href="/student"
+                className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30 text-lg"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <Home className="h-6 w-6" />
+                <span className="font-medium">Ir al Inicio</span>
+              </Link>
+              
+              <div className="pt-4 border-t border-slate-700/50">
+                <h3 className="text-white font-bold text-lg mb-4">Progreso del Curso</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Temas:</span>
+                    <span className="text-white font-semibold">{totalTopics}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Clases:</span>
+                    <span className="text-white font-semibold">{allChapters.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Completadas:</span>
+                    <span className="text-green-400 font-semibold">{completedChapters}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenido principal - OPTIMIZADO PARA MÓVIL */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
+          {/* CONTENIDO ORGANIZADO POR TEMAS DEL PENSUM - MÓVIL FIRST */}
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+            {/* Título responsive */}
             <div className="text-center">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-2 sm:mb-4">
                 CONTENIDO DEL CURSO
               </h2>
-              <p className="text-slate-400 text-lg">
-                {course.chapters.length} {course.chapters.length === 1 ? 'clase disponible' : 'clases disponibles'}
+              <p className="text-slate-400 text-base sm:text-lg">
+                {totalTopics} {totalTopics === 1 ? 'tema' : 'temas'} • {allChapters.length} {allChapters.length === 1 ? 'clase' : 'clases'}
               </p>
-          </div>
+            </div>
 
-                <div className="space-y-4">
-          {visibleChapters.map((chapter: any, index: number) => {
-            const isCompleted = !!chapter.userProgress?.[0]?.isCompleted;
-            const isLocked = isChapterLocked(chapter);
-            const unlockDateFormatted = formatUnlockDate(chapter.unlockDate);
-            
-            return (
-              <div
-                key={chapter.id}
-                    className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/30 via-slate-800/20 to-slate-800/30 hover:from-slate-700/40 hover:via-slate-700/30 hover:to-slate-700/40 border border-slate-700/30 hover:border-slate-600/50 transition-all duration-300 backdrop-blur-sm"
-              >
-                    {/* Efecto de brillo */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                <Link 
-                  href={isLocked ? '#' : `/courses/${courseId}/chapters/${chapter.id}`}
-                      className={`relative z-10 flex items-center gap-6 p-6 ${
-                        isLocked ? 'cursor-not-allowed opacity-60' : 'transition-all duration-300'
-                  }`}
-                >
-                      {/* Número/Estado - MÁS HERMOSO */}
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-lg ${
-                    isLocked 
-                      ? 'bg-slate-700/40 text-slate-500' 
-                      : isCompleted 
-                            ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-green-500/25' 
-                            : 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-black shadow-yellow-400/25 group-hover:shadow-yellow-400/40'
-                  }`}>
-                    {isLocked ? (
-                          <Lock size={20} />
-                    ) : isCompleted ? (
-                          <CheckCircle size={20} />
-                    ) : (
-                          <span className="text-lg">{index + 1}</span>
+            {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
+            <div className="space-y-4 sm:space-y-6">
+              {course.pensumTopics?.map((topic: any, topicIndex: number) => {
+                const isExpanded = expandedTopics[topic.id];
+                const topicProgress = getTopicProgress(topic);
+                const isTopicCompleted = topicProgress.completed === topicProgress.total && topicProgress.total > 0;
+
+                return (
+                  <div key={topic.id} className="space-y-3 sm:space-y-4">
+                    {/* HEADER DEL TEMA - MÓVIL OPTIMIZADO */}
+                    <div 
+                      onClick={() => toggleTopic(topic.id)}
+                      className="group cursor-pointer bg-gradient-to-r from-yellow-500/10 via-yellow-400/5 to-yellow-500/10 hover:from-yellow-500/20 hover:via-yellow-400/10 hover:to-yellow-500/20 border border-yellow-500/30 hover:border-yellow-400/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-base sm:text-lg flex-shrink-0 ${
+                            isTopicCompleted
+                              ? 'bg-gradient-to-br from-green-500 to-green-600 text-white'
+                              : 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-black'
+                          }`}>
+                            {isTopicCompleted ? <CheckCircle size={20} className="sm:w-6 sm:h-6" /> : (topicIndex + 1)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors truncate pr-2">
+                              📚 {topic.title}
+                            </h3>
+                            <p className="text-slate-400 mt-1 text-sm sm:text-base">
+                              {topicProgress.completed}/{topicProgress.total} clases completadas
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                          {isTopicCompleted && (
+                            <span className="px-2 sm:px-3 py-1 bg-green-500/20 text-green-400 font-bold rounded-full text-xs sm:text-sm">
+                              ✅ <span className="hidden sm:inline">TEMA COMPLETADO</span>
+                            </span>
+                          )}
+                          <div className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                            <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-slate-400 group-hover:text-yellow-400" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CAPÍTULOS DEL TEMA - MÓVIL OPTIMIZADO */}
+                    {isExpanded && (
+                      <div className="space-y-2 sm:space-y-3 ml-2 sm:ml-4 pl-4 sm:pl-8 border-l-2 border-yellow-400/30">
+                        {topic.chapters.map((chapter: any, chapterIndex: number) => {
+                          const isCompleted = !!chapter.userProgress?.[0]?.isCompleted;
+                          const isLocked = isChapterLocked(chapter);
+                          const unlockDate = formatUnlockDate(chapter.unlockDate);
+
+                          return (
+                            <div key={chapter.id}>
+                              {isLocked ? (
+                                <div className="p-3 sm:p-4 bg-slate-800/40 border border-slate-700/50 rounded-xl">
+                                  <div className="flex items-center gap-3 sm:gap-4">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                                      <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-slate-300 font-medium text-sm sm:text-base line-clamp-2">
+                                        {chapter.title}
+                                      </h4>
+                                      {unlockDate && (
+                                        <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
+                                          Disponible: {unlockDate}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <Link
+                                  href={`/courses/${courseId}/chapters/${chapter.id}`}
+                                  className={`block p-3 sm:p-4 rounded-xl transition-all duration-200 border hover:scale-[1.02] ${
+                                    isCompleted
+                                      ? 'bg-gradient-to-r from-green-500/20 to-green-600/20 border-green-500/30 hover:border-green-400/50'
+                                      : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 hover:border-slate-600/50'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3 sm:gap-4">
+                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                                      isCompleted
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
+                                    }`}>
+                                      {isCompleted ? (
+                                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                                      ) : (
+                                        <Play className="h-4 w-4 sm:h-5 sm:w-5" />
+                                      )}
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className={`font-semibold text-sm sm:text-base line-clamp-2 ${
+                                        isCompleted ? 'text-green-400' : 'text-white'
+                                      }`}>
+                                        Clase {chapterIndex + 1}: {chapter.title}
+                                      </h4>
+                                      
+                                      <div className="flex items-center gap-2 sm:gap-4 mt-1 sm:mt-2">
+                                        {chapter.isFree && (
+                                          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
+                                            GRATIS
+                                          </span>
+                                        )}
+                                        {isCompleted && (
+                                          <span className="text-green-400 text-xs sm:text-sm font-medium flex items-center gap-1">
+                                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span className="hidden sm:inline">Completada</span>
+                                          </span>
+                                        )}
+                                        <div className="text-slate-400 text-xs sm:text-sm flex items-center gap-1">
+                                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                                          <span className="hidden sm:inline">~10 min</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 group-hover:text-white transition-colors flex-shrink-0" />
+                                  </div>
+                                </Link>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
+                );
+              })}
+            </div>
+          </div>
 
-                  {/* Contenido */}
-                  <div className="flex-1 min-w-0">
-                        <h3 className={`text-xl font-bold mb-3 ${
-                          isLocked ? 'text-slate-500' : 'text-white group-hover:text-yellow-400'
-                        } transition-colors duration-300`}>
-                      {chapter.title}
-                    </h3>
-                        <div className="flex items-center gap-4 text-sm">
-                          <span className="text-slate-400 font-medium">Clase {index + 1}</span>
-                      {isCompleted && (
-                            <span className="px-3 py-1 bg-green-500/20 text-green-400 font-bold rounded-full border border-green-500/30">
-                              ✓ COMPLETADO
-                            </span>
-                      )}
-                      {isLocked && unlockDateFormatted && (
-                            <span className="px-3 py-1 bg-yellow-400/20 text-yellow-400 font-bold rounded-full border border-yellow-400/30 flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                          Se desbloquea: {unlockDateFormatted}
-                        </span>
-                      )}
-                      {isLocked && !unlockDateFormatted && (
-                            <span className="px-3 py-1 bg-red-500/20 text-red-400 font-bold rounded-full border border-red-500/30">
-                              🔒 BLOQUEADO
-                            </span>
-                      )}
-                      {chapter.isFree && !hasAccess && (
-                            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 font-bold rounded-full border border-blue-500/30">
-                              👁️ VISTA PREVIA
-                            </span>
-                      )}
-                    </div>
+          {/* SIDEBAR - OCULTO EN MÓVIL, MOSTRADO EN DESKTOP */}
+          <div className="hidden lg:block">
+            <div className="sticky top-28 space-y-6">
+              {/* Información del curso */}
+              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/30">
+                <h3 className="text-white font-bold text-xl mb-4">Información del Curso</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Progreso:</span>
+                    <span className="text-white font-semibold">{Math.round((completedChapters / allChapters.length) * 100) || 0}%</span>
                   </div>
-
-                      {/* Icono de acción - MÁS HERMOSO */}
-                  {!isLocked && (
-                        <div className="w-12 h-12 bg-slate-700/30 group-hover:bg-gradient-to-br group-hover:from-green-400/20 group-hover:to-green-500/20 rounded-xl flex items-center justify-center transition-all duration-300 border border-slate-600/30 group-hover:border-green-400/50">
-                          <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-green-400 group-hover:translate-x-1 transition-all duration-300" />
-                    </div>
-                  )}
-                </Link>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Completadas:</span>
+                    <span className="text-green-400 font-semibold">{completedChapters}/{allChapters.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Acceso:</span>
+                    <span className={hasAccess ? "text-green-400" : "text-yellow-400"}>
+                      {hasAccess ? "✅ Total" : "⭐ Limitado"}
+                    </span>
+                  </div>
+                </div>
               </div>
-            );
-          })}
-        </div>
 
-            {/* Botón para mostrar más capítulos - MÁS HERMOSO */}
-        {hasMoreChapters && (
-              <div className="mt-8 text-center">
-            <button
-              onClick={() => setShowAllChapters(!showAllChapters)}
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/60 hover:to-slate-600/60 text-white hover:text-yellow-400 rounded-2xl border border-slate-600/50 hover:border-yellow-400/50 transition-all duration-300 font-bold shadow-lg backdrop-blur-sm"
-            >
-              {showAllChapters ? (
-                <>
-                      <ChevronUp className="h-5 w-5" />
-                      MOSTRAR MENOS
-                </>
-              ) : (
-                <>
-                      <ChevronDown className="h-5 w-5" />
-                      VER TODAS LAS CLASES ({course.chapters.length - 5} más)
-                </>
-              )}
-            </button>
-          </div>
-        )}
-          </div>
-
-          {/* Panel lateral - MÁS HERMOSO */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-6 space-y-6">
-              {/* Panel de progreso */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800/40 via-slate-800/20 to-slate-900/40 p-8 border border-slate-700/30 backdrop-blur-sm">
-                {/* Efectos decorativos */}
-                <div className="absolute -top-12 -right-12 w-24 h-24 bg-green-400/10 rounded-full blur-2xl"></div>
-                
-                <div className="relative z-10 space-y-6">
-                  {/* Progreso del estudiante - MÁS DESTACADO */}
-                  {hasAccess && (
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-white mb-3">TU PROGRESO</h3>
-                        <div className="relative">
-                          <span className="text-5xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-                            {progressCount}%
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="w-full bg-slate-800/60 rounded-full h-4 overflow-hidden shadow-inner">
-                        <div 
-                          className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-500 h-4 rounded-full transition-all duration-1000 ease-out shadow-lg"
-                          style={{width: `${progressCount}%`}}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 rounded-2xl p-4 text-center border border-slate-700/30">
-                          <p className="text-3xl font-bold text-white">{completedChapters}</p>
-                          <p className="text-slate-400 text-sm font-medium">Completados</p>
-                        </div>
-                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 rounded-2xl p-4 text-center border border-slate-700/30">
-                          <p className="text-3xl font-bold text-white">{course.chapters.length - completedChapters}</p>
-                          <p className="text-slate-400 text-sm font-medium">Restantes</p>
-                        </div>
-                      </div>
+              {/* Progreso visual */}
+              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/30">
+                <h3 className="text-white font-bold text-lg mb-4">Tu Progreso</h3>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${(completedChapters / allChapters.length) * 100 || 0}%` }}
+                      ></div>
                     </div>
-                  )}
-
-                  {/* Botón de acción principal - MÁS HERMOSO */}
-                  <div>
-                    {hasAccess ? (
-                      <Link 
-                        href={`/courses/${courseId}/chapters/${course.chapters[0]?.id}`}
-                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 hover:from-green-600 hover:via-green-700 hover:to-emerald-700 text-white font-bold text-lg rounded-2xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-105"
-                      >
-                        <Play className="h-6 w-6" />
-                        {progressCount > 0 ? 'CONTINUAR CURSO' : 'COMENZAR CURSO'}
-                      </Link>
-                    ) : (
-                      <Link 
-                        href={`/courses/${courseId}/chapters/${course.chapters[0]?.id}`}
-                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold text-lg rounded-2xl shadow-lg shadow-yellow-400/25 hover:shadow-yellow-400/40 transition-all duration-300 hover:scale-105"
-                      >
-                        <Play className="h-6 w-6" />
-                        {isFreeCoure ? 'ACCEDER GRATIS' : 'VER CONTENIDO'}
-                      </Link>
-                    )}
+                    <p className="text-center text-slate-400 text-sm mt-2">
+                      {Math.round((completedChapters / allChapters.length) * 100) || 0}% completado
+                    </p>
                   </div>
-
-                  {/* Información adicional */}
-                  {!hasAccess && course.price && course.price > 0 && (
-                    <div className="pt-6 border-t border-slate-700/50">
-                      <div className="text-center">
-                        <p className="text-slate-400 text-sm mb-2 font-medium">Precio del curso</p>
-                        <p className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                          ${course.price.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

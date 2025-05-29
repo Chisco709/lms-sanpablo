@@ -26,6 +26,7 @@ export const CoursesList = ({ items }: CoursesListProps) => {
             price={item.price || 0}
             progress={item.progress}
             category={item?.category?.name || "Sin categoría"}
+            description={item.description || undefined}
             isPurchased={item.isPurchased}
           />
         ))}
