@@ -7,6 +7,7 @@ import { SignedOut } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { SignInButton } from "@clerk/nextjs";
 import { Search } from "lucide-react";
+import Image from "next/image";
 
 export const Navbar = () => {
     const pathname = usePathname();
@@ -27,14 +28,20 @@ export const Navbar = () => {
                     <div className="flex items-center gap-4">
                         <MobileSidebar />
                         
-                        {/* Logo minimalista y estable */}
+                        {/* Logo del Instituto San Pablo */}
                         <div className="hidden md:flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center shadow-lg">
-                                <span className="text-black font-bold text-lg select-none" suppressHydrationWarning={true}>S</span>
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shadow-lg border border-white/10">
+                                <Image 
+                                    src="/instituto-sanpablo-logo.svg" 
+                                    alt="Instituto San Pablo" 
+                                    width={24} 
+                                    height={24}
+                                    className="rounded-lg"
+                                />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-white font-semibold text-lg leading-none">SanPablo</span>
-                                <span className="text-yellow-400 text-xs font-medium leading-none">LMS</span>
+                                <span className="text-white font-semibold text-lg leading-none">Instituto San Pablo</span>
+                                <span className="text-yellow-400 text-xs font-medium leading-none">Pereira, Colombia</span>
                             </div>
                         </div>
                     </div>

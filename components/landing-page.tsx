@@ -135,20 +135,20 @@ export default function LandingPage() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 relative">
                 Transforma Tu Aprendizaje con{" "}
                 <span className="text-yellow-400 relative inline-block">
-                  SanPablo
+                  Instituto San Pablo
                   <svg
                     className="absolute -bottom-2 left-0 w-full"
                     height="6"
-                    viewBox="0 0 200 6"
+                    viewBox="0 0 280 6"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path d="M0 3C50 0.5 150 0.5 200 3" stroke="#FACC15" strokeWidth="5" strokeLinecap="round" />
+                    <path d="M0 3C70 0.5 210 0.5 280 3" stroke="#FACC15" strokeWidth="5" strokeLinecap="round" />
                   </svg>
                 </span>
               </h1>
               <p className="text-gray-300 text-base sm:text-lg md:text-xl mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed">
-                Plataforma educativa completa para carreras técnicas, educación temprana y dominio del inglés.
+                Centro educativo en Pereira, Colombia. Formación técnica especializada en Primera Infancia, Inglés y carreras técnicas que transforman vidas.
               </p>
               <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link
@@ -168,45 +168,59 @@ export default function LandingPage() {
               </div>
               <div className="mt-10 flex items-center justify-center md:justify-start space-x-4">
                 <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-black bg-gray-300 overflow-hidden">
-                      <Image
-                        src={`/placeholder.svg?height=32&width=32&text=${i}`}
-                        alt={`User ${i}`}
-                        width={32}
-                        height={32}
-                        className="w-full h-full object-cover"
-                      />
+                  <div className="w-10 h-10 rounded-full border-2 border-yellow-400 bg-white/10 overflow-hidden">
+                    <Image
+                      src="/instituto-sanpablo-logo.svg"
+                      alt="Instituto San Pablo"
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-yellow-400 bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">🎓</span>
                     </div>
                   ))}
                 </div>
                 <div className="text-sm text-gray-400">
-                  <span className="text-yellow-400 font-semibold">2,000+</span> Estudiantes ya están aprendiendo
+                  <span className="text-yellow-400 font-semibold">500+</span> Graduados del Instituto San Pablo
                 </div>
               </div>
             </div>
             <div className="relative mt-8 md:mt-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-green-500/20 rounded-2xl blur-3xl opacity-30 transform -rotate-6"></div>
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)] transform perspective-[1000px] rotate-1 hover:rotate-0 transition-transform duration-500 border border-white/10">
-                <Image
-                  src="/placeholder.svg?height=600&width=800"
-                  alt="SanPablo LMS Platform"
-                  width={800}
-                  height={600}
-                  priority
-                  className="w-full h-auto transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div className="absolute bottom-0 left-0 w-full p-6">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-green-400">Clases En Vivo</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-yellow-400/20 rounded-2xl blur-3xl opacity-30 transform -rotate-6"></div>
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)] transform perspective-[1000px] rotate-1 hover:rotate-0 transition-transform duration-500 border border-yellow-400/20">
+                <div className="relative w-full h-[400px] md:h-[500px] bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700">
+                  {/* Imagen de graduación de fondo */}
+                  <div className="absolute inset-0 bg-[url('/instituto-sanpablo/graduacion-hero.jpg')] bg-cover bg-center opacity-80"></div>
+                  
+                  {/* Overlay con gradiente */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  
+                  {/* Contenido superpuesto */}
+                  <div className="absolute bottom-0 left-0 w-full p-6 text-white">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                      <span className="text-sm text-yellow-400 font-medium">Graduaciones Presenciales</span>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">Formando Profesionales en Pereira</h3>
+                    <p className="text-gray-300 text-sm">Más de 15 años transformando vidas a través de la educación técnica</p>
                   </div>
-                  <h3 className="text-xl font-bold">Experiencia De Aprendizaje Interactivo</h3>
+                  
+                  {/* Logo del instituto en la esquina */}
+                  <div className="absolute top-4 right-4 w-12 h-12 bg-white/10 backdrop-blur rounded-full flex items-center justify-center border border-white/20">
+                    <Image
+                      src="/instituto-sanpablo-logo.svg"
+                      alt="Instituto San Pablo"
+                      width={28}
+                      height={28}
+                    />
+                  </div>
                 </div>
               </div>
               <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-yellow-400 text-black font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-lg transform rotate-6">
-                Nuevos Cursos!
+                ¡Inscripciones Abiertas!
               </div>
             </div>
           </div>
@@ -500,23 +514,23 @@ export default function LandingPage() {
 
             <div className="text-center relative">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-yellow-400 to-green-500 bg-clip-text text-transparent">
-                Ready to Transform Your Learning Journey?
+                ¿Listo para Transformar tu Aprendizaje?
               </h2>
               <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of students and educators who have elevated their skills with SanPablo LMS. Start your
-                journey today and unlock your full potential.
+                Únete a miles de estudiantes y educadores que han elevado sus habilidades con SanPablo LMS. Comienza tu
+                formación hoy y desbloquea todo tu potencial.
               </p>
               <Link
                 href="/sign-in"
                 className="px-8 sm:px-10 py-3 sm:py-4 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_7px_14px_rgba(255,222,0,0.3)] inline-flex items-center justify-center group text-base sm:text-lg"
               >
-                Sign In Now
+                Ingresar Ahora
                 <ArrowRight size={20} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <div className="mt-6 text-sm text-gray-400">
-                New to SanPablo?{" "}
+                ¿Nuevo en SanPablo?{" "}
                 <Link href="/sign-up" className="text-yellow-400 hover:underline">
-                  Create an account
+                  Crear una cuenta
                 </Link>
               </div>
             </div>
@@ -531,17 +545,32 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid md:grid-cols-3 gap-10 mb-12 md:mb-16">
             <div className="md:col-span-1">
-              <div className="text-2xl font-extrabold mb-6">
-                <span className="text-white">San</span>
-                <span className="text-yellow-400 relative">
-                  Pablo
-                  <span className="absolute w-2 h-2 bg-green-500 rounded-full top-0 -right-2"></span>
-                </span>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-yellow-400/30">
+                  <Image
+                    src="/instituto-sanpablo-logo.svg"
+                    alt="Instituto San Pablo"
+                    width={32}
+                    height={32}
+                  />
+                </div>
+                <div className="text-2xl font-extrabold">
+                  <span className="text-white">Instituto San</span>
+                  <span className="text-yellow-400 relative">
+                    Pablo
+                    <span className="absolute w-2 h-2 bg-green-500 rounded-full top-0 -right-2"></span>
+                  </span>
+                </div>
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                Empowering educators and learners with innovative technology and comprehensive training programs
-                designed for real-world success.
+                Empoderando a educadores y estudiantes con tecnología innovadora y programas de capacitación integral
+                diseñados para el éxito en el mundo real.
               </p>
+              <div className="space-y-2 mb-6">
+                <p className="text-yellow-400 text-sm font-medium">📍 Pereira, Colombia</p>
+                <p className="text-gray-400 text-sm">🎓 Más de 15 años formando profesionales</p>
+                <p className="text-gray-400 text-sm">✨ 500+ graduados exitosos</p>
+              </div>
               <div className="flex space-x-4">
                 {["facebook", "twitter", "instagram", "linkedin"].map((social) => (
                   <a
@@ -560,15 +589,15 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:col-span-2">
               <div>
                 <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
-                  Programs
+                  Programas
                   <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
                 </h3>
                 <ul className="space-y-3">
                   {[
-                    "Early Childhood Education",
-                    "English Language Learning",
-                    "Professional Development",
-                    "Certification Courses",
+                    "Técnico en Primera Infancia",
+                    "Técnico en Inglés",
+                    "Desarrollo Profesional",
+                    "Cursos de Certificación",
                   ].map((item, index) => (
                     <li key={index}>
                       <Link
@@ -585,11 +614,11 @@ export default function LandingPage() {
 
               <div>
                 <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
-                  Company
+                  Instituto
                   <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
                 </h3>
                 <ul className="space-y-3">
-                  {["About Us", "Our Team", "Careers", "Contact Us"].map((item, index) => (
+                  {["Sobre Nosotros", "Nuestro Equipo", "Carreras", "Contáctanos"].map((item, index) => (
                     <li key={index}>
                       <Link
                         href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
@@ -605,11 +634,11 @@ export default function LandingPage() {
 
               <div>
                 <h3 className="text-yellow-400 font-bold text-lg mb-4 relative inline-block">
-                  Resources
+                  Recursos
                   <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-green-500"></span>
                 </h3>
                 <ul className="space-y-3">
-                  {["Blog", "Guides", "Webinars", "Support"].map((item, index) => (
+                  {["Blog", "Guías", "Seminarios", "Soporte"].map((item, index) => (
                     <li key={index}>
                       <Link
                         href={`/${item.toLowerCase()}`}
@@ -627,20 +656,20 @@ export default function LandingPage() {
 
           <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} SanPablo LMS. All rights reserved.
+              © {new Date().getFullYear()} Instituto San Pablo. Todos los derechos reservados.
             </p>
             <div className="flex space-x-6">
               <Link
                 href="/privacy"
                 className="text-gray-500 hover:text-yellow-400 text-sm transition-colors duration-300"
               >
-                Privacy Policy
+                Política de Privacidad
               </Link>
               <Link
                 href="/terms"
                 className="text-gray-500 hover:text-yellow-400 text-sm transition-colors duration-300"
               >
-                Terms of Service
+                Términos de Servicio
               </Link>
             </div>
           </div>

@@ -9,7 +9,11 @@ import {
   FcMusic,
   FcOldTimeCamera,
   FcSalesPerformance,
-  FcSportsMode
+  FcSportsMode,
+  FcElectronics,
+  FcAutomotive,
+  FcBusiness,
+  FcGears
 } from "react-icons/fc"
 import { CategoryItem } from "./category-item"
 
@@ -18,6 +22,16 @@ interface CategoriesProps {
 }
 
 const iconMap: Record<Category["name"], IconType> = {
+  // Categorías técnicas en español
+  "Técnico en Computación": FcMultipleDevices,
+  "Técnico en Electrónica": FcElectronics,
+  "Técnico en Mecánica": FcGears,
+  "Técnico en Electricidad": FcEngineering,
+  "Técnico en Soldadura": FcEngineering,
+  "Técnico en Refrigeración": FcEngineering,
+  "Técnico en Automotriz": FcAutomotive,
+  "Técnico en Construcción": FcBusiness,
+  // Categorías antiguas por compatibilidad
   "Music": FcMusic,
   "Photography": FcOldTimeCamera,
   "Fitness": FcSportsMode,

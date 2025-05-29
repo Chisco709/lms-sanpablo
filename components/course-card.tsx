@@ -45,6 +45,13 @@ export const CourseCard = ({
     return imageUrl
   }
 
+  // Seleccionar imagen de graduación basada en el ID del curso para variedad
+  const getGraduationImage = () => {
+    const images = ['/imagen-id1.jpg', '/imagen-id2.jpg', '/imagen-id3.jpg', '/imagen-id4.jpg', '/imagen-id5.jpg', '/imagen-id6.jpg']
+    const index = id.length % images.length
+    return images[index]
+  }
+
   return (
     <Link href={`/courses/${id}`}>
       <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800/40 via-slate-800/20 to-slate-900/40 hover:from-slate-700/50 hover:via-slate-700/30 hover:to-slate-800/50 border border-slate-700/30 hover:border-slate-600/50 transition-all duration-500 backdrop-blur-sm hover:scale-[1.02] hover:shadow-2xl hover:shadow-slate-900/50">
@@ -79,10 +86,19 @@ export const CourseCard = ({
                 {category}
               </span>
             </div>
+            
+            {/* IMAGEN PEQUEÑA CON MARCO A LA DERECHA */}
+            <div className="absolute top-4 right-4">
+              <img 
+                src={getGraduationImage()}
+                alt="Graduación Instituto San Pablo"
+                className="w-12 h-12 object-cover rounded-lg border-2 border-white/30 shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+              />
+            </div>
           
             {/* Badge de estado */}
             {isCompleted && (
-              <div className="absolute top-4 right-4">
+              <div className="absolute bottom-4 right-4">
                 <div className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
                   <CheckCircle className="h-3 w-3" />
                   COMPLETADO
@@ -91,7 +107,7 @@ export const CourseCard = ({
             )}
 
             {isInProgress && (
-              <div className="absolute top-4 right-4">
+              <div className="absolute bottom-4 right-4">
                 <div className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
                   <Play className="h-3 w-3" />
                   EN PROGRESO

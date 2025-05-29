@@ -109,41 +109,64 @@ export const CoursePageClient = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header MÓVIL MEJORADO */}
-      <div className="bg-gradient-to-r from-slate-900/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            {/* Lado izquierdo - MÓVIL OPTIMIZADO */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              <button
-                onClick={handleBackNavigation}
-                className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 group border border-slate-700/30"
-              >
-                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 group-hover:-translate-x-1 transition-transform" />
-                <span className="font-medium text-sm sm:text-base hidden xs:inline">{canGoBack ? 'Volver' : 'Mis Cursos'}</span>
-              </button>
-              <div className="h-4 w-px bg-gradient-to-b from-transparent via-slate-600 to-transparent hidden sm:block"></div>
-              <span className="text-slate-400 text-xs sm:text-sm font-medium hidden sm:inline">Curso</span>
-            </div>
-            
-            {/* Lado derecho - MÓVIL OPTIMIZADO */}
-            <div className="flex items-center gap-2">
-              {/* Botón móvil de menú */}
-              <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="lg:hidden flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30"
-              >
-                {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-              
-              {/* Botón inicio - Desktop */}
-              <Link 
+      {/* Header del curso con imagen de graduación */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-6 sm:p-8 lg:p-12 border-b border-white/10">
+        {/* Imagen de fondo de graduación */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-15"
+          style={{
+            backgroundImage: "url('/imagen-id1.jpg')"
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/60 to-purple-900/40"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-8">
+            {/* Información del curso */}
+            <div className="flex-1 space-y-2 lg:space-y-4">
+              <Link
                 href="/student"
-                className="hidden lg:flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30"
+                className="inline-flex items-center gap-2 text-slate-300 hover:text-white text-sm lg:text-base transition-colors"
               >
-                <Home className="h-5 w-5" />
-                <span className="font-medium">Inicio</span>
+                <ArrowLeft className="h-4 w-4" />
+                <span>Volver al Dashboard</span>
               </Link>
+              
+              <div className="space-y-1 lg:space-y-2">
+                <h1 className="text-2xl lg:text-4xl font-bold text-white line-clamp-2">
+                  {course.title}
+                </h1>
+                {course.category && (
+                  <p className="text-slate-300 text-sm lg:text-base">
+                    {course.category.name} • Instituto San Pablo
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Botón móvil del menú */}
+            <button
+              onClick={() => setShowMobileMenu(true)}
+              className="lg:hidden p-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-slate-700/50 transition-all duration-300"
+              aria-label="Abrir menú del curso"
+            >
+              <Menu className="h-6 w-6 text-white" />
+            </button>
+
+            {/* Estadísticas del curso - Desktop */}
+            <div className="hidden lg:flex items-center gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{totalTopics}</div>
+                <div className="text-slate-400 text-sm">Temas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{allChapters.length}</div>
+                <div className="text-slate-400 text-sm">Clases</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">{completedChapters}</div>
+                <div className="text-slate-400 text-sm">Completadas</div>
+              </div>
             </div>
           </div>
         </div>

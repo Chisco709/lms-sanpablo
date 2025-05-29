@@ -1,4 +1,3 @@
-
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/columns";
 import { auth } from "@clerk/nextjs/server";
@@ -77,7 +76,7 @@ const CoursesPage = async() => {
               </div>
               {publishedCourses.length > 0 && (
                 <div className="mt-2 text-xs text-green-300/70">
-                  Visible para {publishedCourses.length} curso{publishedCourses.length !== 1 ? 's' : ''} en el dashboard de estudiantes
+                  Visible para {publishedCourses.length} curso{publishedCourses.length !== 1 ? 's' : ''} en la página de inicio de estudiantes
                 </div>
               )}
             </div>

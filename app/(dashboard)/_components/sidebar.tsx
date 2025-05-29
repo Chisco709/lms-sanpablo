@@ -1,4 +1,5 @@
 import { SidebarRoutes } from "./sidebar-routes"
+import Image from "next/image"
 
 export const Sidebar = () => {
     return (
@@ -6,12 +7,18 @@ export const Sidebar = () => {
             {/* Logo Section */}
             <div className="p-6 border-b border-white/5">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-green-400 flex items-center justify-center shadow-lg shadow-yellow-400/20">
-                        <span className="text-black font-bold text-xl select-none">S</span>
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center shadow-lg border border-white/10">
+                        <Image 
+                            src="/instituto-sanpablo-logo.svg" 
+                            alt="Instituto San Pablo" 
+                            width={32} 
+                            height={32}
+                            className="rounded-lg"
+                        />
                     </div>
                     <div>
-                        <h1 className="text-white font-bold text-xl">SanPablo</h1>
-                        <p className="text-gray-500 text-xs">Plataforma Educativa</p>
+                        <h1 className="text-white font-bold text-xl">Instituto San Pablo</h1>
+                        <p className="text-yellow-400 text-xs font-medium">Pereira, Colombia</p>
                     </div>
                 </div>
             </div>

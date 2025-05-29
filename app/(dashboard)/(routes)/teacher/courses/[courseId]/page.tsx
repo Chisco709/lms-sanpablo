@@ -9,6 +9,7 @@ import { TitleForm } from "./_components/title-form";
 import { DescriptionForm } from "./_components/description-form";
 import { ImageForm } from "./_components/image-form";
 import { PriceForm } from "./_components/price-form";
+import { NotificationsPanel } from "./_components/notifications-panel";
 
 import { PensumTopicsForm } from "./_components/pensum-topics-form";
 import { CourseActions } from "./_components/course-actions";
@@ -85,11 +86,14 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <CourseHeader completionText={completionText} />
-          <CourseActions
-            disabled={completedFields !== totalFields}
-            courseId={courseId}
-            isPublished={course.isPublished}
-          />
+          <div className="flex items-center gap-3">
+            <NotificationsPanel courseId={courseId} />
+            <CourseActions
+              disabled={completedFields !== totalFields}
+              courseId={courseId}
+              isPublished={course.isPublished}
+            />
+          </div>
         </div>
 
         {/* Success Banner */}
