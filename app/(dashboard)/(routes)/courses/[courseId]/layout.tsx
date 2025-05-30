@@ -59,7 +59,7 @@ const CourseLayout = async ({
   });
 
   const isFreeCoure = !course.price || course.price === 0;
-  const hasAccess = purchase || isFreeCoure;
+  const hasAccess = !!purchase || isFreeCoure;
 
   return (
     <CourseLayoutClient

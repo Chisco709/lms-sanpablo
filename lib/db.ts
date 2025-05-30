@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
     
 // Extensión de tipos para globalThis sin usar 'var'
 declare global {
-  // eslint-disable-next-line no-var
   var _prisma: PrismaClient | undefined
 }
 

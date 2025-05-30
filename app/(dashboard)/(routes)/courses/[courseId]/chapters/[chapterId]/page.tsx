@@ -49,8 +49,8 @@ const ChapterIdPage = async ({
       chapter={chapterData}
       course={course}
       attachments={attachments}
-      nextChapter={nextChapter}
-      userProgress={userProgress}
+      nextChapter={nextChapter ?? undefined}
+      userProgress={userProgress ?? undefined}
       purchase={purchase}
       userId={user.id}
     />

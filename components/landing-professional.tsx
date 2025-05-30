@@ -33,7 +33,7 @@ export default function LandingProfessional() {
             <a href="#programas" className="text-white/80 hover:text-green-400 transition-colors text-base">Programas</a>
             <a href="#excelencia" className="text-white/80 hover:text-green-400 transition-colors text-base">Excelencia</a>
             <a href="#contacto" className="text-white/80 hover:text-green-400 transition-colors text-base">Contacto</a>
-            <a href="/sign-in" className="ml-4 px-6 py-2 rounded-full bg-gradient-to-r from-green-500 via-yellow-400 to-green-500 text-black font-bold shadow-xl border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-200">Portal Estudiantil</a>
+            <Link href="/sign-in" className="ml-4 px-6 py-2 rounded-full bg-gradient-to-r from-green-500 via-yellow-400 to-green-500 text-black font-bold shadow-xl border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-200">Portal Estudiantil</Link>
           </div>
         </div>
       </nav>
@@ -95,7 +95,7 @@ export default function LandingProfessional() {
             </div>
             <h3 className="text-xl font-bold text-white mt-2 mb-1">Técnico en Primera Infancia</h3>
             <p className="text-white/70 text-center text-base mb-2">Prácticas en jardines, certificación SENA, inglés especializado y psicología infantil.</p>
-            <a href="/sign-in" className="mt-auto px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-lg shadow-lg border-2 border-green-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-200">Inscribirme</a>
+            <Link href="/sign-in" className="mt-auto px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-lg shadow-lg border-2 border-green-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-200">Inscribirme</Link>
                     </div>
           {/* Tarjeta 2 */}
           <div className="bg-black/80 rounded-2xl shadow-2xl border-4 border-yellow-400/30 flex flex-col items-center p-8 gap-4 transition-transform hover:scale-105 hover:shadow-2xl">
@@ -104,7 +104,7 @@ export default function LandingProfessional() {
             </div>
             <h3 className="text-xl font-bold text-white mt-2 mb-1">Certificación en Inglés</h3>
             <p className="text-white/70 text-center text-base mb-2">Niveles A1 a C1, certificación Cambridge, club de conversación y business English.</p>
-            <a href="/sign-in" className="mt-auto px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-green-400 text-black font-bold text-lg shadow-lg border-2 border-yellow-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-200">Inscribirme</a>
+            <Link href="/sign-in" className="mt-auto px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-green-400 text-black font-bold text-lg shadow-lg border-2 border-yellow-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-200">Inscribirme</Link>
           </div>
         </div>
       </section>

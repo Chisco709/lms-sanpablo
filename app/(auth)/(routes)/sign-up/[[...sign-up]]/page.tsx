@@ -1,5 +1,6 @@
 "use client";
 import { SignUp } from "@clerk/nextjs"
+import Image from "next/image"
 
 // Este archivo debe ser un Client Component para usar Clerk y styled-jsx
 export default function Page() {
@@ -54,11 +55,14 @@ export default function Page() {
       <div className="hidden lg:flex flex-1 items-center justify-center relative z-10 bg-transparent">
         <div className="w-full max-w-xl px-8">
           <div className="rounded-3xl overflow-hidden shadow-2xl border-2 border-yellow-400/20 bg-black/60 backdrop-blur-xl">
-            <img
+            <Image
               src="/imagen-principio.jpg"
               alt="Bienvenido a SanPablo LMS"
+              width={500}
+              height={500}
               className="w-full h-[500px] object-cover object-center"
-              draggable="false"
+              draggable={false}
+              priority
             />
             <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 via-transparent to-transparent">
               <h2 className="text-2xl font-bold text-yellow-400 drop-shadow mb-2">¡Bienvenido!</h2>

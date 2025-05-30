@@ -7,7 +7,7 @@ import { getPublishedCourses } from "@/actions/get-published-courses"
 import Link from "next/link"
 
 export default async function Dashboard() {
-  const { user.id } = auth()
+  const user = await currentUser();
 
   if (!user) {
     return redirect("/")

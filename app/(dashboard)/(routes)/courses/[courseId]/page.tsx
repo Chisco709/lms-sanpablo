@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getProgress } from "@/actions/get-progress";
 import { CoursePageClient } from "./_components/course-page-client";
+import Head from "next/head";
 
 const CourseIdPage = async ({
   params
@@ -106,15 +107,50 @@ const CourseIdPage = async ({
 
   const completedChapters = allChapters.filter(ch => ch.userProgress?.[0]?.isCompleted).length;
 
+  // SEO dinámico
+  const seoTitle = `${course.title} | Instituto San Pablo`;
+  const seoDescription = course.description || `Curso de ${course.title} en el Instituto San Pablo. Aprende y certifícate con los mejores.`;
+  const seoImage = course.imageUrl || "/logo-sanpablo.jpg";
+  const seoUrl = `https://institutosanpablo.edu.co/courses/${courseId}`;
+  const jsonLd = {
+    "@context": "http://schema.org",
+    "@type": "Course",
+    "name": course.title,
+    "description": seoDescription,
+    "provider": {
+      "@type": "Organization",
+      "name": "Instituto San Pablo",
+      "sameAs": "https://institutosanpablo.edu.co"
+    },
+    "url": seoUrl,
+    "image": seoImage
+  };
+
   return (
-    <CoursePageClient 
-      course={course}
-      progressCount={progressCount}
-      completedChapters={completedChapters}
-      hasAccess={hasAccess}
-      isFreeCoure={isFreeCoure}
-      courseId={courseId}
-    />
+    <>
+      <Head>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:image" content={seoImage} />
+        <meta property="og:url" content={seoUrl} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        <meta name="twitter:image" content={seoImage} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      </Head>
+      <CoursePageClient 
+        course={course}
+        progressCount={progressCount}
+        completedChapters={completedChapters}
+        hasAccess={hasAccess}
+        isFreeCoure={isFreeCoure}
+        courseId={courseId}
+      />
+    </>
   );
 }
 

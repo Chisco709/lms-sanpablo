@@ -108,98 +108,99 @@ export const CoursePageClient = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black relative">
+      {/* Luces de fondo globales mejoradas */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute left-[-15%] top-[-15%] w-[500px] h-[500px] bg-green-500/30 rounded-full blur-[120px] opacity-70" />
+        <div className="absolute right-[-10%] bottom-[-10%] w-[400px] h-[400px] bg-green-400/20 rounded-full blur-[100px] opacity-60" />
+        <div className="absolute right-[10%] top-[10%] w-[250px] h-[250px] bg-yellow-300/10 rounded-full blur-[80px] opacity-50" />
+        <div className="absolute left-[30%] bottom-[5%] w-[200px] h-[200px] bg-white/5 rounded-full blur-[60px] opacity-30" />
+      </div>
       {/* Header del curso con imagen de graduación */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-6 sm:p-8 lg:p-12 border-b border-white/10">
+      <div className="relative overflow-hidden bg-black/90 border-b-4 border-green-400/20 p-6 sm:p-8 lg:p-12">
         {/* Imagen de fondo de graduación */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-15"
+          className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{
             backgroundImage: "url('/imagen-id1.jpg')"
           }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/60 to-purple-900/40"></div>
-        
+        <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 via-black/0 to-black/0"></div>
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-8">
             {/* Información del curso */}
             <div className="flex-1 space-y-2 lg:space-y-4">
               <Link
                 href="/student"
-                className="inline-flex items-center gap-2 text-slate-300 hover:text-white text-sm lg:text-base transition-colors"
+                className="inline-flex items-center gap-2 text-green-400 hover:text-yellow-400 text-sm lg:text-base transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Volver al Dashboard</span>
               </Link>
-              
               <div className="space-y-1 lg:space-y-2">
                 <h1 className="text-2xl lg:text-4xl font-bold text-white line-clamp-2">
                   {course.title}
                 </h1>
                 {course.category && (
-                  <p className="text-slate-300 text-sm lg:text-base">
+                  <p className="text-green-400 text-sm lg:text-base">
                     {course.category.name} • Instituto San Pablo
                   </p>
                 )}
               </div>
             </div>
-
             {/* Botón móvil del menú */}
             <button
               onClick={() => setShowMobileMenu(true)}
-              className="lg:hidden p-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-slate-700/50 transition-all duration-300"
+              className="lg:hidden p-3 bg-black/60 hover:bg-green-400/10 rounded-xl border border-green-400/30 transition-all duration-300"
               aria-label="Abrir menú del curso"
             >
               <Menu className="h-6 w-6 text-white" />
             </button>
-
             {/* Estadísticas del curso - Desktop */}
             <div className="hidden lg:flex items-center gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-white">{totalTopics}</div>
-                <div className="text-slate-400 text-sm">Temas</div>
+                <div className="text-green-400 text-sm">Temas</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-white">{allChapters.length}</div>
-                <div className="text-slate-400 text-sm">Clases</div>
+                <div className="text-green-400 text-sm">Clases</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{completedChapters}</div>
-                <div className="text-slate-400 text-sm">Completadas</div>
+                <div className="text-2xl font-bold text-yellow-400">{completedChapters}</div>
+                <div className="text-yellow-400 text-sm">Completadas</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* MENÚ MÓVIL DESLIZABLE */}
       {showMobileMenu && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)}>
-          <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/50 p-6">
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)}>
+          <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-black/95 backdrop-blur-xl border-l-4 border-green-400/20 p-6">
             <div className="space-y-4">
               <Link 
                 href="/student"
-                className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 rounded-xl transition-all duration-300 border border-slate-700/30 text-lg"
+                className="flex items-center gap-3 px-4 py-3 text-green-400 hover:text-yellow-400 bg-black/60 hover:bg-green-400/10 rounded-xl transition-all duration-300 border border-green-400/30 text-lg"
                 onClick={() => setShowMobileMenu(false)}
               >
                 <Home className="h-6 w-6" />
                 <span className="font-medium">Ir al Inicio</span>
               </Link>
-              
-              <div className="pt-4 border-t border-slate-700/50">
+              <div className="pt-4 border-t border-green-400/20">
                 <h3 className="text-white font-bold text-lg mb-4">Progreso del Curso</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Temas:</span>
+                    <span className="text-green-400">Temas:</span>
                     <span className="text-white font-semibold">{totalTopics}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Clases:</span>
+                    <span className="text-green-400">Clases:</span>
                     <span className="text-white font-semibold">{allChapters.length}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Completadas:</span>
-                    <span className="text-green-400 font-semibold">{completedChapters}</span>
+                    <span className="text-yellow-400">Completadas:</span>
+                    <span className="text-yellow-400 font-semibold">{completedChapters}</span>
                   </div>
                 </div>
               </div>
@@ -207,7 +208,6 @@ export const CoursePageClient = ({
           </div>
         </div>
       )}
-
       {/* Contenido principal - OPTIMIZADO PARA MÓVIL */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
@@ -215,14 +215,13 @@ export const CoursePageClient = ({
           <div className="lg:col-span-3 space-y-4 sm:space-y-6">
             {/* Título responsive */}
             <div className="text-center">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-2 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-white bg-clip-text text-transparent mb-2 sm:mb-4">
                 CONTENIDO DEL CURSO
               </h2>
-              <p className="text-slate-400 text-base sm:text-lg">
+              <p className="text-green-400 text-base sm:text-lg">
                 {totalTopics} {totalTopics === 1 ? 'tema' : 'temas'} • {allChapters.length} {allChapters.length === 1 ? 'clase' : 'clases'}
               </p>
             </div>
-
             {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
             <div className="space-y-4 sm:space-y-6">
               {course.pensumTopics?.map((topic: any, topicIndex: number) => {
