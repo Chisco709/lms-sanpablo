@@ -18,8 +18,8 @@ export default function LandingProfessional() {
         <div className="absolute left-[-15%] top-[-15%] w-[500px] h-[500px] bg-green-500/40 rounded-full blur-[120px] opacity-80" />
         {/* Luz amarilla esquina inferior derecha */}
         <div className="absolute right-[-15%] bottom-[-15%] w-[600px] h-[600px] bg-yellow-400/30 rounded-full blur-[140px] opacity-80" />
-      </div>
-
+        </div>
+        
       {/* NAVBAR minimalista */}
       <nav className="fixed top-[40px] left-0 w-full z-40 bg-black/80 backdrop-blur-md border-b border-green-400/10 shadow-lg transition-all duration-300" style={{height:'80px'}}>
         <div className="container mx-auto px-6 flex items-center justify-between h-20">
@@ -47,12 +47,12 @@ export default function LandingProfessional() {
           <div className="flex flex-col sm:flex-row gap-4 w-full">
             <a href="#programas" className="px-10 py-4 rounded-full bg-gradient-to-r from-green-500 via-yellow-400 to-green-500 text-black font-extrabold text-xl shadow-xl border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-200">Ver Programas</a>
             <a href="#contacto" className="px-10 py-4 rounded-full border-2 border-yellow-400 text-white font-bold text-xl bg-black/40 hover:bg-yellow-400/10 hover:text-yellow-400 hover:border-yellow-400 transition-all duration-200 shadow-lg hover:scale-110">Contáctanos</a>
-          </div>
+      </div>
           <div className="flex gap-8 mt-8">
             <div className="flex flex-col items-center">
               <span className="text-3xl font-extrabold text-green-400">500+</span>
               <span className="text-sm text-white/60">Graduados</span>
-            </div>
+              </div>
             <div className="flex flex-col items-center">
               <span className="text-3xl font-extrabold text-yellow-400">15+</span>
               <span className="text-sm text-white/60">Años</span>
@@ -96,7 +96,7 @@ export default function LandingProfessional() {
             <h3 className="text-xl font-bold text-white mt-2 mb-1">Técnico en Primera Infancia</h3>
             <p className="text-white/70 text-center text-base mb-2">Prácticas en jardines, certificación SENA, inglés especializado y psicología infantil.</p>
             <a href="/sign-in" className="mt-auto px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-lg shadow-lg border-2 border-green-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-200">Inscribirme</a>
-          </div>
+                    </div>
           {/* Tarjeta 2 */}
           <div className="bg-black/80 rounded-2xl shadow-2xl border-4 border-yellow-400/30 flex flex-col items-center p-8 gap-4 transition-transform hover:scale-105 hover:shadow-2xl">
             <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border-4 border-yellow-400/40 mb-2">
@@ -117,7 +117,7 @@ export default function LandingProfessional() {
             <span className="bg-green-500/20 p-4 rounded-full mb-2"><CheckCircle size={32} className="text-green-400" /></span>
             <span className="font-semibold text-white">Certificación SENA</span>
             <span className="text-white/60 text-base">Títulos 100% avalados a nivel nacional.</span>
-          </div>
+        </div>
           <div className="flex flex-col items-center text-center gap-3">
             <span className="bg-yellow-400/20 p-4 rounded-full mb-2"><Award size={32} className="text-yellow-400" /></span>
             <span className="font-semibold text-white">Docentes Expertos</span>
@@ -151,15 +151,15 @@ export default function LandingProfessional() {
           <div className="bg-black/80 rounded-2xl shadow-2xl border-4 border-yellow-400/30 flex flex-col items-center p-8 gap-4">
             <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-400/40 mb-2">
               <Image src="/imagen-id6.jpg" alt="Carlos J. Herrera" fill style={{objectFit:'cover'}} className="rounded-full" />
-            </div>
+                </div>
             <span className="font-semibold text-white text-lg">Carlos J. Herrera</span>
             <span className="text-white/60 text-base text-center">“El nivel de inglés que alcancé me abrió puertas a un mejor empleo. Los profesores son excelentes y muy dedicados.”</span>
             <div className="flex gap-1 mt-2">{Array(5).fill(0).map((_,i)=>(<span key={i} className="text-yellow-400 text-xl">★</span>))}</div>
-          </div>
+                </div>
           <div className="bg-black/80 rounded-2xl shadow-2xl border-4 border-green-400/30 flex flex-col items-center p-8 gap-4">
             <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-green-400/40 mb-2">
               <Image src="/imagen-id7.jpg" alt="Sofía Vargas" fill style={{objectFit:'cover'}} className="rounded-full" />
-            </div>
+                  </div>
             <span className="font-semibold text-white text-lg">Sofía Vargas</span>
             <span className="text-white/60 text-base text-center">“Los cursos de desarrollo profesional me dieron las herramientas exactas que necesitaba para ascender en mi empresa. ¡Totalmente recomendado!”</span>
             <div className="flex gap-1 mt-2">{Array(5).fill(0).map((_,i)=>(<span key={i} className="text-yellow-400 text-xl">★</span>))}</div>
@@ -174,7 +174,7 @@ export default function LandingProfessional() {
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-8 shadow-lg border border-green-400/20 w-full md:w-1/3">
             <MapPin size={36} className="text-green-400 mb-2" />
             <span className="text-white/90 text-lg font-semibold text-center">Carrera 12 #18-15, Centro<br />Pereira, Risaralda, Colombia</span>
-          </div>
+        </div>
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-8 shadow-lg border border-yellow-400/20 w-full md:w-1/3">
             <Phone size={36} className="text-yellow-400 mb-2" />
             <span className="text-white/90 text-lg font-semibold text-center">(606) 335-2847<br />WhatsApp: +57 314 567-8910</span>
@@ -198,8 +198,8 @@ export default function LandingProfessional() {
           <div>
             <h3 className="text-2xl font-bold text-yellow-400 mb-4">Visión</h3>
             <p className="text-white/80 text-base leading-relaxed">Ser el instituto líder en formación técnica en Pereira, reconocido por la excelencia académica, la innovación y el impacto positivo en la comunidad.</p>
-          </div>
-          <div>
+                  </div>
+                  <div>
             <h3 className="text-2xl font-bold text-white mb-4">Decretos y Normatividad</h3>
             <ul className="text-white/70 text-base leading-relaxed list-disc list-inside space-y-2">
               <li>Resolución 1234 de 2010 - Secretaría de Educación de Pereira</li>
@@ -216,8 +216,8 @@ export default function LandingProfessional() {
           <div className="flex items-center gap-2">
             <Image src="/logo-sanpablo.jpg" alt="Logo" width={32} height={32} className="rounded" />
             <span>Instituto San Pablo</span>
-          </div>
-          <div>
+            </div>
+            <div>
             © {new Date().getFullYear()} Instituto San Pablo. Todos los derechos reservados.
           </div>
           <div className="flex gap-4">

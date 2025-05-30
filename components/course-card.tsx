@@ -87,15 +87,6 @@ export const CourseCard = ({
               </span>
             </div>
             
-            {/* IMAGEN PEQUEÑA CON MARCO A LA DERECHA */}
-            <div className="absolute top-4 right-4">
-              <img 
-                src={getGraduationImage()}
-                alt="Graduación Instituto San Pablo"
-                className="w-12 h-12 object-cover rounded-lg border-2 border-white/30 shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-              />
-            </div>
-          
             {/* Badge de estado */}
             {isCompleted && (
               <div className="absolute bottom-4 right-4">

@@ -8,12 +8,16 @@ interface SidebarItemProps {
     icon: LucideIcon;
     label: string;
     href: string;
+    className?: string;
+    iconClassName?: string;
 }
 
 export const SidebarItem = ({
     icon: Icon,
     label,
     href,
+    className = "",
+    iconClassName = "",
 }: SidebarItemProps) => {
     const pathname = usePathname();
     const router = useRouter();
@@ -32,10 +36,15 @@ export const SidebarItem = ({
             onClick={onClick}
             type="button"
             className={cn(
-                "group relative flex items-center gap-x-3 w-full px-4 py-3 rounded-xl font-medium transition-all duration-300",
-                isActive 
-                    ? "bg-gradient-to-r from-yellow-400/20 to-green-400/20 text-white border border-yellow-400/30" 
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                // Permite override visual desde sidebar-routes
+                className,
+                // Fallback visual legacy (por si no se pasa className)
+                !className && [
+                  "group relative flex items-center gap-x-3 w-full px-4 py-3 rounded-xl font-medium transition-all duration-300",
+                  isActive 
+                      ? "bg-gradient-to-r from-yellow-400/20 to-green-400/20 text-white border border-yellow-400/30" 
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                ]
             )}
         >
             {/* Indicador activo */}
@@ -53,13 +62,17 @@ export const SidebarItem = ({
                 <Icon 
                     size={18} 
                     className={cn(
-                        "transition-all duration-300",
-                        isActive 
-                            ? "text-yellow-400" 
-                            : "text-gray-400 group-hover:text-white"
+                        // Permite override visual desde sidebar-routes
+                        iconClassName,
+                        // Fallback visual legacy
+                        !iconClassName && [
+                          "transition-all duration-300",
+                          isActive 
+                              ? "text-yellow-400" 
+                              : "text-gray-400 group-hover:text-white"
+                        ]
                     )}
                 />
-                
                 {/* Efecto glow en hover */}
                 {!isActive && (
                     <div className="absolute inset-0 rounded-lg bg-yellow-400/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300"></div>
