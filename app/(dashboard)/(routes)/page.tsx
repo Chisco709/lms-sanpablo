@@ -13,11 +13,18 @@ export default async function Dashboard() {
     return redirect("/")
   }
 
-  const { completedCourses, coursesInProgress } = await getDashboardCourses(
-    user.id
-  )
+  const { completedCourses, coursesInProgress } = await getDashboardCourses({
+    userId: user.id
+  })
   
   const availableCourses = await getPublishedCourses()
+  
+  // Agregar progress a los cursos disponibles para que sean compatibles con CoursesList
+  const availableCoursesWithProgress = availableCourses.map(course => ({
+    ...course,
+    progress: null,
+    isPurchased: false
+  }))
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -63,7 +70,7 @@ export default async function Dashboard() {
         
         {availableCourses.length > 0 ? (
           <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-6 border border-blue-500/20">
-            <CoursesList items={availableCourses} />
+            <CoursesList items={availableCoursesWithProgress} />
           </div>
         ) : (
           <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">

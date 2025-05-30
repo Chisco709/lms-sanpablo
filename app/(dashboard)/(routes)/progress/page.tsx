@@ -14,7 +14,7 @@ const ProgressPage = async () => {
   const {
     completedCourses,
     coursesInProgress,
-  } = await getDashboardCourses(user.id);
+  } = await getDashboardCourses({ userId: user.id });
 
   const totalCourses = completedCourses.length + coursesInProgress.length;
   const completionRate = totalCourses > 0 ? (completedCourses.length / totalCourses) * 100 : 0;

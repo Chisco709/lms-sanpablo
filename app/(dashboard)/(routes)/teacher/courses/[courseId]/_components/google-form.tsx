@@ -36,7 +36,7 @@ export const GoogleForm = ({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            googleFormUrl: initialData?.googleFormUrl || ""
+            googleFormUrl: (initialData as any)?.googleFormUrl || ""
         }
     });
 
@@ -89,7 +89,7 @@ export const GoogleForm = ({
                     ) : (
                         <>
                             <Pencil className="h-4 w-4 mr-2"/>
-                            {initialData.googleFormUrl ? "Editar" : "Agregar"} formulario
+                            {(initialData as any).googleFormUrl ? "Editar" : "Agregar"} formulario
                         </>
                     )}
                 </Button>
@@ -97,7 +97,7 @@ export const GoogleForm = ({
 
             {!isEditing && (
                 <div className="mt-4">
-                    {!initialData.googleFormUrl ? (
+                    {!(initialData as any).googleFormUrl ? (
                         <p className="text-sm text-slate-400 italic">
                             No hay formulario de Google configurado
                         </p>
@@ -122,7 +122,7 @@ export const GoogleForm = ({
                                 {/* Botones de acción */}
                                 <div className="flex gap-2">
                                     <a
-                                        href={initialData.googleFormUrl}
+                                        href={(initialData as any).googleFormUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"

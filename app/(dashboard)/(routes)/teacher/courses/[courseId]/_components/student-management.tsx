@@ -360,7 +360,7 @@ export const StudentManagement = ({ courseId, students }: StudentManagementProps
                 <div className="flex items-center gap-2">
                   <Select
                     value={student.status}
-                    onValueChange={(value) => handleStatusChange(student.id, value)}
+                    onValueChange={(value: string) => handleStatusChange(student.id, value)}
                   >
                     <SelectTrigger className="w-32 bg-slate-600 border-slate-500 text-white text-xs">
                       <SelectValue />

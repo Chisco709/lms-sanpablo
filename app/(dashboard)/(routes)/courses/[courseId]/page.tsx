@@ -78,7 +78,7 @@ const CourseIdPage = async ({
 
   const progressCount = await getProgress(user.id, course.id);
   const isFreeCoure = !course.price || course.price === 0;
-  const hasAccess = purchase || isFreeCoure;
+  const hasAccess = !!purchase || isFreeCoure;
 
   // ✅ SOPORTE PARA CURSOS CON Y SIN TEMAS DEL PENSUM
   let allChapters = [];
@@ -91,14 +91,35 @@ const CourseIdPage = async ({
     allChapters = course.chapters;
     
     // Crear un tema virtual para mantener la UI consistente
-    course.pensumTopics = [{
+    const virtualTopic = {
       id: 'virtual-topic',
       title: 'Contenido del Curso',
       description: 'Todas las clases del curso',
       position: 1,
       isPublished: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      courseId: course.id,
       chapters: course.chapters
-    }];
+    };
+    
+    // Crear nuevo objeto course con pensumTopics
+    const courseWithTopics = {
+      ...course,
+      pensumTopics: [virtualTopic]
+    };
+    
+    // Pasar courseWithTopics al componente
+    return (
+      <CoursePageClient 
+        course={courseWithTopics}
+        progressCount={progressCount}
+        completedChapters={0}
+        hasAccess={hasAccess}
+        isFreeCoure={isFreeCoure}
+        courseId={courseId}
+      />
+    );
   }
 
   if (allChapters.length === 0) {
