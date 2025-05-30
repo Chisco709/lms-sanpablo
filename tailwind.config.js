@@ -1,11 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
@@ -65,48 +63,13 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
-        // Animaciones personalizadas futuristas
-        "spin-slow": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
-        },
-        "glow": {
-          "0%, 100%": { 
-            boxShadow: "0 0 20px rgba(16, 185, 129, 0.5)",
-            transform: "scale(1)"
-          },
-          "50%": { 
-            boxShadow: "0 0 40px rgba(16, 185, 129, 0.8)",
-            transform: "scale(1.05)"
-          },
-        },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        "shimmer": {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { 
-            opacity: 1,
-            boxShadow: "0 0 20px rgba(251, 191, 36, 0.5)"
-          },
-          "50%": { 
-            opacity: 0.8,
-            boxShadow: "0 0 40px rgba(251, 191, 36, 0.8)"
-          },
-        },
-        "slide-in": {
-          "0%": { 
-            transform: "translateX(-100%)",
-            opacity: 0
-          },
-          "100%": { 
-            transform: "translateX(0)",
-            opacity: 1
-          },
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-5px)" },
         },
         "fade-in-up": {
           "0%": {
@@ -118,29 +81,15 @@ module.exports = {
             transform: "translateY(0)"
           },
         },
-        "holographic": {
-          "0%, 100%": {
-            background: "linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent)"
-          },
-          "50%": {
-            background: "linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent)"
-          },
-        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        // Animaciones personalizadas
-        "spin-slow": "spin-slow 8s linear infinite",
-        "glow": "glow 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
-        "shimmer": "shimmer 2s linear infinite",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "slide-in": "slide-in 0.5s ease-out",
+        "float": "float 6s ease-in-out infinite",
+        "float-slow": "float-slow 8s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.6s ease-out",
-        "holographic": "holographic 3s ease-in-out infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 } 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { scheduleProgramUnlocks } from "@/lib/unlock-system";
 
@@ -8,19 +8,21 @@ import { scheduleProgramUnlocks } from "@/lib/unlock-system";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { programId: string } }
+  { params }: { params: Promise<{ programId: string }> }
 ) {
   try {
-    const { userId } = auth();
-
-    if (!userId) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const user = await currentUser();
+    const userId = user?.id;
+    
+    if (!user) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { programId } = params;
+    const { programId  } = await params;
     const body = await request.json();
+    
     const {
-      studentId, // Cédula
+      studentId,
       phone,
       city,
       department,
@@ -29,11 +31,8 @@ export async function POST(
 
     // Verificar que el programa existe
     const program = await db.technicalProgram.findUnique({
-      where: { id: programId },
-      include: {
-        courses: {
-          orderBy: { createdAt: 'asc' }
-        }
+      where: {
+        id: programId
       }
     });
 
@@ -44,11 +43,10 @@ export async function POST(
       );
     }
 
-    // Verificar si ya está inscrito
+    // Verificar si el usuario ya está inscrito
     const existingEnrollment = await db.programEnrollment.findUnique({
       where: {
-        userId_programId: {
-          userId,
+        userId_programId: { userId: user.id,
           programId
         }
       }
@@ -61,21 +59,31 @@ export async function POST(
       );
     }
 
-    const enrollmentStartDate = startDate ? new Date(startDate) : new Date();
-    const expectedEndDate = new Date(enrollmentStartDate);
+    // Calcular fecha de finalización esperada (duración en meses)
+    const start = new Date(startDate);
+    const expectedEndDate = new Date(start);
     expectedEndDate.setMonth(expectedEndDate.getMonth() + program.duration);
 
     // Crear inscripción
     const enrollment = await db.programEnrollment.create({
-      data: {
-        userId,
+      data: { userId: user.id,
         programId,
-        startDate: enrollmentStartDate,
-        expectedEndDate,
         studentId,
         phone,
         city,
-        department
+        department,
+        startDate: start,
+        expectedEndDate,
+        status: 'active'
+      },
+      include: {
+        program: {
+          select: {
+            title: true,
+            duration: true,
+            qualification: true
+          }
+        }
       }
     });
 
@@ -86,28 +94,20 @@ export async function POST(
         month: index + 1
       }));
 
-      await scheduleProgramUnlocks(programId, enrollmentStartDate, courseSchedule);
+      await scheduleProgramUnlocks(programId, start, courseSchedule);
     }
 
     // Crear notificación de bienvenida
     await db.notification.create({
-      data: {
-        userId,
+      data: { userId: user.id,
         title: "¡Bienvenido a tu programa técnico!",
-        message: `Te has inscrito exitosamente en ${program.title}. Tu programa comenzará el ${enrollmentStartDate.toLocaleDateString('es-CO')}.`,
+        message: `Te has inscrito exitosamente en ${program.title}. Tu programa comenzará el ${start.toLocaleDateString('es-CO')}.`,
         type: "program_enrollment",
         relatedProgramId: programId
       }
     });
 
-    return NextResponse.json({
-      enrollment,
-      message: "Inscripción exitosa",
-      programTitle: program.title,
-      startDate: enrollmentStartDate,
-      expectedEndDate
-    }, { status: 201 });
-
+    return NextResponse.json(enrollment, { status: 201 });
   } catch (error) {
     console.error("Error en inscripción:", error);
     return NextResponse.json(
@@ -122,21 +122,25 @@ export async function POST(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { programId: string } }
+  { params }: { params: Promise<{ programId: string }> }
 ) {
   try {
-    const { userId } = auth();
+    const user = await currentUser();
+  const userId = user?.id;
+  
+  if (!user) {
+    return new NextResponse('Unauthorized', { status: 401 });
+  }
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { programId } = params;
+    const { programId  } = await params;
 
     const enrollment = await db.programEnrollment.findUnique({
       where: {
-        userId_programId: {
-          userId,
+        userId_programId: { userId: user.id,
           programId
         }
       },
@@ -148,7 +152,7 @@ export async function GET(
                 chapters: {
                   include: {
                     userProgress: {
-                      where: { userId }
+                      where: { userId: user.id }
                     }
                   }
                 }

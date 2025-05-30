@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import LandingPage from "../components/landing-page";
+import { currentUser } from "@clerk/nextjs/server";
+import LandingProfessional from "../components/landing-professional";
 import Link from "next/link";
 
 export default async function Home() {
-  const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId) {
-    return <LandingPage />;
+  if (!user) {
+    return <LandingProfessional />;
   }
 
   // Dashboard estilizado y creativo según la landing page

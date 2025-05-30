@@ -106,7 +106,7 @@ const ChapterPage = ({
       <div className="bg-white/5 border-b border-white/10 p-3 md:p-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <Link 
-              href={`/courses/${course.id}`}
+              href="/student"
             className="flex items-center gap-2 md:gap-4 text-white hover:text-yellow-400 transition-all duration-300 group w-full sm:w-auto"
           >
             <div className="w-12 h-12 md:w-16 md:h-16 bg-white/10 group-hover:bg-yellow-400/20 rounded-2xl md:rounded-3xl flex items-center justify-center transition-all duration-300 flex-shrink-0">
@@ -114,7 +114,7 @@ const ChapterPage = ({
             </div>
             <div className="min-w-0 flex-1">
               <span className="text-white/60 text-sm md:text-lg block">← Volver</span>
-              <span className="font-bold text-lg md:text-2xl text-white line-clamp-1">{course.title}</span>
+              <span className="font-bold text-lg md:text-2xl text-white line-clamp-1">Mis Cursos</span>
             </div>
             </Link>
             

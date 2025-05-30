@@ -1,45 +1,53 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import { ToastProvider } from "@/components/providers/toaster-providers";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { ClerkProvider } from "@clerk/nextjs"
+import { ToastProvider } from "@/components/providers/toaster-providers"
 
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Instituto San Pablo - Plataforma Educativa",
-  description: "Plataforma de aprendizaje del Instituto San Pablo en Pereira, Colombia. Formación técnica en Primera Infancia, Inglés y carreras técnicas.",
-  icons: {
-    icon: "/instituto-sanpablo-logo.svg",
-    shortcut: "/instituto-sanpablo-logo.svg",
-    apple: "/instituto-sanpablo-logo.svg",
+  title: "Instituto San Pablo | Formación Técnica en Pereira",
+  description: "Instituto San Pablo - 15+ años formando profesionales técnicos en Pereira, Risaralda. Programas certificados SENA en Primera Infancia e Inglés.",
+  keywords: "instituto san pablo, pereira, risaralda, formación técnica, SENA, primera infancia, inglés",
+  authors: [{ name: "Instituto San Pablo" }],
+  creator: "Instituto San Pablo",
+  openGraph: {
+    title: "Instituto San Pablo | Formación Técnica en Pereira",
+    description: "15+ años transformando vidas en Pereira, Risaralda. Programas técnicos certificados.",
+    url: "https://institutosanpablo.edu.co",
+    siteName: "Instituto San Pablo",
+    locale: "es_CO",
+    type: "website",
   },
-};
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <ClerkProvider afterSignOutUrl="/" afterSignInUrl="/">
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <ClerkProvider
+      appearance={{
+        elements: {
+          avatarBox: {
+            width: "2rem",
+            height: "2rem"
+          }
+        }
+      }}
+    >
+      <html lang="es" className={inter.className} suppressHydrationWarning>
+        <body className="bg-slate-950 text-white">
           <ToastProvider />
           {children}
         </body>
       </html>
     </ClerkProvider>
-  );
+  )
 }

@@ -1,15 +1,36 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 export function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
+  const timerRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay || 500)
+    // Limpiar timer anterior si existe
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
 
+    // Establecer nuevo timer
+    timerRef.current = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay || 500)
+
+    // Cleanup function
     return () => {
-      clearTimeout(timer)
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
     }
   }, [value, delay])
+
+  // Limpiar timer al desmontar
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
 
   return debouncedValue
 } 

@@ -1,24 +1,25 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
+    const { courseId, chapterId } = await params;
     
     // 1. Validación de autenticación
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Acceso no autorizado", { status: 401 });
     }
 
     // 2. Verificar propiedad del curso
     const course = await db.course.findFirst({
       where: { 
-        id: params.courseId, 
-        userId 
+        id: courseId, 
+        userId: user.id
       },
       select: { id: true }
     });
@@ -30,9 +31,9 @@ export async function PATCH(
     // 3. Obtener el capítulo con validación de ownership
     const chapter = await db.chapter.findFirst({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
-        course: { userId }
+        id: chapterId,
+        courseId: courseId,
+        course: { userId: user.id }
       }
     });
 
@@ -53,7 +54,7 @@ export async function PATCH(
 
     // 6. Actualizar publicación
     const publishedChapter = await db.chapter.update({
-      where: { id: params.chapterId },
+      where: { id: chapterId },
       data: { isPublished: true },
       select: { isPublished: true }
     });

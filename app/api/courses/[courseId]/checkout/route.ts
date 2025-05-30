@@ -1,22 +1,23 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
+    const { courseId } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const course = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         isPublished: true,
       }
     });
@@ -24,8 +25,8 @@ export async function POST(
     const purchase = await db.purchase.findUnique({
       where: {
         userId_courseId: {
-          userId,
-          courseId: params.courseId,
+          userId: user.id,
+          courseId: courseId,
         }
       }
     });
@@ -42,13 +43,13 @@ export async function POST(
     // En producción, aquí iría la integración con Stripe
     const newPurchase = await db.purchase.create({
       data: {
-        courseId: params.courseId,
-        userId,
+        courseId: courseId,
+        userId: user.id,
       }
     });
 
     return NextResponse.json({ 
-      url: `/courses/${params.courseId}`,
+      url: `/courses/${courseId}`,
       message: "Compra realizada exitosamente" 
     });
   } catch (error) {

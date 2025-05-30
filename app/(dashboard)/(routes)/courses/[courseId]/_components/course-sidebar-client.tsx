@@ -75,6 +75,7 @@ export const CourseSidebarClient = ({
                 courseId={course.id}
                 isLocked={!chapter.isFree && !hasAccess}
                 chapterNumber={index + 1}
+                duration="5 min"
               />
             ))}
           </div>

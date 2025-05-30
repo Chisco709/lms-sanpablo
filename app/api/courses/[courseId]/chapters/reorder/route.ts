@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db"
 
 export async function PUT(
     req: Request,
-    { params } : {params: { courseId: string } }
+    { params } : {params: Promise<{ courseId: string }> }
 ) {
     try {
-          const { userId } = await auth();        
+        const user = await currentUser();
+        const { courseId } = await params;
 
-        if (!userId) {
+        if (!user) {
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
@@ -17,8 +18,8 @@ export async function PUT(
 
         const ownCourse = await db.course.findUnique({
             where: {
-                id: params.courseId,
-                userId: userId
+                id: courseId,
+                userId: user.id
             }
         });
 
@@ -32,7 +33,6 @@ export async function PUT(
                 data:  { position: item.position }
             });
         }
-
 
         return new NextResponse("Success", { status: 200 })
 

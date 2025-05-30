@@ -1,6 +1,6 @@
 // app/api/courses/[courseId]/chapters/[chapterId]/route.ts
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 export async function PATCH(
@@ -8,17 +8,17 @@ export async function PATCH(
   { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { courseId, chapterId  } = await params;
     const values = await req.json();
 
-    if (!userId) return new NextResponse("No autorizado", { status: 401 });
+    if (!user) return new NextResponse("No autorizado", { status: 401 });
 
     // Verificar propiedad del curso
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId
+        userId: user.id
       }
     });
 

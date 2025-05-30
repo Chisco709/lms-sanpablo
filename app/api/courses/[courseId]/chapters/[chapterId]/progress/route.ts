@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -8,11 +8,11 @@ export async function PUT(
   { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { isCompleted } = await req.json();
     const { courseId, chapterId } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -28,7 +28,7 @@ export async function PUT(
                 where: { isPublished: true },
                 include: {
                   userProgress: {
-                    where: { userId }
+                    where: { userId: user.id }
                   }
                 }
               }
@@ -66,7 +66,7 @@ export async function PUT(
     const userProgress = await db.userProgress.upsert({
       where: {
         userId_chapterId: {
-          userId,
+          userId: user.id,
           chapterId: chapterId,
         }
       },
@@ -74,7 +74,7 @@ export async function PUT(
         isCompleted
       },
       create: {
-        userId,
+        userId: user.id,
         chapterId: chapterId,
         isCompleted,
       }

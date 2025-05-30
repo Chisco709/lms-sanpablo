@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Eye, LayoutDashboard } from "lucide-react";
@@ -11,17 +11,17 @@ import { TopicActions } from "./_components/topic-actions";
 import { TopicChaptersForm } from "./_components/topic-chapters-form";
 
 interface TopicIdPageProps {
-  params: {
+  params: Promise<{
     courseId: string;
     topicId: string;
-  };
+  }>;
 }
 
 export default async function TopicIdPage({ params }: TopicIdPageProps) {
-  const { userId } = await auth();
+  const user = await currentUser();
   const { courseId, topicId } = await params;
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
 
@@ -29,7 +29,7 @@ export default async function TopicIdPage({ params }: TopicIdPageProps) {
   const courseOwner = await db.course.findUnique({
     where: {
       id: courseId,
-      userId: userId,
+      userId: user.id,
     },
   });
 

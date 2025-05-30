@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 import { BookOpen } from "lucide-react"
@@ -7,9 +7,9 @@ import Image from "next/image"
 import { CoursesList } from "@/components/courses-list"
 
 const StudentPage = async () => {
-  const { userId } = await auth()
+  const user = await currentUser();
 
-  if (!userId) {
+  if (!user) {
     return redirect("/")
   }
 
@@ -29,8 +29,7 @@ const StudentPage = async () => {
           },
         },
         purchases: {
-          where: {
-            userId,
+          where: { userId: user.id,
           },
         },
       },
@@ -114,7 +113,7 @@ const StudentPage = async () => {
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center border border-green-400/30">
                       <Image
-                        src="/instituto-sanpablo-logo.svg"
+                        src="/logo-sanpablo.jpg"
                         alt="Instituto San Pablo"
                         width={20}
                         height={20}
@@ -124,7 +123,7 @@ const StudentPage = async () => {
                     <span className="text-xl sm:text-2xl">📖</span>
                     <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">MIS CURSOS</h2>
                     <span className="text-xl sm:text-2xl">⭐</span>
-                  </div>
+        </div>
                   <p className="text-slate-300 text-sm sm:text-base">Continúa donde lo dejaste</p>
                 </div>
               </div>
@@ -139,7 +138,7 @@ const StudentPage = async () => {
                 ></div>
                 <div className="absolute inset-0 bg-gradient-to-br from-green-900/40 to-transparent"></div>
                 
-                <div className="relative z-10">
+              <div className="relative z-10">
                   <CoursesList items={purchasedCourses} />
                 </div>
               </div>
@@ -153,7 +152,7 @@ const StudentPage = async () => {
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center border border-blue-400/30">
                     <Image
-                      src="/instituto-sanpablo-logo.svg"
+                      src="/logo-sanpablo.jpg"
                       alt="Instituto San Pablo"
                       width={20}
                       height={20}
@@ -173,10 +172,10 @@ const StudentPage = async () => {
                   <div className="flex items-center gap-1 sm:gap-2">
                     <p className="text-sm sm:text-base">Técnico en Inglés</p>
                     <span className="text-lg sm:text-2xl">🌟</span>
-                  </div>
-                </div>
               </div>
             </div>
+          </div>
+        </div>
 
             {availableCourses.length > 0 ? (
               <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border border-blue-500/20 backdrop-blur-sm">
@@ -199,9 +198,9 @@ const StudentPage = async () => {
                     <p className="text-slate-300 text-sm sm:text-base lg:text-lg max-w-md mx-auto leading-relaxed">
                       Estamos preparando los cursos de Técnico en Primera Infancia y Técnico en Inglés para ti.
                     </p>
-                  </div>
-                </div>
-              </div>
+            </div>
+          </div>
+            </div>
             )}
           </div>
           

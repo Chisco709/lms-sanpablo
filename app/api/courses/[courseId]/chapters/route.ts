@@ -1,23 +1,24 @@
 import { db } from "@/lib/db"
-import { auth } from "@clerk/nextjs/server"; // Cambio clave aquí
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server"
 
 export async function POST(
     req: Request,
-    { params } : { params: { courseId: string } }
+    { params } : { params: Promise<{ courseId: string }> }
 ) {
     try {
-        const { userId } = await auth(); // Añadir await aquí
+        const user = await currentUser();
+        const { courseId } = await params;
         const { title, pensumTopicId } = await req.json()
 
-        if(!userId) {
+        if(!user) {
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
         const courseOwner = await db.course.findUnique({
             where: {
-                id: params.courseId,
-                userId: userId,
+                id: courseId,
+                userId: user.id,
             }
         });
 
@@ -27,7 +28,7 @@ export async function POST(
 
         const lastChapter = await db.chapter.findFirst({
             where: {
-                courseId: params.courseId
+                courseId: courseId
             },
             orderBy: {
                 position: "desc"
@@ -39,16 +40,15 @@ export async function POST(
         const chapter = await db.chapter.create({
             data: {
                 title,
-                courseId: params.courseId,
+                courseId: courseId,
                 position: newPosition,
                 pensumTopicId: pensumTopicId || null
             }
         })
 
-
         return NextResponse.json(chapter)
     } catch (error) {
-        console.log("[CHAPTERS", error)
+        console.log("[CHAPTERS]", error)
         return new NextResponse("Internal Error", { status: 500 })
     }
 }

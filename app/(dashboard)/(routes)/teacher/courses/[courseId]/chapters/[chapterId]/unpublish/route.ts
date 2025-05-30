@@ -1,22 +1,23 @@
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { currentUser } from "@clerk/nextjs/server"
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { courseId: string; chapterId: string } }
+    { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
     try {
-        const { userId } = await auth();
+        const user = await currentUser();
+        const { courseId, chapterId } = await params;
 
-        if (!userId) {
+        if (!user) {
             return new NextResponse("No autorizado", { status: 401 });
         }
 
         const ownCourse = await db.course.findUnique({
             where: {
-                id: params.courseId,
-                userId
+                id: courseId,
+                userId: user.id
             }
         });
 
@@ -26,8 +27,8 @@ export async function PATCH(
 
         const chapter = await db.chapter.findUnique({
             where: {
-                id: params.chapterId,
-                courseId: params.courseId,
+                id: chapterId,
+                courseId: courseId,
             }
         });
 
@@ -39,8 +40,8 @@ export async function PATCH(
         // Despublicar el capítulo
         const unpublishedChapter = await db.chapter.update({
             where: {
-                id: params.chapterId,
-                courseId: params.courseId
+                id: chapterId,
+                courseId: courseId
             },
             data: {
                 isPublished: false // Cambio clave aquí

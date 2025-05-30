@@ -1,6 +1,6 @@
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/columns";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import Link from "next/link";
@@ -8,16 +8,16 @@ import { Plus, BookOpen, Users, TrendingUp } from "lucide-react";
 
 const CoursesPage = async() => {
 
-  const { userId } = await auth()
+  const user = await currentUser();
 
-  if (!userId) {
+  if (!user) {
     return redirect("/")
   }
 
   const courses = await db.course.findMany(
     {
       where: {
-        userId,
+        userId: user.id,
       },
       orderBy: {
         createdAt: "desc",

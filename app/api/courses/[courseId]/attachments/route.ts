@@ -1,24 +1,24 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { url } = await req.json();
-    const { courseId  } = params;
+    const { courseId   } = await params;
     
-    if (!userId) {
+    if (!user) {
       return new NextResponse("No autorizado", { status: 401 });
     }
 
     const courseOwner = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       },
     });
 

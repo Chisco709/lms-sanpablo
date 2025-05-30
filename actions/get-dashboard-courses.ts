@@ -37,17 +37,21 @@ export const getDashboardCourses = async ({
       },
     })
 
-    const courses = purchasedCourses.map(
-      (purchase) => purchase.course
-    ) as CourseWithProgressWithCategory[]
+    const coursesWithProgress: CourseWithProgressWithCategory[] = []
 
-    for (let course of courses) {
-      const progress = await getProgress(userId, course.id)
-      course["progress"] = progress
+    for (const purchase of purchasedCourses) {
+      const progress = await getProgress(userId, purchase.course.id)
+      
+      const courseWithProgress: CourseWithProgressWithCategory = {
+        ...purchase.course,
+        progress
+      }
+      
+      coursesWithProgress.push(courseWithProgress)
     }
 
-    const completedCourses = courses.filter((course) => course.progress === 100)
-    const coursesInProgress = courses.filter(
+    const completedCourses = coursesWithProgress.filter((course) => course.progress === 100)
+    const coursesInProgress = coursesWithProgress.filter(
       (course) => (course.progress ?? 0) < 100
     )
 

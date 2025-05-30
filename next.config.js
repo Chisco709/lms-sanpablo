@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   
- 
   images: {
     remotePatterns: [
       {
@@ -13,23 +13,22 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "3000",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
         pathname: "/**",
       }
     ]
   },
 
-  webpack: (config) => {
-    // Solución para react-quill
-    config.resolve.alias.canvas = false;
-    config.resolve.alias.encoding = false;
-    
-    return config;
+  // Optimizaciones básicas
+  poweredByHeader: false,
+  compress: true,
+  
+  // Configuración para build
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  
+  eslint: {
+    ignoreDuringBuilds: false,
   }
 };
 

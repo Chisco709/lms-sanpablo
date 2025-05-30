@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getChapter } from "@/actions/get-chapter";
 import ChapterPage from "./_components/chapter-page";
@@ -6,12 +6,12 @@ import ChapterPage from "./_components/chapter-page";
 const ChapterIdPage = async ({
   params
 }: {
-  params: { courseId: string; chapterId: string }
+  params: Promise<{ courseId: string; chapterId: string }>
 }) => {
-  const { userId } = await auth();
+  const user = await currentUser();
   const { courseId, chapterId } = await params;
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
 
@@ -22,8 +22,8 @@ const ChapterIdPage = async ({
     nextChapter,
     userProgress,
     purchase,
-  } = await getChapter({
-    userId,
+  } = await getChapter({ 
+    userId: user.id,
     chapterId,
     courseId,
   });
@@ -32,15 +32,27 @@ const ChapterIdPage = async ({
     return redirect("/");
   }
 
+  // Simplificar los tipos para evitar conflictos
+  const chapterData = {
+    id: chapter.id,
+    title: chapter.title,
+    description: chapter.description || "",
+    videoUrl: chapter.videoUrl || "",
+    position: chapter.position || 1,
+    pdfUrl: chapter.pdfUrl || "",
+    googleFormUrl: chapter.googleFormUrl || "",
+    isFree: chapter.isFree || false,
+  };
+
   return (
     <ChapterPage
-      chapter={chapter}
+      chapter={chapterData}
       course={course}
       attachments={attachments}
       nextChapter={nextChapter}
       userProgress={userProgress}
       purchase={purchase}
-      userId={userId}
+      userId={user.id}
     />
   );
 };

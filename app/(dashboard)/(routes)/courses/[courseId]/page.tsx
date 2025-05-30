@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getProgress } from "@/actions/get-progress";
@@ -7,12 +7,12 @@ import { CoursePageClient } from "./_components/course-page-client";
 const CourseIdPage = async ({
   params
 }: {
-  params: { courseId: string }
+  params: Promise<{ courseId: string }>
 }) => {
-  const { userId } = await auth();
+  const user = await currentUser();
   const { courseId } = await params;
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
   
@@ -28,8 +28,7 @@ const CourseIdPage = async ({
         },
         include: {
           userProgress: {
-            where: {
-              userId,
+            where: { userId: user.id,
             }
           }
         },
@@ -48,8 +47,7 @@ const CourseIdPage = async ({
             },
             include: {
               userProgress: {
-                where: {
-                  userId,
+                where: { userId: user.id,
                 }
               }
             },
@@ -71,14 +69,13 @@ const CourseIdPage = async ({
 
   const purchase = await db.purchase.findUnique({
     where: {
-      userId_courseId: {
-        userId,
+      userId_courseId: { userId: user.id,
         courseId: course.id,
       }
     }
   });
 
-  const progressCount = await getProgress(userId, course.id);
+  const progressCount = await getProgress(user.id, course.id);
   const isFreeCoure = !course.price || course.price === 0;
   const hasAccess = purchase || isFreeCoure;
 

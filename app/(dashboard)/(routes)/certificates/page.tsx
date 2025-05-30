@@ -1,16 +1,16 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 import { Award, Download, Calendar, CheckCircle, BookOpen } from "lucide-react";
 
 const CertificatesPage = async () => {
-  const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
 
-  const { completedCourses } = await getDashboardCourses(userId);
+  const { completedCourses } = await getDashboardCourses({ userId: user.id });
 
   return (
     <div className="p-6 space-y-6">

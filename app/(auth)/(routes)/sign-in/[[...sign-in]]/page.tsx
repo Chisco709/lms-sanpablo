@@ -42,7 +42,6 @@ export default function Page() {
                 colorBackground: '#111',
                 colorInputBackground: '#18181b',
                 colorInputText: '#fff',
-                colorInputBorder: '#fff',
                 colorDanger: '#ef4444',
               },
             }}

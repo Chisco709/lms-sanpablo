@@ -1,17 +1,17 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    const { courseId  } = params;
+    const user = await currentUser();
+    const { courseId   } = await params;
     const { userEmail, paymentType, amount, notes } = await req.json();
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -19,7 +19,7 @@ export async function POST(
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       },
     });
 
@@ -77,13 +77,13 @@ export async function POST(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    const { courseId  } = params;
+    const user = await currentUser();
+    const { courseId   } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -91,7 +91,7 @@ export async function GET(
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       },
     });
 
@@ -118,7 +118,7 @@ export async function GET(
       user: {
         firstName: "Usuario", // Temporal
         lastName: "",
-        emailAddress: student.userId, // Temporal: userId es el email
+        emailAddress: student.user.id, // Temporal: userId es el email
       },
     }));
 

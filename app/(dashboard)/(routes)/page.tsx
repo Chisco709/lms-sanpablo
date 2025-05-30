@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation"
 import { BookOpen, Play, Search, GraduationCap } from "lucide-react"
 import { CoursesList } from "@/components/courses-list"
@@ -7,14 +7,14 @@ import { getPublishedCourses } from "@/actions/get-published-courses"
 import Link from "next/link"
 
 export default async function Dashboard() {
-  const { userId } = auth()
+  const { user.id } = auth()
 
-  if (!userId) {
+  if (!user) {
     return redirect("/")
   }
 
   const { completedCourses, coursesInProgress } = await getDashboardCourses(
-    userId
+    user.id
   )
   
   const availableCourses = await getPublishedCourses()

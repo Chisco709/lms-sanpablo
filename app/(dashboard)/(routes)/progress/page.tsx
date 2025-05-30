@@ -1,20 +1,20 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 import { CheckCircle, Clock, BookOpen, TrendingUp, Target, Award } from "lucide-react";
 import { CourseProgress } from "@/components/course-progress";
 
 const ProgressPage = async () => {
-  const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
 
   const {
     completedCourses,
     coursesInProgress,
-  } = await getDashboardCourses(userId);
+  } = await getDashboardCourses(user.id);
 
   const totalCourses = completedCourses.length + coursesInProgress.length;
   const completionRate = totalCourses > 0 ? (completedCourses.length / totalCourses) * 100 : 0;

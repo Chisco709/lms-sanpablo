@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 /**
@@ -7,8 +7,9 @@ import { db } from "@/lib/db";
  */
 export async function GET() {
   try {
-    const { userId } = auth();
-
+    const user = await currentUser();
+    const userId = user?.id;
+    
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
@@ -81,7 +82,8 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = auth();
+    const user = await currentUser();
+    const userId = user?.id;
 
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });

@@ -39,8 +39,8 @@ export const CourseCard = ({
     if (imageError) {
       return "/logo-sanpablo.jpg" // Fallback principal
     }
-    if (!imageUrl || imageUrl.includes('logo-sanpablo (1)')) {
-      return "/logo-sanpablo.jpg" // URL limpia
+    if (!imageUrl || imageUrl.trim() === '') {
+      return "/logo-sanpablo.jpg" // URL limpia para casos vacíos
     }
     return imageUrl
   }

@@ -1,5 +1,5 @@
 // app/(dashboard)/(routes)/teacher/courses/[courseId]/page.tsx
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CircleDollarSign, LayoutDashboard, ListChecks, File } from "lucide-react";
 
@@ -23,16 +23,16 @@ interface CourseWithAttachments extends Course {
 }
 
 interface CourseIdPageProps {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 }
 
 export default async function CourseIdPage({ params }: CourseIdPageProps) {
-  const { userId } = await auth();
+  const user = await currentUser();
   const { courseId } = await params;
 
-  if (!userId) {
+  if (!user) {
     return redirect("/");
   }
 
@@ -40,7 +40,7 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId
+        userId: user.id
       },
       include: {
         chapters: {

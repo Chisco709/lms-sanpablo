@@ -12,8 +12,7 @@ import {
   FcSportsMode,
   FcElectronics,
   FcAutomotive,
-  FcBusiness,
-  FcGears
+  FcBusiness
 } from "react-icons/fc"
 import { CategoryItem } from "./category-item"
 
@@ -25,7 +24,7 @@ const iconMap: Record<Category["name"], IconType> = {
   // Categorías técnicas en español
   "Técnico en Computación": FcMultipleDevices,
   "Técnico en Electrónica": FcElectronics,
-  "Técnico en Mecánica": FcGears,
+  "Técnico en Mecánica": FcEngineering,
   "Técnico en Electricidad": FcEngineering,
   "Técnico en Soldadura": FcEngineering,
   "Técnico en Refrigeración": FcEngineering,

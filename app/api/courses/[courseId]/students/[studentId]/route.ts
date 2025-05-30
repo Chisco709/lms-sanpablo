@@ -1,17 +1,17 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { courseId: string; studentId: string } }
+  { params }: { params: Promise<{ courseId: string; studentId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    const { courseId, studentId  } = params;
+    const user = await currentUser();
+    const { courseId, studentId   } = await params;
     const { status, notes } = await req.json();
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -19,7 +19,7 @@ export async function PATCH(
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       },
     });
 
@@ -49,13 +49,13 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { courseId: string; studentId: string } }
+  { params }: { params: Promise<{ courseId: string; studentId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    const { courseId, studentId  } = params;
+    const user = await currentUser();
+    const { courseId, studentId   } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -63,7 +63,7 @@ export async function DELETE(
     const course = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       },
     });
 

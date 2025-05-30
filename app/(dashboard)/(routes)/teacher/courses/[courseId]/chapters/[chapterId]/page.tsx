@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation"
 import Link from "next/link";
 import { db } from "@/lib/db"
@@ -20,10 +20,10 @@ const ChapterIdPage = async({
 }: {
     params: Promise<{ courseId: string; chapterId: string }>
 }) => {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { courseId, chapterId  } = await params;
     
-    if (!userId) {
+    if (!user) {
         return redirect("/")
     }
 
