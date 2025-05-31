@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "dev:fast": "next dev --turbo",
-    "build": "prisma generate && next build",
+    "build": "prisma generate --no-engine && next build",
     "build:analyze": "ANALYZE=true next build",
-    "build:vercel": "prisma generate && next build",
+    "build:vercel": "prisma generate --no-engine && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:check": "next lint",

@@ -22,14 +22,11 @@ interface CourseWithAttachments extends Course {
   pensumTopics: (PensumTopic & { chapters: Chapter[] })[];
 }
 
-// Definir el tipo de props correctamente para Next.js 15
-interface CourseIdPageProps {
-  params: Promise<{
-    courseId: string;
-  }>;
-}
-
-export default async function CourseIdPage({ params }: CourseIdPageProps) {
+export default async function CourseIdPage({
+  params,
+}: {
+  params: Promise<{ courseId: string }>
+}) {
   const user = await currentUser();
   const { courseId } = await params;
 
