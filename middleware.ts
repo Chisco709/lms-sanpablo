@@ -1,6 +1,4 @@
 import { clerkMiddleware } from '@clerk/nextjs/server'
-import { authMiddleware } from "@clerk/nextjs";
-import { NextResponse } from "next/server";
 
 export default clerkMiddleware({})
 
@@ -12,13 +10,3 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
-
-export default authMiddleware({
-  publicRoutes: ["/", "/login", "/register", "/about", "/contact"],
-  afterAuth(auth, req) {
-    if (auth.userId && ["/", "/login", "/register", "/about", "/contact"].includes(req.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL("/student", req.url));
-    }
-    return NextResponse.next();
-  },
-});
