@@ -39,6 +39,13 @@ const StudentPage = async () => {
     const purchasedCourses = coursesWithPurchaseInfo.filter(course => course.isPurchased)
     const availableCourses = coursesWithPurchaseInfo.filter(course => !course.isPurchased)
 
+    // Determinar el saludo según la hora
+    const hora = new Date().getHours();
+    let saludo = "";
+    if (hora >= 5 && hora < 12) saludo = "Buenos días";
+    else if (hora >= 12 && hora < 19) saludo = "Buenas tardes";
+    else saludo = "Buenas noches";
+
     return (
       <div className="relative min-h-screen bg-black text-white font-sans antialiased">
         {/* Efectos de fondo sutiles */}
@@ -48,8 +55,20 @@ const StudentPage = async () => {
         </div>
         {/* CONTENIDO PRINCIPAL */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-8 py-8 space-y-8">
-          {/* Acceso rápido */}
-          <StudentQuickNav />
+          {/* Saludo personalizado */}
+          <div className="mb-2">
+            <h1 className="text-2xl font-bold text-green-400">{saludo}, {user?.firstName || 'Estudiante'}!</h1>
+          </div>
+          {/* Mis cursos */}
+          {purchasedCourses.length > 0 && (
+            <div className="bg-black/70 rounded-2xl border-2 border-green-400/30 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <GraduationCap className="h-5 w-5 text-green-400" />
+                <h2 className="text-xl font-bold text-white">Mis Cursos</h2>
+              </div>
+              <CoursesList items={purchasedCourses} />
+            </div>
+          )}
           {/* Stats rápidas */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-black/60 rounded-xl border border-green-400/30 p-4 text-center">
@@ -65,16 +84,6 @@ const StudentPage = async () => {
               <div className="text-xs text-white/70">Empleabilidad</div>
             </div>
           </div>
-          {/* Mis cursos */}
-          {purchasedCourses.length > 0 && (
-            <div className="bg-black/70 rounded-2xl border-2 border-green-400/30 p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <GraduationCap className="h-5 w-5 text-green-400" />
-                <h2 className="text-xl font-bold text-white">Mis Cursos</h2>
-              </div>
-              <CoursesList items={purchasedCourses} />
-            </div>
-          )}
           {/* Cursos disponibles */}
           <div className="bg-black/70 rounded-2xl border-2 border-yellow-400/30 p-6">
             <div className="flex items-center gap-2 mb-4">
