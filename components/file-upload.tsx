@@ -21,7 +21,7 @@ export const FileUpload = ({
             console.log("📂 FileUpload Response:", res);
             
             // Intentar diferentes propiedades que podría devolver UploadThing
-            const fileUrl = res?.[0]?.url || res?.[0]?.ufsUrl || res?.[0]?.fileUrl;
+            const fileUrl = res?.[0]?.url || res?.[0]?.ufsUrl;
             
             console.log("📎 URL extraída:", fileUrl);
             

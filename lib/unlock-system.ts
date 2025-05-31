@@ -108,7 +108,7 @@ async function createUnlockNotifications(courseId: string, programId: string) {
   if (!course) return;
 
   // Crear notificaciones para cada estudiante
-  const notifications = enrollments.map(enrollment => ({
+  const notifications = enrollments.map((enrollment: any) => ({
     userId: enrollment.userId,
     title: "¡Nuevo curso disponible!",
     message: `El curso "${course.title}" ya está disponible en tu programa técnico.`,
@@ -123,40 +123,32 @@ async function createUnlockNotifications(courseId: string, programId: string) {
 }
 
 /**
- * Programa el desbloqueo de cursos para un programa técnico
+ * Función para programar desbloqueos de cursos en un programa técnico
  */
 export async function scheduleProgramUnlocks(
   programId: string, 
-  startDate: Date,
-  courses: Array<{ courseId: string; month: number }>
+  startDate: Date, 
+  courseSchedule: { courseId: string; month: number }[]
 ) {
-  const unlockSchedule: UnlockSchedule[] = [];
-
-  for (const courseInfo of courses) {
-    // Calcular fecha de desbloqueo (primer día del mes correspondiente)
-    const unlockDate = new Date(startDate);
-    unlockDate.setMonth(unlockDate.getMonth() + courseInfo.month - 1);
-    unlockDate.setDate(1);
-    unlockDate.setHours(0, 0, 0, 0);
-
-    // Actualizar curso con fecha de desbloqueo
-    await db.course.update({
-      where: { id: courseInfo.courseId },
-      data: {
-        unlockDate: unlockDate,
-        isPublished: courseInfo.month === 1 // Solo el primer mes se publica inmediatamente
-      }
-    });
-
-    unlockSchedule.push({
-      programId,
-      courseId: courseInfo.courseId,
-      unlockDate,
-      month: courseInfo.month
-    });
+  try {
+    console.log(`Programando desbloqueos para el programa ${programId}`, courseSchedule);
+    
+    // Actualizar fechas de desbloqueo de los cursos
+    for (const schedule of courseSchedule) {
+      const unlockDate = new Date(startDate);
+      unlockDate.setMonth(unlockDate.getMonth() + schedule.month - 1);
+      
+      await db.course.update({
+        where: { id: schedule.courseId },
+        data: { unlockDate }
+      });
+    }
+    
+    console.log(`Desbloqueos programados exitosamente para el programa ${programId}`);
+  } catch (error) {
+    console.error("Error programando desbloqueos:", error);
+    throw error;
   }
-
-  return unlockSchedule;
 }
 
 /**
@@ -170,12 +162,11 @@ export async function getProgramUnlockSchedule(programId: string) {
       id: true,
       title: true,
       unlockDate: true,
-      isPublished: true,
-      position: true
+      isPublished: true
     }
   });
 
-  return courses.map((course, index) => ({
+  return courses.map((course: any, index: number) => ({
     ...course,
     month: index + 1,
     status: course.isPublished ? 'unlocked' : 'locked',
@@ -215,10 +206,10 @@ export async function getStudentProgramProgress(userId: string, programId: strin
     orderBy: { unlockDate: 'asc' }
   });
 
-  const progress = courses.map(course => {
+  const progress = courses.map((course: any) => {
     const totalChapters = course.chapters.length;
     const completedChapters = course.chapters.filter(
-      chapter => chapter.userProgress.some(progress => progress.isCompleted)
+      (chapter: any) => chapter.userProgress.some((progress: any) => progress.isCompleted)
     ).length;
 
     const completionPercentage = totalChapters > 0 ? 
@@ -236,7 +227,7 @@ export async function getStudentProgramProgress(userId: string, programId: strin
   });
 
   const overallProgress = progress.length > 0 ?
-    progress.reduce((sum, course) => sum + course.completionPercentage, 0) / progress.length : 0;
+    progress.reduce((sum: number, course: any) => sum + course.completionPercentage, 0) / progress.length : 0;
 
   return {
     enrollment,

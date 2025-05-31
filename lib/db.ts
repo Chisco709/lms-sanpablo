@@ -2,17 +2,37 @@ import { PrismaClient } from '@prisma/client'
     
 // Extensión de tipos para globalThis sin usar 'var'
 declare global {
-  var _prisma: PrismaClient | undefined
+  var prisma: PrismaClient | undefined
 }
 
-// Creamos un alias para evitar el warning de ESLint
-const prismaGlobal = globalThis as typeof globalThis & {
-  _prisma?: PrismaClient
-}
+// Configuración condicional para diferentes entornos
+const getDatabaseConfig = () => {
+  const baseConfig: any = {
+    errorFormat: "minimal",
+  };
+
+  // Solo agregar logs en desarrollo
+  if (process.env.NODE_ENV === "development") {
+    baseConfig.log = ["query", "error", "warn"];
+  }
+
+  return baseConfig;
+};
 
 // Inicialización de PrismaClient
-export const db = prismaGlobal._prisma ?? new PrismaClient()
+export const db = globalThis.prisma ?? new PrismaClient(getDatabaseConfig());
 
-if (process.env.NODE_ENV !== 'production') {
-  prismaGlobal._prisma = db
+// Optimización específica para Vercel y desarrollo
+if (process.env.NODE_ENV !== "production") {
+  globalThis.prisma = db;
+}
+
+// Manejo de conexión para Vercel
+if (typeof window === "undefined") {
+  // Solo en el servidor
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    db.$connect().catch((error: Error) => {
+      console.warn("Database connection warning:", error.message);
+    });
+  }
 }

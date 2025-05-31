@@ -61,12 +61,20 @@ const CourseLayout = async ({
   const isFreeCoure = !course.price || course.price === 0;
   const hasAccess = !!purchase || isFreeCoure;
 
+  // Calcular capítulos completados
+  const completedChapters = course.chapters.filter(chapter => 
+    chapter.userProgress && 
+    chapter.userProgress.length > 0 && 
+    chapter.userProgress[0]?.isCompleted
+  ).length;
+
   return (
     <CourseLayoutClient
       course={course}
       progressCount={progressCount}
+      completedChapters={completedChapters}
       hasAccess={hasAccess}
-      isFreeCoure={isFreeCoure}
+      courseId={courseId}
     >
       {children}
     </CourseLayoutClient>

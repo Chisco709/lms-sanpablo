@@ -51,7 +51,7 @@ export async function PATCH(
 
     // 5. Validar formato de YouTube
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
-    if (!youtubeRegex.test(chapter.videoUrl)) {
+    if (chapter.videoUrl && !youtubeRegex.test(chapter.videoUrl)) {
         return new NextResponse(
             "La URL del video debe ser una URL válida de YouTube (formato: youtube.com/watch?v=ID o youtu.be/ID)",
             { status: 400 }

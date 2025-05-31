@@ -33,6 +33,9 @@ export async function POST(
     const program = await db.technicalProgram.findUnique({
       where: {
         id: programId
+      },
+      include: {
+        courses: true
       }
     });
 
@@ -89,7 +92,7 @@ export async function POST(
 
     // Programar desbloqueos de cursos si hay cursos en el programa
     if (program.courses.length > 0) {
-      const courseSchedule = program.courses.map((course, index) => ({
+      const courseSchedule = program.courses.map((course: any, index: number) => ({
         courseId: course.id,
         month: index + 1
       }));
@@ -172,10 +175,10 @@ export async function GET(
     }
 
     // Calcular progreso
-    const coursesProgress = enrollment.program.courses.map(course => {
+    const coursesProgress = enrollment.program.courses.map((course: any) => {
       const totalChapters = course.chapters.length;
       const completedChapters = course.chapters.filter(
-        chapter => chapter.userProgress.some(progress => progress.isCompleted)
+        (chapter: any) => chapter.userProgress.some((progress: any) => progress.isCompleted)
       ).length;
 
       return {
@@ -190,7 +193,7 @@ export async function GET(
     });
 
     const overallProgress = coursesProgress.length > 0 ?
-      Math.round(coursesProgress.reduce((sum, course) => sum + course.completionPercentage, 0) / coursesProgress.length) : 0;
+      Math.round(coursesProgress.reduce((sum: number, course: any) => sum + course.completionPercentage, 0) / coursesProgress.length) : 0;
 
     const currentMonth = Math.floor((Date.now() - enrollment.startDate.getTime()) / (1000 * 60 * 60 * 24 * 30)) + 1;
 

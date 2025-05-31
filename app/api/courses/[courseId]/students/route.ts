@@ -34,20 +34,17 @@ export async function POST(
     // Por ahora, crearemos el registro con el email como userId temporal
     
     // Verificar si ya existe un pago para este usuario en este curso
-    const existingPayment = await db.studentPayment.findUnique({
+    const existingPayment = await db.purchase.findUnique({
       where: {
         userId_courseId: {
           userId: userEmail, // Temporal: usar email como userId
           courseId: courseId,
-        },
-      },
+        }
+      }
     });
 
     if (existingPayment) {
-      return NextResponse.json(
-        { message: "Este estudiante ya está registrado en este curso" }, 
-        { status: 400 }
-      );
+      return new NextResponse("Student already enrolled", { status: 400 });
     }
 
     // Calcular fecha de vencimiento (1 mes desde ahora)
@@ -55,20 +52,17 @@ export async function POST(
     expiryDate.setMonth(expiryDate.getMonth() + 1);
 
     // Crear el registro de pago del estudiante
-    const studentPayment = await db.studentPayment.create({
+    const studentPayment = await db.purchase.create({
       data: {
         userId: userEmail, // Temporal: usar email como userId
         courseId: courseId,
-        paymentType: paymentType,
-        amount: amount,
-        currency: "COP",
-        status: "active",
-        expiryDate: expiryDate,
-        notes: notes || null,
-      },
+      }
     });
 
-    return NextResponse.json(studentPayment);
+    return NextResponse.json({
+      message: "Estudiante registrado exitosamente",
+      student: studentPayment
+    });
   } catch (error) {
     console.log("[STUDENTS_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -103,7 +97,7 @@ export async function GET(
     }
 
     // Obtener todos los estudiantes del curso
-    const students = await db.studentPayment.findMany({
+    const students = await db.purchase.findMany({
       where: {
         courseId: courseId,
       },
@@ -113,16 +107,16 @@ export async function GET(
     });
 
     // Aquí podrías agregar información del usuario desde Clerk si es necesario
-    const studentsWithUserInfo = students.map(student => ({
-      ...student,
+    const formattedStudents = students.map((student: any) => ({
+      id: student.id,
       user: {
         firstName: "Usuario", // Temporal
         lastName: "",
-        emailAddress: student.user.id, // Temporal: userId es el email
+        emailAddress: student.userId, // Usar directamente userId
       },
     }));
 
-    return NextResponse.json(studentsWithUserInfo);
+    return NextResponse.json(formattedStudents);
   } catch (error) {
     console.log("[STUDENTS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

@@ -291,7 +291,7 @@ export const ChapterPdfForm = ({
                     Cancelar
                   </Button>
                   <Button
-                    onClick={() => onSubmit(tempPdfUrl)}
+                    onClick={() => onSubmit(tempPdfUrl!)}
                     disabled={isSubmitting || !tempPdfUrl}
                     className={`font-medium ${
                       tempPdfUrl 

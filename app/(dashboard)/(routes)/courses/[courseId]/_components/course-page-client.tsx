@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
   CheckCircle, 
   Lock, 
   Play, 
-  BookOpen, 
+  BookOpen,
   ArrowRight, 
   ChevronDown,
   ChevronUp,
@@ -15,9 +15,9 @@ import {
   ArrowLeft,
   Home,
   Star,
-  Clock,
   Menu,
-  X
+  X,
+  Clock
 } from "lucide-react";
 
 interface CoursePageClientProps {

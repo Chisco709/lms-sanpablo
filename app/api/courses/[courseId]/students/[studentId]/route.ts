@@ -8,8 +8,7 @@ export async function PATCH(
 ) {
   try {
     const user = await currentUser();
-    const { courseId, studentId   } = await params;
-    const { status, notes } = await req.json();
+    const { courseId, studentId } = await params;
 
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -27,20 +26,19 @@ export async function PATCH(
       return new NextResponse("Course not found", { status: 404 });
     }
 
-    // Actualizar el estudiante
-    const updatedStudent = await db.studentPayment.update({
+    // Buscar la compra existente
+    const purchase = await db.purchase.findUnique({
       where: {
         id: studentId,
         courseId: courseId,
       },
-      data: {
-        status: status,
-        notes: notes,
-        updatedAt: new Date(),
-      },
     });
 
-    return NextResponse.json(updatedStudent);
+    if (!purchase) {
+      return new NextResponse("Purchase not found", { status: 404 });
+    }
+
+    return NextResponse.json(purchase);
   } catch (error) {
     console.log("[STUDENT_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -72,7 +70,7 @@ export async function DELETE(
     }
 
     // Eliminar el estudiante
-    await db.studentPayment.delete({
+    await db.purchase.delete({
       where: {
         id: studentId,
         courseId: courseId,

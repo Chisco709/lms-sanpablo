@@ -5,8 +5,6 @@ import {
   Menu, 
   X, 
   BookOpen, 
-  Trophy, 
-  Clock,
   CheckCircle,
   Lock,
   Play,
@@ -18,6 +16,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CourseResources, useCourseResources } from "./course-resources";
+import { User } from "@clerk/nextjs/server";
+import { Progress } from "@/components/ui/progress";
+import { CourseSidebar } from "./course-sidebar";
+import { CourseNavbar } from "./course-navbar";
 
 // Types
 interface Chapter {
@@ -34,11 +36,12 @@ interface Course {
 }
 
 interface CourseLayoutClientProps {
-  children: React.ReactNode;
   course: Course;
   progressCount: number;
+  completedChapters: number;
   hasAccess: boolean;
-  isFreeCoure: boolean;
+  courseId: string;
+  children: React.ReactNode;
 }
 
 // Base Components siguiendo el patrón ReactBits
@@ -183,24 +186,15 @@ export const CourseLayoutClient = ({
   children,
   course,
   progressCount,
+  completedChapters,
   hasAccess,
-  isFreeCoure
+  courseId
 }: CourseLayoutClientProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   
   // Obtener recursos del curso
   const courseResources = useCourseResources(course.id);
-
-  // Memoized calculations
-  const completedChapters = useMemo(() => 
-    course.chapters.filter(chapter => 
-      chapter.userProgress && 
-      chapter.userProgress.length > 0 && 
-      chapter.userProgress[0]?.isCompleted
-    ).length,
-    [course.chapters]
-  );
 
   // Callbacks
   const handleSidebarToggle = useCallback(() => {

@@ -18,18 +18,38 @@ const nextConfig = {
     ]
   },
 
-  // Optimizaciones básicas
+  // Optimizaciones para producción
   poweredByHeader: false,
   compress: true,
   
-  // Configuración para build
+  // Configuración para build estable
   typescript: {
     ignoreBuildErrors: false,
   },
   
   eslint: {
     ignoreDuringBuilds: false,
-  }
+  },
+
+  // Optimizaciones experimentales estables
+  experimental: {
+    optimizeCss: true,
+    esmExternals: true,
+  },
+
+  // Configuración específica para Vercel
+  ...(process.env.VERCEL && {
+    experimental: {
+      optimizeCss: false, // Desactivar en Vercel si causa problemas
+    }
+  }),
+
+  // Bundle analyzer solo en desarrollo
+  ...(process.env.ANALYZE === 'true' && {
+    bundleAnalyzer: {
+      enabled: true,
+    }
+  }),
 };
 
 module.exports = nextConfig;

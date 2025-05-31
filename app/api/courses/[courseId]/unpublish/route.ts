@@ -8,7 +8,7 @@ export async function PATCH(
 ) {
   try {
     const { userId } = await auth();
-    const { courseId  } = params;
+    const { courseId } = await params;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });
