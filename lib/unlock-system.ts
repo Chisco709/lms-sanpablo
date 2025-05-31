@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db } from "./db";
 
 /**
  * Sistema de desbloqueo automático para programas técnicos
@@ -11,6 +11,35 @@ export interface UnlockSchedule {
   unlockDate: Date;
   month: number; // Mes del programa (1-18)
 }
+
+// Tipos específicos para evitar 'any'
+type EnrollmentWithUser = {
+  userId: string;
+  [key: string]: any;
+};
+
+type CourseWithChapters = {
+  id: string;
+  title: string;
+  isPublished: boolean;
+  unlockDate: Date | null;
+  chapters: {
+    userProgress: {
+      isCompleted: boolean;
+    }[];
+  }[];
+  [key: string]: any;
+};
+
+type CourseProgress = {
+  courseId: string;
+  title: string;
+  isUnlocked: boolean;
+  unlockDate: Date | null;
+  totalChapters: number;
+  completedChapters: number;
+  completionPercentage: number;
+};
 
 /**
  * Verifica y desbloquea cursos que deben estar disponibles
@@ -108,7 +137,7 @@ async function createUnlockNotifications(courseId: string, programId: string) {
   if (!course) return;
 
   // Crear notificaciones para cada estudiante
-  const notifications = enrollments.map((enrollment: any) => ({
+  const notifications = enrollments.map((enrollment: EnrollmentWithUser) => ({
     userId: enrollment.userId,
     title: "¡Nuevo curso disponible!",
     message: `El curso "${course.title}" ya está disponible en tu programa técnico.`,
@@ -206,7 +235,7 @@ export async function getStudentProgramProgress(userId: string, programId: strin
     orderBy: { unlockDate: 'asc' }
   });
 
-  const progress = courses.map((course: any) => {
+  const progress = courses.map((course: CourseWithChapters): CourseProgress => {
     const totalChapters = course.chapters.length;
     const completedChapters = course.chapters.filter(
       (chapter: any) => chapter.userProgress.some((progress: any) => progress.isCompleted)
@@ -227,7 +256,7 @@ export async function getStudentProgramProgress(userId: string, programId: strin
   });
 
   const overallProgress = progress.length > 0 ?
-    progress.reduce((sum: number, course: any) => sum + course.completionPercentage, 0) / progress.length : 0;
+    progress.reduce((sum: number, course: CourseProgress) => sum + course.completionPercentage, 0) / progress.length : 0;
 
   return {
     enrollment,

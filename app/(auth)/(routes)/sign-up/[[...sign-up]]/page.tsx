@@ -5,84 +5,180 @@ import Image from "next/image"
 // Este archivo debe ser un Client Component para usar Clerk y styled-jsx
 export default function Page() {
   return (
-    <div className="min-h-screen w-full flex items-stretch bg-gradient-to-br from-black via-zinc-900 to-black relative overflow-hidden">
-      {/* Fondo decorativo auténtico */}
+    <div className="min-h-screen w-full bg-black relative overflow-hidden">
+      {/* Efectos de fondo móvil optimizados */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float-slow" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(250,204,21,0.08)_0%,rgba(0,0,0,0)_70%)]" />
+        <div className="absolute top-0 left-0 w-[200px] sm:w-[300px] h-[200px] sm:h-[300px] bg-yellow-400/20 rounded-full blur-[60px] sm:blur-[80px] animate-float-slow" />
+        <div className="absolute bottom-0 right-0 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-green-500/15 rounded-full blur-[80px] sm:blur-[120px] animate-float" />
+        <div className="absolute top-1/2 left-1/4 w-[150px] sm:w-[200px] h-[150px] sm:h-[200px] bg-green-400/10 rounded-full blur-[50px] sm:blur-[70px] animate-pulse" />
       </div>
 
-      {/* Panel de autenticación a la izquierda */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-12 sm:px-8 md:px-12 lg:px-24 xl:px-32">
-        <div className="w-full max-w-md bg-zinc-950/90 rounded-xl shadow-xl border border-white/10 p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-green-500"></div>
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-yellow-400 mb-1">SanPablo</h1>
-            <p className="text-gray-400 text-sm">Crea tu cuenta para comenzar</p>
+      {/* DISEÑO MOBILE-FIRST */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        
+        {/* Header móvil del Instituto */}
+        <div className="w-full px-4 pt-8 pb-4 text-center">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-green-400/80 shadow-2xl flex items-center justify-center bg-white overflow-hidden">
+              <Image src="/logo-sanpablo.jpg" alt="Logo San Pablo" width={48} height={48} className="rounded-full object-cover" priority />
+            </div>
+            <div className="text-left">
+              <h1 className="text-xl sm:text-2xl font-bold text-green-400">Instituto</h1>
+              <h2 className="text-xl sm:text-2xl font-bold text-yellow-400 -mt-1">San Pablo</h2>
+            </div>
           </div>
-          <SignUp
-            appearance={{
-              elements: {
-                card: "bg-transparent shadow-none border-none p-0",
-                headerTitle: "text-yellow-400 font-bold text-xl mb-2",
-                headerSubtitle: "text-gray-400 mb-4 text-sm",
-                formButtonPrimary: "bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition-all duration-300 py-2 mt-4 text-base",
-                formFieldInput: "bg-black/80 border border-white/10 text-white placeholder-gray-400 rounded-lg focus:border-yellow-400 focus:ring-yellow-400 text-base",
-                formFieldLabel: "text-gray-300 font-medium mb-1 text-sm",
-                socialButtonsBlockButton: "bg-zinc-900 text-white border border-white/10 hover:bg-yellow-400 hover:text-black transition-all duration-300 text-base",
-                socialButtonsBlockButtonText: "!text-white font-semibold text-base",
-                'socialButtonsBlockButtonText__google': '!text-white',
-                'socialButtonsBlockButtonText__facebook': '!text-white',
-                footerAction: "text-gray-400 mt-6 text-sm",
-                footerActionLink: "text-yellow-400 hover:underline text-sm",
-                formFieldErrorText: "text-red-500 text-xs mt-1",
-              },
-              variables: {
-                colorPrimary: '#FACC15',
-                colorText: '#fff',
-                colorBackground: '#111',
-                colorInputBackground: '#18181b',
-                colorInputText: '#fff',
-                colorDanger: '#ef4444',
-              },
-            }}
-          />
+          <p className="text-white/70 text-sm sm:text-base">Pereira, Risaralda • Formación técnica desde 2008</p>
         </div>
-      </div>
 
-      {/* Imagen decorativa a la derecha */}
-      <div className="hidden lg:flex flex-1 items-center justify-center relative z-10 bg-transparent">
-        <div className="w-full max-w-xl px-8">
-          <div className="rounded-3xl overflow-hidden shadow-2xl border-2 border-yellow-400/20 bg-black/60 backdrop-blur-xl">
-            <Image
-              src="/imagen-principio.jpg"
-              alt="Bienvenido a SanPablo LMS"
-              width={500}
-              height={500}
-              className="w-full h-[500px] object-cover object-center"
-              draggable={false}
-              priority
-            />
-            <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 via-transparent to-transparent">
-              <h2 className="text-2xl font-bold text-yellow-400 drop-shadow mb-2">¡Bienvenido!</h2>
-              <p className="text-gray-300 text-base max-w-md">Únete a la comunidad SanPablo y accede a programas educativos de calidad, clases en vivo y recursos exclusivos.</p>
+        {/* Contenedor principal responsive */}
+        <div className="flex-1 flex flex-col lg:flex-row">
+          
+          {/* Panel de autenticación - MÓVIL OPTIMIZADO */}
+          <div className="flex-1 flex items-center justify-center px-4 py-6 lg:py-12">
+            <div className="w-full max-w-md">
+              
+              {/* Tarjeta de registro móvil */}
+              <div className="bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-yellow-400/30 p-6 sm:p-8 relative overflow-hidden">
+                
+                {/* Borde animado superior */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-green-500 to-yellow-400"></div>
+                
+                {/* Efecto de luz interna */}
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-green-400/5 rounded-2xl"></div>
+                
+                <div className="relative z-10">
+                  {/* Encabezado */}
+                  <div className="text-center mb-6 sm:mb-8">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">¡Comienza tu futuro!</h3>
+                    <p className="text-yellow-400 text-sm sm:text-base font-medium">Crea tu cuenta y transforma tu carrera</p>
+                    <div className="flex items-center justify-center gap-2 mt-2">
+                      <span className="text-xs sm:text-sm text-white/60">🚀 Certificación SENA</span>
+                      <span className="text-white/40">•</span>
+                      <span className="text-xs sm:text-sm text-white/60">⭐ 95% Empleabilidad</span>
+                    </div>
+                  </div>
+
+                  {/* Componente Clerk con estilos móviles */}
+                  <SignUp
+                    appearance={{
+                      elements: {
+                        card: "bg-transparent shadow-none border-none p-0",
+                        headerTitle: "hidden",
+                        headerSubtitle: "hidden", 
+                        formButtonPrimary: "w-full bg-gradient-to-r from-yellow-400 via-green-500 to-yellow-400 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300 py-3 sm:py-4 text-base sm:text-lg hover:scale-105",
+                        formFieldInput: "w-full bg-black/60 border-2 border-yellow-400/30 text-white placeholder-gray-400 rounded-xl focus:border-green-400 focus:ring-2 focus:ring-green-400/20 text-base sm:text-lg py-3 sm:py-4 px-4",
+                        formFieldLabel: "text-yellow-400 font-semibold mb-2 text-sm sm:text-base",
+                        socialButtonsBlockButton: "w-full bg-black/60 text-white border-2 border-yellow-400/30 hover:border-green-400 hover:bg-green-400/10 transition-all duration-300 text-base sm:text-lg py-3 sm:py-4 rounded-xl",
+                        socialButtonsBlockButtonText: "!text-white font-semibold",
+                        'socialButtonsBlockButtonText__google': '!text-white',
+                        'socialButtonsBlockButtonText__facebook': '!text-white',
+                        footerAction: "text-white/70 mt-6 text-sm sm:text-base text-center",
+                        footerActionLink: "text-green-400 hover:text-yellow-400 font-semibold transition-colors",
+                        formFieldErrorText: "text-red-400 text-xs sm:text-sm mt-2",
+                        dividerLine: "bg-yellow-400/30",
+                        dividerText: "text-white/60 text-sm",
+                        formFieldSuccessText: "text-green-400 text-xs sm:text-sm mt-2",
+                      },
+                      variables: {
+                        colorPrimary: '#FACC15',
+                        colorText: '#fff',
+                        colorBackground: 'transparent',
+                        colorInputBackground: 'rgba(0,0,0,0.6)',
+                        colorInputText: '#fff',
+                        colorDanger: '#EF4444',
+                        spacingUnit: '1rem',
+                        borderRadius: '0.75rem',
+                      },
+                    }}
+                  />
+
+                  {/* Footer motivacional móvil */}
+                  <div className="mt-6 sm:mt-8 text-center">
+                    <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-3 sm:p-4">
+                      <p className="text-white/80 text-xs sm:text-sm">
+                        🏆 <span className="font-semibold text-yellow-400">15+ años formando profesionales</span> • 
+                        🎯 <span className="font-semibold text-green-400">Programa técnico certificado</span> • 
+                        📍 <span className="font-semibold text-yellow-400">Pereira, Risaralda</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Imagen decorativa - Solo visible en desktop */}
+          <div className="hidden lg:flex flex-1 items-center justify-center relative">
+            <div className="w-full max-w-xl px-8">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-green-400/30">
+                
+                {/* Imagen principal */}
+                <div className="relative h-[500px] xl:h-[600px]">
+                  <Image
+                    src="/imagen-principio.jpg"
+                    alt="Estudiantes Instituto San Pablo"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 1024px) 0px, 500px"
+                    priority
+                  />
+                  
+                  {/* Overlay con información */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
+                    <div className="absolute bottom-0 left-0 w-full p-6 xl:p-8">
+                      <h3 className="text-2xl xl:text-3xl font-bold text-green-400 mb-3">¡Únete a nosotros!</h3>
+                      <p className="text-white/90 text-base xl:text-lg leading-relaxed max-w-md">
+                        Sé parte de la próxima generación de profesionales técnicos. Formación de calidad, certificada y con alta demanda laboral.
+                      </p>
+                      <div className="flex items-center gap-4 mt-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-yellow-400 text-sm xl:text-base">👶</span>
+                          <span className="text-white/80 text-sm xl:text-base">Primera Infancia</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-400 text-sm xl:text-base">🗣️</span>
+                          <span className="text-white/80 text-sm xl:text-base">Inglés Profesional</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Footer móvil con incentivos */}
+        <div className="lg:hidden w-full px-4 py-6 text-center">
+          <div className="bg-black/60 backdrop-blur-xl rounded-xl border border-yellow-400/20 p-4">
+            <div className="grid grid-cols-2 gap-4 text-center mb-3">
+              <div className="bg-green-400/10 rounded-lg p-3">
+                <span className="text-green-400 font-bold text-lg sm:text-xl block">TÉCNICO</span>
+                <p className="text-white/70 text-xs sm:text-sm">Primera Infancia</p>
+                <p className="text-green-400 text-xs">🎯 Alta demanda</p>
+              </div>
+              <div className="bg-yellow-400/10 rounded-lg p-3">
+                <span className="text-yellow-400 font-bold text-lg sm:text-xl block">INGLÉS</span>
+                <p className="text-white/70 text-xs sm:text-sm">Certificado</p>
+                <p className="text-yellow-400 text-xs">🌍 Global</p>
+              </div>
+            </div>
+            <p className="text-white/60 text-xs sm:text-sm">
+              ✨ Inscripciones abiertas • 🏆 Certificación SENA • 📍 Pereira
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Animaciones globales */}
+      {/* Animaciones CSS embebidas */}
       <style jsx global>{`
         @keyframes float {
-          0% { transform: translateY(0) rotate(0); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-          100% { transform: translateY(0) rotate(0); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-15px) rotate(2deg); }
         }
         @keyframes float-slow {
-          0% { transform: translateY(0) rotate(0); }
-          50% { transform: translateY(-10px) rotate(-5deg); }
-          100% { transform: translateY(0) rotate(0); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(-1deg); }
         }
         .animate-float {
           animation: float 8s ease-in-out infinite;
