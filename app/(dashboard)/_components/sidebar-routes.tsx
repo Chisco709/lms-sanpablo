@@ -51,19 +51,17 @@ export const SidebarRoutes = () => {
   const routes = isTeacherPage && isChisco ? teacherRoutes : studentRoutes;
 
   return (
-    <div className="flex flex-col w-full space-y-2">
-      {routes.map((route) => {
-        return (
-          <SidebarItem
-            key={route.href}
-            icon={route.icon}
-            label={route.label}
-            href={route.href}
-            className={buttonClass}
-            iconClassName="text-green-500"
-          />
-        );
-      })}
+    <div className="flex flex-col w-full gap-2">
+      {routes.map((route) => (
+        <SidebarItem
+          key={route.href}
+          icon={route.icon}
+          label={route.label}
+          href={route.href}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all text-sm border border-transparent hover:border-green-400/40 hover:bg-green-400/10 focus:outline-none focus:ring-2 focus:ring-green-400/40"
+          iconClassName="text-green-400"
+        />
+      ))}
     </div>
   );
 };
