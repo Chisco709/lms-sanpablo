@@ -44,7 +44,8 @@ const nextConfig = {
         ]
       },
       {
-        source: '/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico))',
+        // Corrige la regex: elimina grupos de captura
+        source: '/:all*.(jpg|jpeg|png|gif|webp|svg|ico)',
         headers: [
           {
             key: 'Cache-Control',
@@ -81,7 +82,6 @@ const nextConfig = {
   // Optimizaciones para producción
   poweredByHeader: false,
   compress: true,
-  swcMinify: true,
   
   // Configuración para build estable
   typescript: {
@@ -104,9 +104,7 @@ const nextConfig = {
       'framer-motion'
     ],
     webVitalsAttribution: ['CLS', 'LCP'],
-    instrumentationHook: true,
-    serverComponentsExternalPackages: ['@prisma/client'],
-    bundlePagesRouterDependencies: true,
+    serverExternalPackages: ['@prisma/client'], // Actualizado: antes serverComponentsExternalPackages
     optimizeServerReact: true,
   },
 

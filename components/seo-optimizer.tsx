@@ -99,13 +99,13 @@ export default function SEOOptimizer({
   // Tracking de Web Vitals
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Lazy load del tracking de Web Vitals
-      import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-        getCLS(console.log)
-        getFID(console.log)
-        getFCP(console.log)
-        getLCP(console.log)
-        getTTFB(console.log)
+      // Lazy load del tracking de Web Vitals (v5+ API)
+      import('web-vitals').then(({ onCLS, onFCP, onINP, onLCP, onTTFB }) => {
+        onCLS(console.log)
+        onFCP(console.log)
+        onINP(console.log)
+        onLCP(console.log)
+        onTTFB(console.log)
       }).catch(() => {
         // Web vitals no disponible
       })
@@ -196,4 +196,4 @@ export default function SEOOptimizer({
       {children}
     </>
   )
-} 
+}
