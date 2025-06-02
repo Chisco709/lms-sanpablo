@@ -11,6 +11,7 @@ import {
 
 import { Preview } from "@/components/preview";
 import { CourseProgressButton } from "./course-progress-button";
+import MobileChapterViewer from "@/components/mobile-chapter-viewer";
 
 // Función para convertir URL de YouTube a formato embed
 const getYouTubeEmbedUrl = (url: string) => {
@@ -99,258 +100,312 @@ const ChapterPage = ({
   const embedUrl = chapter.videoUrl ? getYouTubeEmbedUrl(chapter.videoUrl) : null;
   const isCompleted = !!userProgress?.isCompleted;
 
+  // Preparar datos para el componente móvil
+  const mobileCourseData = {
+    id: course.id,
+    title: course.title,
+    instructor: "Instituto San Pablo",
+    image: "/logo-sanpablo.jpg",
+    progress: isCompleted ? 100 : 50,
+    chapters: [
+      {
+        id: chapter.id,
+        title: chapter.title,
+        description: chapter.description || "",
+        duration: 45 * 60, // 45 minutos en segundos
+        videoUrl: chapter.videoUrl,
+        isCompleted: isCompleted,
+        isLocked: isLocked,
+        position: chapter.position || 1,
+        resources: [
+          ...(chapter.pdfUrl ? [{
+            name: "Guía de trabajo",
+            url: chapter.pdfUrl,
+            type: "pdf" as const
+          }] : []),
+          ...(chapter.googleFormUrl ? [{
+            name: "Formulario de entrega",
+            url: chapter.googleFormUrl,
+            type: "link" as const
+          }] : []),
+          ...attachments.map(att => ({
+            name: att.name,
+            url: att.url,
+            type: "doc" as const
+          }))
+        ]
+      }
+    ]
+  };
+
   return (
-    <div className="min-h-screen bg-black relative">
-      {/* Luces de fondo globales */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute left-[-15%] top-[-15%] w-[400px] h-[400px] bg-green-500/30 rounded-full blur-[120px] opacity-70" />
-        <div className="absolute right-[-10%] bottom-[-10%] w-[300px] h-[300px] bg-yellow-400/20 rounded-full blur-[100px] opacity-60" />
-        <div className="absolute right-[10%] top-[10%] w-[180px] h-[180px] bg-white/10 rounded-full blur-[60px] opacity-20" />
+    <>
+      {/* Componente móvil - solo visible en dispositivos móviles */}
+      <div className="block md:hidden">
+        <MobileChapterViewer 
+          course={mobileCourseData}
+          currentChapterId={chapter.id}
+          onChapterComplete={(chapterId) => {
+            // Aquí puedes agregar lógica de completar capítulo
+            console.log(`Completar capítulo: ${chapterId}`);
+          }}
+          onBack={() => window.history.back()}
+        />
       </div>
-      {/* HEADER - MOBILE OPTIMIZADO */}
-      <div className="bg-black/80 border-b-4 border-green-400/20 p-3 md:p-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-            <Link 
-              href="/student"
-              className="flex items-center gap-2 md:gap-4 text-green-400 hover:text-yellow-400 transition-all duration-300 group w-full sm:w-auto"
-            >
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-black/60 group-hover:bg-green-400/10 rounded-2xl md:rounded-3xl flex items-center justify-center transition-all duration-300 flex-shrink-0 border border-green-400/30">
-                <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="text-green-400 text-sm md:text-lg block">← Volver</span>
-                <span className="font-bold text-lg md:text-2xl text-white line-clamp-1">Mis Cursos</span>
-              </div>
-            </Link>
-            {isCompleted && (
-              <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 bg-green-500/20 rounded-2xl md:rounded-3xl border border-green-500/30 w-full sm:w-auto justify-center sm:justify-start">
-                <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-400 flex-shrink-0" />
-                <span className="text-green-400 font-bold text-lg md:text-xl">¡Completada!</span>
-              </div>
-            )}
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
-        {/* TÍTULO - MOBILE OPTIMIZADO */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-3 md:gap-4 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-green-400/10 via-yellow-400/10 to-white/5 rounded-2xl md:rounded-3xl mb-6 md:mb-8 border border-green-400/20">
-            <div className="text-3xl md:text-4xl">📚</div>
-            <div>
-              <span className="text-green-400 font-bold text-base md:text-lg block">Clase {chapter.position || '1'}</span>
-              {isCompleted && <span className="text-green-400 font-bold text-xs md:text-sm">✅ Ya la terminé</span>}
-            </div>
-          </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 md:mb-8 leading-tight px-2">
-            {chapter.title}
-          </h1>
-        </div>
-        {/* VIDEO - MOBILE OPTIMIZADO */}
-        <div className="mb-10 md:mb-16">
-          <div className="bg-black/80 rounded-2xl md:rounded-3xl overflow-hidden border-4 border-green-400/20" style={{ aspectRatio: '16/9' }}>
-            {isLocked ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12 bg-yellow-400/10">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-8">🔒</div>
-                <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Clase Bloqueada</h3>
-                <p className="text-white text-base md:text-lg max-w-2xl px-4">
-                  Primero debes completar las clases anteriores para desbloquear esta
-                </p>
-              </div>
-            ) : embedUrl ? (
-              <iframe
-                src={embedUrl}
-                title={chapter.title}
-                className="w-full h-full"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                style={{ border: 'none' }}
-              />
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-8">📹</div>
-                <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Video Próximamente</h3>
-                <p className="text-white text-base md:text-lg">El video estará disponible muy pronto</p>
-              </div>
-            )}
-          </div>
-        </div>
-        {/* SECCIONES - MOBILE STACK, DESKTOP GRID */}
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
-          
-          {/* GUÍA PDF - MOBILE OPTIMIZADO */}
-        {chapter.pdfUrl && hasAccess && (
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-6">📄</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Guía de Trabajo</h2>
-                <p className="text-white text-sm md:text-base mb-6 md:mb-8">
-                  Descarga esta guía para seguir la clase
-                  </p>
 
-                <div className="space-y-3 md:space-y-4">
-                  <a
-                    href={chapter.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-5 md:px-6 py-3 md:py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-                  >
-                    👀 Ver Guía
-                  </a>
-                  
-                  <a
-                    href={chapter.pdfUrl}
-                    download
-                    className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-                  >
-                    📥 Descargar
-                  </a>
+      {/* Diseño de PC - solo visible en desktop */}
+      <div className="hidden md:block min-h-screen bg-black relative">
+        {/* Luces de fondo globales */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute left-[-15%] top-[-15%] w-[400px] h-[400px] bg-green-500/30 rounded-full blur-[120px] opacity-70" />
+          <div className="absolute right-[-10%] bottom-[-10%] w-[300px] h-[300px] bg-yellow-400/20 rounded-full blur-[100px] opacity-60" />
+          <div className="absolute right-[10%] top-[10%] w-[180px] h-[180px] bg-white/10 rounded-full blur-[60px] opacity-20" />
+        </div>
+        {/* HEADER - MOBILE OPTIMIZADO */}
+        <div className="bg-black/80 border-b-4 border-green-400/20 p-3 md:p-6">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <Link 
+                href="/student"
+                className="flex items-center gap-2 md:gap-4 text-green-400 hover:text-yellow-400 transition-all duration-300 group w-full sm:w-auto"
+              >
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-black/60 group-hover:bg-green-400/10 rounded-2xl md:rounded-3xl flex items-center justify-center transition-all duration-300 flex-shrink-0 border border-green-400/30">
+                  <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
                 </div>
-                
-                <div className="mt-4 md:mt-6 p-3 md:p-4 bg-yellow-400/20 rounded-xl md:rounded-2xl border border-yellow-400/30">
-                  <p className="text-yellow-400 font-bold text-xs md:text-sm">
-                    💡 Lee la guía antes de ver el video
-                  </p>
+                <div className="min-w-0 flex-1">
+                  <span className="text-green-400 text-sm md:text-lg block">← Volver</span>
+                  <span className="font-bold text-lg md:text-2xl text-white line-clamp-1">Mis Cursos</span>
+                </div>
+              </Link>
+              {isCompleted && (
+                <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 bg-green-500/20 rounded-2xl md:rounded-3xl border border-green-500/30 w-full sm:w-auto justify-center sm:justify-start">
+                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-400 flex-shrink-0" />
+                  <span className="text-green-400 font-bold text-lg md:text-xl">¡Completada!</span>
+                </div>
+              )}
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
+          {/* TÍTULO - MOBILE OPTIMIZADO */}
+          <div className="text-center mb-8 md:mb-12">
+            <div className="inline-flex items-center gap-3 md:gap-4 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-green-400/10 via-yellow-400/10 to-white/5 rounded-2xl md:rounded-3xl mb-6 md:mb-8 border border-green-400/20">
+              <div className="text-3xl md:text-4xl">📚</div>
+              <div>
+                <span className="text-green-400 font-bold text-base md:text-lg block">Clase {chapter.position || '1'}</span>
+                {isCompleted && <span className="text-green-400 font-bold text-xs md:text-sm">✅ Ya la terminé</span>}
               </div>
             </div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 md:mb-8 leading-tight px-2">
+              {chapter.title}
+            </h1>
           </div>
-        )}
+          {/* VIDEO - MOBILE OPTIMIZADO */}
+          <div className="mb-10 md:mb-16">
+            <div className="bg-black/80 rounded-2xl md:rounded-3xl overflow-hidden border-4 border-green-400/20" style={{ aspectRatio: '16/9' }}>
+              {isLocked ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12 bg-yellow-400/10">
+                  <div className="text-4xl md:text-6xl mb-4 md:mb-8">🔒</div>
+                  <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Clase Bloqueada</h3>
+                  <p className="text-white text-base md:text-lg max-w-2xl px-4">
+                    Primero debes completar las clases anteriores para desbloquear esta
+                  </p>
+                </div>
+              ) : embedUrl ? (
+                <iframe
+                  src={embedUrl}
+                  title={chapter.title}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  style={{ border: 'none' }}
+                />
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12">
+                  <div className="text-4xl md:text-6xl mb-4 md:mb-8">📹</div>
+                  <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Video Próximamente</h3>
+                  <p className="text-white text-base md:text-lg">El video estará disponible muy pronto</p>
+                </div>
+              )}
+            </div>
+          </div>
+          {/* SECCIONES - MOBILE STACK, DESKTOP GRID */}
+          <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
+            
+            {/* GUÍA PDF - MOBILE OPTIMIZADO */}
+          {chapter.pdfUrl && hasAccess && (
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-center">
+                  <div className="text-4xl md:text-6xl mb-4 md:mb-6">📄</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Guía de Trabajo</h2>
+                  <p className="text-white text-sm md:text-base mb-6 md:mb-8">
+                    Descarga esta guía para seguir la clase
+                    </p>
 
-          {/* FORMULARIO DE GOOGLE - MOBILE OPTIMIZADO */}
-        {chapter.googleFormUrl && hasAccess && (
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-6">📝</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Entrega tu Trabajo</h2>
-                <p className="text-white text-sm md:text-base mb-6 md:mb-8">
-                  Completa este formulario cuando termines
-                  </p>
-                
-                <a
-                  href={chapter.googleFormUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-                >
-                  📋 Abrir Formulario
-                </a>
-                
-                <div className="mt-4 md:mt-6 p-3 md:p-4 bg-green-400/20 rounded-xl md:rounded-2xl border border-green-400/30">
-                  <p className="text-green-400 font-bold text-xs md:text-sm">
-                    ✅ Complétalo después del video
-                  </p>
+                  <div className="space-y-3 md:space-y-4">
+                    <a
+                      href={chapter.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full px-5 md:px-6 py-3 md:py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
+                    >
+                      👀 Ver Guía
+                    </a>
+                    
+                    <a
+                      href={chapter.pdfUrl}
+                      download
+                      className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
+                    >
+                      📥 Descargar
+                    </a>
+                  </div>
+                  
+                  <div className="mt-4 md:mt-6 p-3 md:p-4 bg-yellow-400/20 rounded-xl md:rounded-2xl border border-yellow-400/30">
+                    <p className="text-yellow-400 font-bold text-xs md:text-sm">
+                      💡 Lee la guía antes de ver el video
+                    </p>
                 </div>
               </div>
             </div>
           )}
-        </div>
 
-        {/* BOTÓN DE COMPLETAR - MOBILE OPTIMIZADO */}
-        {hasAccess && (
-          <div className="mt-8 md:mt-12 text-center">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-3xl md:text-4xl mb-3 md:mb-4">🎯</div>
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
-                ¿Ya terminaste de ver la clase?
-              </h3>
-              <p className="text-white text-sm md:text-base mb-5 md:mb-6">
-                Marca como completada para continuar con el siguiente tema
-              </p>
-              <CourseProgressButton
-                chapterId={chapter.id}
-                courseId={course.id}
-                nextChapterId={nextChapter?.id}
-                isCompleted={isCompleted}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* DESCRIPCIÓN - MOBILE OPTIMIZADO */}
-        {chapter.description && (
-          <div className="mt-8 md:mt-12">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center mb-6 md:mb-8">
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4">📖</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white">¿Qué aprenderás?</h2>
-              </div>
-              <div className="prose prose-base md:prose-lg max-w-none text-white prose-headings:text-white prose-strong:text-white prose-em:text-white">
-                <Preview value={chapter.description} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* MATERIAL DE APOYO - MOBILE OPTIMIZADO */}
-        {!!attachments.length && (
-          <div className="mt-8 md:mt-12">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center mb-6 md:mb-8">
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4">📎</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white">Material Extra</h2>
-              </div>
-              <div className="space-y-4 md:space-y-6">
-              {attachments.map((attachment) => {
-                const fileExtension = attachment.name.split('.').pop()?.toLowerCase();
-                const isPDF = fileExtension === 'pdf';
-                
-                return (
-                  <a 
-                    href={attachment.url}
+            {/* FORMULARIO DE GOOGLE - MOBILE OPTIMIZADO */}
+          {chapter.googleFormUrl && hasAccess && (
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-center">
+                  <div className="text-4xl md:text-6xl mb-4 md:mb-6">📝</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Entrega tu Trabajo</h2>
+                  <p className="text-white text-sm md:text-base mb-6 md:mb-8">
+                    Completa este formulario cuando termines
+                    </p>
+                  
+                  <a
+                    href={chapter.googleFormUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    key={attachment.id}
-                      className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-white/5 hover:bg-white/10 rounded-2xl md:rounded-3xl transition-all duration-300 group border border-white/10"
+                    className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
                   >
-                      <div className="text-3xl md:text-4xl flex-shrink-0">
-                        {isPDF ? '📄' : '📁'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-white font-bold text-base md:text-lg mb-1 md:mb-2 truncate">
-                        {attachment.name}
-                      </p>
-                        <p className="text-white/60 text-sm md:text-base">
-                          Haz clic para descargar
-                      </p>
-                    </div>
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-green-400/20 rounded-2xl md:rounded-3xl flex items-center justify-center flex-shrink-0">
-                        <Download className="h-5 w-5 md:h-6 md:w-6 text-green-400" />
-                      </div>
+                    📋 Abrir Formulario
                   </a>
-                );
-              })}
+                  
+                  <div className="mt-4 md:mt-6 p-3 md:p-4 bg-green-400/20 rounded-xl md:rounded-2xl border border-green-400/30">
+                    <p className="text-green-400 font-bold text-xs md:text-sm">
+                      ✅ Complétalo después del video
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
 
-        {/* SIGUIENTE CLASE - MOBILE OPTIMIZADO */}
-        {nextChapter && hasAccess && (
-          <div className="mt-8 md:mt-12 text-center">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-3xl md:text-4xl mb-4 md:mb-6">🎯</div>
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
-                ¿Ya terminaste?
-              </h3>
-              <p className="text-white text-sm md:text-base mb-6 md:mb-8">
-                Continúa con la siguiente clase
-              </p>
-              
-              <div className="mb-5 md:mb-6">
-                <p className="text-white/60 text-xs md:text-sm mb-1 md:mb-2">Siguiente:</p>
-                <p className="text-white font-bold text-base md:text-lg line-clamp-2">{nextChapter.title}</p>
+          {/* BOTÓN DE COMPLETAR - MOBILE OPTIMIZADO */}
+          {hasAccess && (
+            <div className="mt-8 md:mt-12 text-center">
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-3xl md:text-4xl mb-3 md:mb-4">🎯</div>
+                <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
+                  ¿Ya terminaste de ver la clase?
+                </h3>
+                <p className="text-white text-sm md:text-base mb-5 md:mb-6">
+                  Marca como completada para continuar con el siguiente tema
+                </p>
+                <CourseProgressButton
+                  chapterId={chapter.id}
+                  courseId={course.id}
+                  nextChapterId={nextChapter?.id}
+                  isCompleted={isCompleted}
+                />
               </div>
-              
-              <Link
-                href={`/courses/${course.id}/chapters/${nextChapter.id}`}
-                className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-              >
-                <span>Siguiente Clase</span>
-                <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-              </Link>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* DESCRIPCIÓN - MOBILE OPTIMIZADO */}
+          {chapter.description && (
+            <div className="mt-8 md:mt-12">
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-center mb-6 md:mb-8">
+                  <div className="text-3xl md:text-4xl mb-3 md:mb-4">📖</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">¿Qué aprenderás?</h2>
+                </div>
+                <div className="prose prose-base md:prose-lg max-w-none text-white prose-headings:text-white prose-strong:text-white prose-em:text-white">
+                  <Preview value={chapter.description} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MATERIAL DE APOYO - MOBILE OPTIMIZADO */}
+          {!!attachments.length && (
+            <div className="mt-8 md:mt-12">
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-center mb-6 md:mb-8">
+                  <div className="text-3xl md:text-4xl mb-3 md:mb-4">📎</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Material Extra</h2>
+                </div>
+                <div className="space-y-4 md:space-y-6">
+                {attachments.map((attachment) => {
+                  const fileExtension = attachment.name.split('.').pop()?.toLowerCase();
+                  const isPDF = fileExtension === 'pdf';
+                  
+                  return (
+                    <a 
+                      href={attachment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      key={attachment.id}
+                        className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-white/5 hover:bg-white/10 rounded-2xl md:rounded-3xl transition-all duration-300 group border border-white/10"
+                    >
+                        <div className="text-3xl md:text-4xl flex-shrink-0">
+                          {isPDF ? '📄' : '📁'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                          <p className="text-white font-bold text-base md:text-lg mb-1 md:mb-2 truncate">
+                          {attachment.name}
+                        </p>
+                          <p className="text-white/60 text-sm md:text-base">
+                            Haz clic para descargar
+                        </p>
+                      </div>
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-green-400/20 rounded-2xl md:rounded-3xl flex items-center justify-center flex-shrink-0">
+                          <Download className="h-5 w-5 md:h-6 md:w-6 text-green-400" />
+                        </div>
+                    </a>
+                  );
+                })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SIGUIENTE CLASE - MOBILE OPTIMIZADO */}
+          {nextChapter && hasAccess && (
+            <div className="mt-8 md:mt-12 text-center">
+              <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
+                <div className="text-3xl md:text-4xl mb-4 md:mb-6">🎯</div>
+                <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
+                  ¿Ya terminaste?
+                </h3>
+                <p className="text-white text-sm md:text-base mb-6 md:mb-8">
+                  Continúa con la siguiente clase
+                </p>
+                
+                <div className="mb-5 md:mb-6">
+                  <p className="text-white/60 text-xs md:text-sm mb-1 md:mb-2">Siguiente:</p>
+                  <p className="text-white font-bold text-base md:text-lg line-clamp-2">{nextChapter.title}</p>
+                </div>
+                
+                <Link
+                  href={`/courses/${course.id}/chapters/${nextChapter.id}`}
+                  className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
+                >
+                  <span>Siguiente Clase</span>
+                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
