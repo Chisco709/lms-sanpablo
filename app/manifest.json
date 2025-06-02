@@ -1,20 +1,108 @@
 {
-  "name": "Instituto San Pablo - Plataforma Educativa",
-  "short_name": "Instituto San Pablo",
-  "description": "Plataforma de aprendizaje del Instituto San Pablo en Pereira, Colombia. Formación técnica en Primera Infancia, Inglés y carreras técnicas.",
+  "name": "Instituto San Pablo - Plataforma LMS",
+  "short_name": "San Pablo LMS",
+  "description": "Plataforma educativa líder en Pereira, Colombia. 15+ años formando profesionales técnicos con cursos certificados SENA.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#FACC15",
   "orientation": "portrait-primary",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "lang": "es-CO",
+  "categories": ["education", "learning", "courses"],
   "icons": [
     {
-      "src": "/instituto-sanpablo-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/android-chrome-512x512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32", 
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
     }
   ],
-  "categories": ["education", "productivity"],
-  "lang": "es-CO"
+  "shortcuts": [
+    {
+      "name": "Mis Cursos",
+      "short_name": "Cursos",
+      "description": "Accede directamente a tus cursos",
+      "url": "/student",
+      "icons": [
+        {
+          "src": "/shortcut-courses.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Buscar Cursos", 
+      "short_name": "Buscar",
+      "description": "Explora nuevos cursos disponibles",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/shortcut-search.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Panel Profesor",
+      "short_name": "Profesor", 
+      "description": "Gestiona tus cursos como profesor",
+      "url": "/teacher/courses",
+      "icons": [
+        {
+          "src": "/shortcut-teacher.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard principal del Instituto San Pablo LMS"
+    },
+    {
+      "src": "/screenshot-narrow.png", 
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil de cursos disponibles"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+sanpablolms",
+      "url": "/?action=%s"
+    }
+  ]
 } 

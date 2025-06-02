@@ -11,10 +11,65 @@
       "maxDuration": 30
     }
   },
-  "regions": ["iad1"],
+  "regions": ["iad1", "cle1"],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options", 
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=60, stale-while-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(css|js))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "env": {
     "PRISMA_CLI_QUERY_ENGINE_TYPE": "binary",
-    "NEXT_TELEMETRY_DISABLED": "1"
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "VERCEL_ANALYTICS_ID": "prj_instituto-san-pablo-lms"
   },
   "build": {
     "env": {
@@ -24,5 +79,37 @@
     }
   },
   "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD",
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt", 
+      "destination": "/api/robots"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/student", 
+      "permanent": false
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/sitemap-update",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/analytics-report",
+      "schedule": "0 1 * * 1"
+    }
+  ]
 } 

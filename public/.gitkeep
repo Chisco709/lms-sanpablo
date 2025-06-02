@@ -1,0 +1,17 @@
+# Asegura que el directorio public existe para las imágenes SEO
+# 
+# IMÁGENES REQUERIDAS PARA SEO COMPLETO:
+# - favicon.ico
+# - favicon-16x16.png  
+# - favicon-32x32.png
+# - apple-touch-icon.png
+# - android-chrome-192x192.png
+# - android-chrome-512x512.png
+# - og-image.jpg (1200x630)
+# - twitter-image.jpg (1200x600)
+# - screenshot-wide.png (1280x720)
+# - screenshot-narrow.png (750x1334)
+# - logo.png
+# 
+# Genera estas imágenes con el logo del Instituto San Pablo
+# y colócalas en este directorio /public/ 

@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-06-02T13:46:44.231Z",
+  "score": 95,
+  "audit": [
+    {
+      "file": "app/sitemap.ts",
+      "status": "PASS",
+      "description": "Sitemap dinámico configurado"
+    },
+    {
+      "file": "app/robots.ts",
+      "status": "PASS",
+      "description": "Robots.txt configurado"
+    },
+    {
+      "file": "app/manifest.json",
+      "status": "PASS",
+      "description": "Manifest PWA configurado"
+    },
+    {
+      "file": "next.config.js",
+      "status": "PASS",
+      "description": "Next.js config optimizado"
+    },
+    {
+      "file": "vercel.json",
+      "status": "PASS",
+      "description": "Vercel config optimizado"
+    },
+    {
+      "file": "components/seo-optimizer.tsx",
+      "status": "PASS",
+      "description": "Componente SEO reutilizable"
+    }
+  ],
+  "summary": {
+    "passed": 21,
+    "failed": 1,
+    "warnings": 0,
+    "total": 22
+  }
+}
