@@ -79,7 +79,6 @@
     }
   },
   "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD",
   "rewrites": [
     {
       "source": "/sitemap.xml",
