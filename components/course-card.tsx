@@ -120,9 +120,9 @@ export const CourseCard = memo(({
             </div>
 
             {/* Contenido de la tarjeta */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               {/* Título */}
-              <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300 line-clamp-2 leading-tight">
+              <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-yellow-400 transition-colors duration-300 line-clamp-2 leading-tight">
                 {title}
               </h3>
             
@@ -135,14 +135,14 @@ export const CourseCard = memo(({
 
               {/* Información del curso */}
               <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-4 text-slate-300">
+                <div className="flex items-center gap-3 sm:gap-4 text-slate-300">
                   <div className="flex items-center gap-1">
                     <BookOpen className="h-4 w-4 text-yellow-400" aria-hidden="true" />
-                    <span className="font-medium">{chaptersLength} clases</span>
+                    <span className="font-medium text-xs sm:text-sm">{chaptersLength} clases</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-green-400" aria-hidden="true" />
-                    <span className="font-medium">A tu ritmo</span>
+                    <span className="font-medium text-xs sm:text-sm">A tu ritmo</span>
                   </div>
                 </div>
               </div>
@@ -151,8 +151,8 @@ export const CourseCard = memo(({
               {progress !== null && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-400 font-medium">Tu progreso</span>
-                    <span className="text-white font-bold">{formattedProgress}%</span>
+                    <span className="text-slate-400 font-medium text-xs sm:text-sm">Tu progreso</span>
+                    <span className="text-white font-bold text-sm">{formattedProgress}%</span>
                   </div>
                   <CourseProgress
                     variant={isCompleted ? "success" : "default"}
@@ -163,25 +163,26 @@ export const CourseCard = memo(({
               )}
 
               {/* Precio y botón */}
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center justify-between pt-2 gap-3">
                 {isPurchased ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <div className="w-2 h-2 bg-green-400 rounded-full" aria-hidden="true"></div>
-                    <span className="text-green-400 font-medium text-sm">ADQUIRIDO</span>
+                    <span className="text-green-400 font-medium text-xs sm:text-sm">ADQUIRIDO</span>
                   </div>
                 ) : (
-                  <div className="text-white">
+                  <div className="text-white flex-shrink-0">
                     {formattedPrice ? (
-                      <span className="text-lg font-bold">{formattedPrice}</span>
+                      <span className="text-base sm:text-lg font-bold">{formattedPrice}</span>
                     ) : (
-                      <span className="text-green-400 font-bold">GRATIS</span>
+                      <span className="text-green-400 font-bold text-sm sm:text-base">GRATIS</span>
                     )}
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-400/20 to-yellow-500/20 hover:from-yellow-400/30 hover:to-yellow-500/30 text-yellow-400 font-medium text-sm rounded-lg border border-yellow-400/30 hover:border-yellow-400/50 transition-all duration-300 group-hover:scale-105">
-                  <Play className="h-4 w-4" aria-hidden="true" />
-                  <span>{isPurchased ? 'CONTINUAR' : 'VER CURSO'}</span>
+                <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400/20 to-yellow-500/20 hover:from-yellow-400/30 hover:to-yellow-500/30 text-yellow-400 font-medium text-xs sm:text-sm rounded-lg border border-yellow-400/30 hover:border-yellow-400/50 transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                  <Play className="h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">{isPurchased ? 'CONTINUAR' : 'VER CURSO'}</span>
+                  <span className="sm:hidden">{isPurchased ? 'IR' : 'VER'}</span>
                 </div>
               </div>
             </div>

@@ -97,7 +97,7 @@ export default function Page() {
                       <p className="text-white/80 text-xs sm:text-sm">
                         🎯 <span className="font-semibold text-green-400">95% empleabilidad</span> • 
                         🏆 <span className="font-semibold text-yellow-400">500+ egresados</span> • 
-                        📜 <span className="font-semibold text-green-400">Certificación SENA</span>
+                        📜 <span className="font-semibold text-green-400">Certificación</span>
                       </p>
                     </div>
                   </div>
@@ -165,7 +165,7 @@ export default function Page() {
               </div>
             </div>
             <p className="text-white/60 text-xs sm:text-sm mt-3">
-              Instituto San Pablo • Pereira, Risaralda • Certificación SENA
+              Instituto San Pablo • Pereira, Risaralda • Certificación 
             </p>
           </div>
         </div>

@@ -52,7 +52,7 @@ export default function Page() {
                     <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">¡Comienza tu futuro!</h3>
                     <p className="text-yellow-400 text-sm sm:text-base font-medium">Crea tu cuenta y transforma tu carrera</p>
                     <div className="flex items-center justify-center gap-2 mt-2">
-                      <span className="text-xs sm:text-sm text-white/60">🚀 Certificación SENA</span>
+                      <span className="text-xs sm:text-sm text-white/60">🚀 Certificación </span>
                       <span className="text-white/40">•</span>
                       <span className="text-xs sm:text-sm text-white/60">⭐ 95% Empleabilidad</span>
                     </div>
@@ -164,7 +164,7 @@ export default function Page() {
               </div>
             </div>
             <p className="text-white/60 text-xs sm:text-sm">
-              ✨ Inscripciones abiertas • 🏆 Certificación SENA • 📍 Pereira
+              ✨ Inscripciones abiertas • 🏆 Certificación  • 📍 Pereira
             </p>
           </div>
         </div>

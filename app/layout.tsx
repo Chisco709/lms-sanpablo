@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Instituto San Pablo | Formación Técnica en Pereira",
   description: "Instituto San Pablo - 15+ años formando profesionales técnicos en Pereira, Risaralda. Programas certificados SENA en Primera Infancia e Inglés.",
-  keywords: "instituto san pablo, pereira, risaralda, formación técnica, SENA, primera infancia, inglés",
+  keywords: "instituto san pablo, pereira, risaralda, formación técnica, primera infancia, inglés",
   authors: [{ name: "Instituto San Pablo" }],
   creator: "Instituto San Pablo",
   openGraph: {

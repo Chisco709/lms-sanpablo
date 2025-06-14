@@ -350,7 +350,7 @@ export default function LandingProfessionalEnhanced() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-white mt-2 mb-1 group-hover:text-green-400 transition-colors duration-300">Técnico en Primera Infancia</h3>
-            <p className="text-white/70 text-center text-sm sm:text-base mb-2">Prácticas en jardines, certificación SENA, inglés especializado y psicología infantil.</p>
+            <p className="text-white/70 text-center text-sm sm:text-base mb-2">Prácticas en jardines, certificación, inglés especializado y psicología infantil.</p>
             <Link href="/sign-in" className="mt-auto px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-base sm:text-lg shadow-lg border-2 border-green-400/40 hover:scale-105 hover:shadow-2xl transition-all duration-300 glow-green">
               Inscribirme
             </Link>
@@ -382,7 +382,7 @@ export default function LandingProfessionalEnhanced() {
             <span className="bg-green-500/20 p-4 rounded-full mb-2 animate-pulse-glow">
               <CheckCircle size={32} className="text-green-400" />
             </span>
-            <span className="font-semibold text-white">Certificación SENA</span>
+            <span className="font-semibold text-white">Certificación </span>
             <span className="text-white/60 text-sm sm:text-base">Títulos 100% avalados a nivel nacional.</span>
         </div>
           
@@ -506,14 +506,14 @@ export default function LandingProfessionalEnhanced() {
           <div data-animate="fade-up" style={{animationDelay: '100ms'}}>
             <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-4">Misión</h3>
             <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-              Formar técnicos integrales, éticos y competentes, comprometidos con el desarrollo social y laboral de la región, brindando educación de calidad y valores humanos.
+            El CENTRO EDUCATIVO SAN PABLO, es una institución de educación, dedicada a la formación de individuos con calidad humana, sobre una base de principios éticos y valores, que permitan potenciar las habilidades para el desarrollo de proyectos de vida exitosos y que correspondan a las exigencias de la sociedad actual, para ello se brindan herramientas que promuevan una participación, democrática, analítica, critica, responsable que propenda en un mejoramiento continuo.
             </p>
           </div>
           
           <div data-animate="fade-up" style={{animationDelay: '200ms'}}>
             <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">Visión</h3>
             <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-              Ser el instituto líder en formación técnica en Pereira, reconocido por la excelencia académica, la innovación y el impacto positivo en la comunidad.
+            Ser reconocidos dentro de las instituciones de la localidad, como líderes en educación de calidad, implementando procesos dinámicos y de excelencia, que permitan a nuestros educandos el fácil acceso a la educación superior y realización personal, formándoles integralmente en los aspectos: académico, social, ético, espiritual y cultural; aportando líderes que sirvan al país y la sociedad.  
             </p>
                   </div>
           
