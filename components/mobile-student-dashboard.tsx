@@ -67,7 +67,7 @@ const mockCourses: Course[] = [
     completedChapters: 8,
     instructor: 'Prof. María González',
     image: '/curso-primera-infancia.jpg',
-    category: 'Certificación SENA',
+    category: 'Certificación ',
     nextChapter: 'Desarrollo Cognitivo 0-3 años',
     lastAccessed: new Date(),
     estimatedTime: 45

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "./_components/navbar";
 import { Sidebar } from "./_components/sidebar";
+import AmbientMusicPlayer from "@/components/ambient-music-player";
 
 const DashboardLayout = ({children} : { children: React.ReactNode }) => {
     const pathname = usePathname();
@@ -40,6 +41,8 @@ const DashboardLayout = ({children} : { children: React.ReactNode }) => {
                     </div>
                 )}
             </main>
+            {/* Reproductor de música ambiente flotante */}
+            <AmbientMusicPlayer />
         </div>
     )
 }
