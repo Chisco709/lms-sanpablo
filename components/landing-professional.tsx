@@ -286,7 +286,7 @@ export default function LandingProfessionalEnhanced() {
             Forma tu <span className="bg-gradient-to-r from-green-400 via-yellow-400 to-green-500 bg-clip-text text-transparent animate-gradient">Futuro</span> Profesional
           </h1>
           <p className="text-lg sm:text-xl text-white/80 max-w-xl mb-2 animate-fade-in-up delay-400">
-            En el <span className="text-green-400 font-semibold">Instituto San Pablo</span> te preparamos para el éxito en Pereira. Programas técnicos de alta demanda, docentes expertos y una comunidad vibrante.
+            El <span className="text-green-400 font-semibold">CESP Centro Educativo San Pablo</span>te preparamos para un mejor futuro; Programas técnicos laborales de alta demanda, docentes profesionales y clases dinámicas.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md lg:max-w-none animate-fade-in-up delay-600">
             <a href="#programas" className="px-8 sm:px-10 py-3 sm:py-4 rounded-full bg-gradient-to-r from-green-500 via-yellow-400 to-green-500 text-black font-extrabold text-lg sm:text-xl shadow-xl border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-300 glow-green">
@@ -299,11 +299,11 @@ export default function LandingProfessionalEnhanced() {
           
           <div className="flex gap-6 sm:gap-8 mt-6 sm:mt-8 animate-fade-in-up delay-800">
             <div className="flex flex-col items-center hover-lift">
-              <span className="text-2xl sm:text-3xl font-extrabold text-green-400 animate-scale-in delay-100">500+</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-green-400 animate-scale-in delay-100">1000+</span>
               <span className="text-xs sm:text-sm text-white/60">Graduados</span>
               </div>
             <div className="flex flex-col items-center hover-lift">
-              <span className="text-2xl sm:text-3xl font-extrabold text-yellow-400 animate-scale-in delay-200">15+</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-yellow-400 animate-scale-in delay-200">10+</span>
               <span className="text-xs sm:text-sm text-white/60">Años</span>
             </div>
             <div className="flex flex-col items-center hover-lift">
@@ -470,16 +470,16 @@ export default function LandingProfessionalEnhanced() {
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-6 sm:p-8 shadow-lg border border-green-400/20 w-full lg:w-1/3 glass-effect-dark hover:scale-105 transition-all duration-500" data-animate="fade-right">
             <MapPin size={32} className="text-green-400 mb-2 animate-pulse-glow" />
             <span className="text-white/90 text-base sm:text-lg font-semibold text-center">
-              Carrera 12 #18-15, Centro<br />Pereira, Risaralda, Colombia
+            Dirección: Carrera 19 #18 - 75. Av santa Mónica<br />Dosquebradas, Risaralda, Colombia
             </span>
           </div>
           
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-6 sm:p-8 shadow-lg border border-yellow-400/20 w-full lg:w-1/3 glass-effect-dark hover:scale-105 transition-all duration-500" data-animate="fade-up">
             <Phone size={32} className="text-yellow-400 mb-2 animate-pulse-glow" />
             <span className="text-white/90 text-base sm:text-lg font-semibold text-center">
-              (606) 335-2847<br />WhatsApp: +57 314 567-8910
+              Cel:  3104723644 / 3148885007<br />WhatsApp: +57 33043496941
             </span>
-            <a href="https://wa.me/573145678910" target="_blank" rel="noopener noreferrer" className="mt-2 w-full text-center">
+            <a href="https://wa.me/573043496941" target="_blank" rel="noopener noreferrer" className="mt-2 w-full text-center">
               <span className="inline-block w-full px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-base sm:text-lg shadow-lg border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-300 glow-green">
                 Chatear por WhatsApp
               </span>
@@ -489,9 +489,9 @@ export default function LandingProfessionalEnhanced() {
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-6 sm:p-8 shadow-lg border border-green-400/20 w-full lg:w-1/3 glass-effect-dark hover:scale-105 transition-all duration-500" data-animate="fade-left">
             <Mail size={32} className="text-green-400 mb-2 animate-pulse-glow" />
             <span className="text-white/90 text-base sm:text-lg font-semibold text-center">
-              info@institutosanpablo.edu.co<br />admisiones@institutosanpablo.edu.co
+            Sanpabloejecafetero@gmail.com<br />admisiones@institutosanpablo.edu.co
             </span>
-            <a href="mailto:admisiones@institutosanpablo.edu.co" className="mt-2 w-full text-center">
+            <a href="Sanpabloejecafetero@gmail.com" className="mt-2 w-full text-center">
               <span className="inline-block w-full px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-green-400 text-black font-bold text-base sm:text-lg shadow-lg border-2 border-yellow-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-300 glow-yellow">
                 Enviar Email
               </span>
@@ -518,11 +518,14 @@ export default function LandingProfessionalEnhanced() {
                   </div>
           
           <div data-animate="fade-up" style={{animationDelay: '300ms'}} className="md:col-span-2 lg:col-span-1">
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">Decretos y Normatividad</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">Decretos y Normatividad: El CESP con Resolución 18-041 del 16 de noviembre de 2021 - 
+            resoluciones 18010 de Junio del 2015 y resolución 18050 y bajo los decretos:</h3>
             <ul className="text-white/70 text-sm sm:text-base leading-relaxed list-disc list-inside space-y-2">
-              <li>Resolución 1234 de 2010 - Secretaría de Educación de Pereira</li>
-              <li>Registro SENA No. 5678</li>
-              <li>Normas de convivencia y ética institucional</li>
+              <li>Decreto 1326 del 2024</li>
+              <li>Decreto 299 del 4 de febrero del 2009</li>
+              <li>Ley 2170 del 2021</li> 
+              <li>Decreto 1295 de 2010</li>
+              <li>Decreto 1330 de julio 25 de 2019</li>
             </ul>
           </div>
         </div>
@@ -541,10 +544,10 @@ export default function LandingProfessionalEnhanced() {
           </div>
           
           <div className="flex gap-4" data-animate="fade-left">
-            <a href="https://wa.me/573145678910" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors duration-300">
+            <a href="https://wa.me/573043496941" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors duration-300">
               WhatsApp
             </a>
-            <a href="mailto:info@institutosanpablo.edu.co" className="hover:text-yellow-400 transition-colors duration-300">
+            <a href="Sanpabloejecafetero@gmail.com" className="hover:text-yellow-400 transition-colors duration-300">
               Email
             </a>
           </div>
