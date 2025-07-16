@@ -2,12 +2,15 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { LogOut, Crown, Home } from "lucide-react";
+import { LogOut, Crown, Home, Shield } from "lucide-react";
 import { memo, useMemo } from "react";
+import { useTeacherAuth } from "@/hooks/use-teacher-auth";
+import { toast } from "react-hot-toast";
 
 const NavbarRoutes = memo(() => {
   const pathname = usePathname();
   const { user } = useUser();
+  const { isAuthenticated, logout } = useTeacherAuth();
   
   // Memoizar cálculos costosos
   const pageState = useMemo(() => ({
@@ -18,6 +21,11 @@ const NavbarRoutes = memo(() => {
   }), [pathname, user?.primaryEmailAddress?.emailAddress]);
 
   const { isTeacherPage, isPlayerPage, isCoursePage, isChisco } = pageState;
+
+  const handleTeacherLogout = () => {
+    logout();
+    toast.success("Has salido del modo profesor correctamente");
+  };
 
   const buttonClass = "flex items-center gap-2 px-3 py-1 border border-green-400 text-green-500 hover:bg-green-100/10 hover:text-green-700 rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-400/40";
 
@@ -43,15 +51,30 @@ const NavbarRoutes = memo(() => {
 
       {/* Botón de modo profesor/salir */}
       {isTeacherPage || isPlayerPage ? (
-        <Link href="/" prefetch={false}>
-          <button 
-            className={buttonClass}
-            aria-label="Salir del modo profesor"
-          >
-            <LogOut className="h-4 w-4 text-green-500" aria-hidden="true" />
-            <span>Salir</span>
-          </button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Botón de logout del modo profesor (solo si está autenticado como profesor) */}
+          {isTeacherPage && isAuthenticated && (
+            <button 
+              onClick={handleTeacherLogout}
+              className="flex items-center gap-2 px-3 py-1 border border-yellow-400 text-yellow-500 hover:bg-yellow-100/10 hover:text-yellow-700 rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-yellow-400/40"
+              aria-label="Cerrar sesión del modo profesor"
+            >
+              <Shield className="h-4 w-4 text-yellow-500" aria-hidden="true" />
+              <span>Cerrar Sesión</span>
+            </button>
+          )}
+          
+          {/* Botón general de salir */}
+          <Link href="/" prefetch={false}>
+            <button 
+              className={buttonClass}
+              aria-label="Salir del modo profesor"
+            >
+              <LogOut className="h-4 w-4 text-green-500" aria-hidden="true" />
+              <span>Salir</span>
+            </button>
+          </Link>
+        </div>
       ) : (
         isChisco && (
           <Link href="/teacher/courses" prefetch={true}>
