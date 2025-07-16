@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -11,6 +12,7 @@ import {
 
 import { Preview } from "@/components/preview";
 import { CourseProgressButton } from "./course-progress-button";
+import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 
 // Función para convertir URL de YouTube a formato embed
 const getYouTubeEmbedUrl = (url: string) => {
@@ -74,6 +76,25 @@ const ChapterPage = ({
   userProgress,
   purchase
 }: ChapterPageProps) => {
+  
+  // Analytics hooks
+  const { trackLMSEvent } = useAnalytics();
+  usePageTracking();
+  useTimeTracking(`Capítulo: ${chapter?.title || 'Desconocido'}`);
+  
+  // Track chapter view
+  useEffect(() => {
+    if (chapter && course) {
+      trackLMSEvent.chapterStart(chapter.id, chapter.title, course.id);
+    }
+  }, [chapter?.id, chapter?.title, course?.id, trackLMSEvent]);
+  
+  // Track chapter completion
+  useEffect(() => {
+    if (userProgress?.isCompleted && chapter && course) {
+      trackLMSEvent.chapterComplete(chapter.id, chapter.title, course.id);
+    }
+  }, [userProgress?.isCompleted, chapter?.id, chapter?.title, course?.id, trackLMSEvent]);
   
   if (!chapter || !course) {
     return (

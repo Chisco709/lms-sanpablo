@@ -12,6 +12,14 @@ declare global {
   }
 }
 
+// Google Analytics Types
+declare global {
+  interface Window {
+    gtag: (command: string, targetId: string, config?: any) => void;
+    dataLayer: any[];
+  }
+}
+
 // Tipos para componentes comunes
 export interface CourseWithProgress {
   id: string;

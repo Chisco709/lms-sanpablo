@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useAnalytics } from "@/hooks/use-analytics"
 
 export const SearchInput = () => {
   const [value, setValue] = useState("")
@@ -14,6 +15,7 @@ export const SearchInput = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
+  const { trackSearchQuery } = useAnalytics()
 
   const currentCategoryId = searchParams.get("categoryId")
 
@@ -30,7 +32,13 @@ export const SearchInput = () => {
     )
 
     router.push(url)
-  }, [debouncedValue, currentCategoryId, router, pathname])
+    
+    // Track search query if there's a search term
+    if (debouncedValue && debouncedValue.trim().length > 0) {
+      const category = currentCategoryId ? 'category_filtered' : 'general';
+      trackSearchQuery(debouncedValue.trim(), category);
+    }
+  }, [debouncedValue, currentCategoryId, router, pathname, trackSearchQuery])
 
   return (
     <div className="relative max-w-md mx-auto">

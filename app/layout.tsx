@@ -3,13 +3,14 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ToastProvider } from "@/components/providers/toaster-providers"
+import GoogleAnalytics from "@/components/google-analytics"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Instituto San Pablo | Formación Técnica en Pereira",
   description: "Instituto San Pablo - 15+ años formando profesionales técnicos en Pereira, Risaralda. Programas certificados SENA en Primera Infancia e Inglés.",
-  keywords: "instituto san pablo, pereira, risaralda, formación técnica, primera infancia, inglés",
+  keywords: "instituto san pablo, pereira, risaralda, formación técnica, primera infancia, inglés, programas técnicos, certificación sena",
   authors: [{ name: "Instituto San Pablo" }],
   creator: "Instituto San Pablo",
   openGraph: {
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+  metadataBase: new URL('https://institutosanpablo.edu.co'),
 }
 
 export default function RootLayout({
@@ -44,6 +46,7 @@ export default function RootLayout({
     >
       <html lang="es" className={inter.className} suppressHydrationWarning>
         <body className="bg-slate-950 text-white">
+          <GoogleAnalytics />
           <ToastProvider />
           {children}
         </body>

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 import { 
     BookOpen, 
     Upload, 
@@ -48,6 +49,11 @@ const CreatePage = () => {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
     const [isCreating, setIsCreating] = useState(false);
+    
+    // Analytics hooks
+    const { trackTeacherAction, trackFormSubmission } = useAnalytics();
+    usePageTracking();
+    useTimeTracking("Teacher - Crear Curso");
     const [imagePreview, setImagePreview] = useState<string>("");
     const [dragActive, setDragActive] = useState(false);
 
@@ -160,13 +166,23 @@ const CreatePage = () => {
     const onSubmit = async (values: FormData) => {
         try {
             setIsCreating(true);
+            
+            // Track form submission attempt
+            trackFormSubmission("course_creation", "new_course_form");
+            
             const response = await axios.post("/api/courses", values);
+            
+            // Track successful course creation
+            trackTeacherAction("create_course", `Curso: ${values.title}`);
             
             toast.success("¡Curso creado exitosamente! 🎉");
             router.push(`/teacher/courses/${response.data.id}`);
         } catch (error) {
             toast.error("Error al crear el curso");
             console.error(error);
+            
+            // Track error
+            trackTeacherAction("create_course_error", `Error creando: ${values.title}`);
         } finally {
             setIsCreating(false);
         }

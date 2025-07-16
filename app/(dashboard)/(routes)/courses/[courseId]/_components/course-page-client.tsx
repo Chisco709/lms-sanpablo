@@ -19,6 +19,7 @@ import {
   X,
   Clock
 } from "lucide-react";
+import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 
 interface CoursePageClientProps {
   course: any;
@@ -43,6 +44,11 @@ export const CoursePageClient = ({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
   
+  // Analytics hooks
+  const { trackLMSEvent, trackCourseInteraction } = useAnalytics();
+  usePageTracking();
+  useTimeTracking(`Curso: ${course.title}`);
+  
   // Obtener todos los capítulos de todos los temas
   const allChapters = course.pensumTopics?.flatMap((topic: any) => topic.chapters) || [];
   const totalTopics = course.pensumTopics?.length || 0;
@@ -56,7 +62,10 @@ export const CoursePageClient = ({
     if (course.pensumTopics?.length > 0) {
       setExpandedTopics({ [course.pensumTopics[0].id]: true });
     }
-  }, [course.pensumTopics]);
+    
+    // Track course view
+    trackLMSEvent.courseView(courseId, course.title);
+  }, [course.pensumTopics, courseId, course.title, trackLMSEvent]);
 
   const handleBackNavigation = () => {
     if (canGoBack) {
