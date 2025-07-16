@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { 
-        fileUrl,
+      fileUrl,
         message: "Archivo subido exitosamente",
         filename 
       },

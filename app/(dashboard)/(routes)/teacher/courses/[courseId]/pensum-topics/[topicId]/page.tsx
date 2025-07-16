@@ -138,13 +138,13 @@ export default function PensumTopicEditPage() {
     };
 
     if (loading) {
-        return (
+  return (
             <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black flex items-center justify-center">
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full"
-                />
+              />
             </div>
         );
     }
@@ -172,8 +172,8 @@ export default function PensumTopicEditPage() {
                 <div className="absolute -inset-10 opacity-20">
                     <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/30 rounded-full blur-3xl animate-pulse"></div>
                     <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                </div>
-            </div>
+          </div>
+        </div>
 
             <div className="relative z-10 container mx-auto px-6 py-12">
                 {/* Header */}
@@ -195,15 +195,15 @@ export default function PensumTopicEditPage() {
                                     <div className="p-2 bg-gradient-to-r from-green-500 to-yellow-500 rounded-xl">
                                         <Layers className="h-6 w-6 text-black" />
                                     </div>
-                                    <div>
+                <div>
                                         <h1 className="text-3xl font-bold text-white">
                                             {topic.title}
                                         </h1>
                                         <p className="text-slate-400">
                                             Tema del curso: {course.title}
-                                        </p>
-                                    </div>
-                                </div>
+                  </p>
+                </div>
+              </div>
                                 <div className="flex items-center gap-4">
                                     <Badge variant={topic.isPublished ? "default" : "secondary"} className={
                                         topic.isPublished 
@@ -225,9 +225,9 @@ export default function PensumTopicEditPage() {
                                     <span className="text-slate-400 text-sm">
                                         {topic.chapters.length} clases asociadas
                                     </span>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+              </div>
+            </div>
 
                         <div className="flex items-center gap-3">
                             <Button
@@ -345,21 +345,21 @@ export default function PensumTopicEditPage() {
                                         <p className="text-white">
                                             {topic.description || "Haz clic para agregar una descripción del tema"}
                                         </p>
-                                    </div>
-                                )}
+          </div>
+        )}
                             </div>
 
                             {/* Posición */}
-                            <div>
+                <div>
                                 <label className="text-sm font-medium text-slate-400 mb-2 block">
                                     Posición en el curso
                                 </label>
                                 <div className="p-3 bg-slate-900/30 rounded-lg border border-slate-600">
                                     <p className="text-white">
                                         Tema #{topic.position}
-                                    </p>
-                                </div>
-                            </div>
+                  </p>
+                </div>
+              </div>
                         </div>
                     </motion.div>
 
@@ -399,7 +399,7 @@ export default function PensumTopicEditPage() {
                                                         <span className="text-yellow-400 font-bold text-sm">
                                                             {chapter.position}
                                                         </span>
-                                                    </div>
+                </div>
                                                     <div>
                                                         <h4 className="text-white font-medium">{chapter.title}</h4>
                                                         <div className="flex gap-2 mt-1">
@@ -423,9 +423,9 @@ export default function PensumTopicEditPage() {
                                                                     Gratis
                                                                 </Badge>
                                                             )}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                </div>
+              </div>
+            </div>
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant={chapter.isPublished ? "default" : "secondary"}>
                                                         {chapter.isPublished ? "Publicado" : "Borrador"}
@@ -435,7 +435,7 @@ export default function PensumTopicEditPage() {
                                                             <Edit3 className="h-3 w-3" />
                                                         </Button>
                                                     </Link>
-                                                </div>
+            </div>
                                             </div>
                                         </motion.div>
                                     ))}
@@ -455,9 +455,9 @@ export default function PensumTopicEditPage() {
                                             Crear primera clase
                                         </Button>
                                     </Link>
-                                </div>
-                            )}
-                        </div>
+          </div>
+        )}
+              </div>
 
                         {/* Estadísticas del tema */}
                         <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
@@ -470,20 +470,20 @@ export default function PensumTopicEditPage() {
                                 <div className="text-center p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
                                     <div className="text-2xl font-bold text-yellow-400">
                                         {topic.chapters.length}
-                                    </div>
+            </div>
                                     <div className="text-sm text-yellow-300">Total Clases</div>
-                                </div>
+          </div>
                                 <div className="text-center p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
                                     <div className="text-2xl font-bold text-green-400">
                                         {topic.chapters.filter(c => c.isPublished).length}
-                                    </div>
+              </div>
                                     <div className="text-sm text-green-300">Publicadas</div>
-                                </div>
-                            </div>
+            </div>
+          </div>
                         </div>
                     </motion.div>
-                </div>
-            </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 } 

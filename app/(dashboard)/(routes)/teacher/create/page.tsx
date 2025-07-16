@@ -65,7 +65,7 @@ const CreatePage = () => {
             imageUrl: "",
         }
     });
-
+    
     const { isSubmitting, isValid } = form.formState;
     const watchedFields = form.watch();
 
@@ -292,10 +292,10 @@ const CreatePage = () => {
                                 </h2>
                                 <p className="text-slate-400">
                                     {currentStepData.subtitle}
-                                </p>
-                            </div>
+                    </p>
+                </div>
 
-                            <Form {...form}>
+                    <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                                     {/* Paso 1: Título */}
                                     {currentStep === 0 && (
@@ -304,16 +304,16 @@ const CreatePage = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.2 }}
                                         >
-                                            <FormField
-                                                control={form.control}
-                                                name="title"
+                                <FormField
+                                control={form.control}
+                                name="title"
                                                 render={({ field }) => (
-                                                    <FormItem>
+                                    <FormItem>
                                                         <FormLabel className="text-white text-lg font-medium">
-                                                            Título del curso
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input 
+                                            Título del curso
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input 
                                                                 {...field}
                                                                 disabled={isSubmitting}
                                                                 placeholder="ej. 'Técnico en Primera Infancia'"
@@ -414,7 +414,7 @@ const CreatePage = () => {
                                                             <FormControl>
                                                                 <Input 
                                                                     {...field}
-                                                                    disabled={isSubmitting}
+                                            disabled={isSubmitting}
                                                                     placeholder="https://ejemplo.com/imagen.jpg"
                                                                     className="h-14 text-lg bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20 rounded-xl"
                                                                     onChange={(e) => {
@@ -422,12 +422,12 @@ const CreatePage = () => {
                                                                         if (e.target.value) setImagePreview(e.target.value);
                                                                     }}
                                                                 />
-                                                            </FormControl>
-                                                            <FormDescription className="text-slate-400">
+                                        </FormControl>
+                                        <FormDescription className="text-slate-400">
                                                                 Pega la URL de una imagen desde internet
-                                                            </FormDescription>
+                                        </FormDescription>
                                                             <FormMessage className="text-red-400" />
-                                                        </FormItem>
+                                    </FormItem>
                                                     )}
                                                 />
                                             </div>
@@ -577,8 +577,8 @@ const CreatePage = () => {
                                 <div className="flex gap-3">
                                     <Link href="/teacher/courses">
                                         <Button
-                                            type="button"
-                                            variant="outline"
+                                        type="button"
+                                        variant="outline"
                                             className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
                                         >
                                             Cancelar
@@ -596,7 +596,7 @@ const CreatePage = () => {
                                             <ArrowRight className="h-4 w-4 ml-2" />
                                         </Button>
                                     ) : (
-                                        <Button
+                                    <Button
                                             type="button"
                                             onClick={form.handleSubmit(onSubmit)}
                                             disabled={!isValid || isCreating}
@@ -617,7 +617,7 @@ const CreatePage = () => {
                                                     <Sparkles className="h-4 w-4 ml-2" />
                                                 </>
                                             )}
-                                        </Button>
+                                    </Button>
                                     )}
                                 </div>
                             </div>

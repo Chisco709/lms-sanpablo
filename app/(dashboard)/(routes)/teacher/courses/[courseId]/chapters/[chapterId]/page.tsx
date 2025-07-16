@@ -234,10 +234,10 @@ export default function ChapterEditPage() {
                         <div className="flex items-center gap-4">
                             <Link href={`/teacher/courses/${courseId}`}>
                                 <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                                    <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-2" />
                                     Volver al curso
                                 </Button>
-                            </Link>
+        </Link>
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className="p-2 bg-gradient-to-r from-green-500 to-yellow-500 rounded-xl">
@@ -246,7 +246,7 @@ export default function ChapterEditPage() {
                                     <div>
                                         <h1 className="text-3xl font-bold text-white">
                                             {chapter.title}
-                                        </h1>
+          </h1>
                                         <p className="text-slate-400">
                                             Clase del curso: {course.title}
                                             {chapter.pensumTopic && (
