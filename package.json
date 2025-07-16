@@ -12,6 +12,7 @@
     "lint": "next lint",
     "lint:check": "next lint",
     "seed": "tsx scripts/seed.ts",
+    "cleanup": "tsx scripts/cleanup-database.ts",
     "optimize": "node scripts/optimize-performance.js",
     "clean": "rm -rf .next && rm -rf node_modules && rm -f package-lock.json",
     "prisma:generate": "prisma generate",

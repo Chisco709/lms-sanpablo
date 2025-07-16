@@ -1,81 +1,104 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 import path from "path";
-import { writeFile, mkdir } from "fs/promises";
-import { v4 as uuidv4 } from "uuid";
+import fs from "fs/promises";
 
-export async function POST(req: Request) {
+// Configuración
+const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    // Verificar autenticación
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      );
     }
 
-    const formData = await req.formData();
+    // Obtener el archivo del formData
+    const formData = await request.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No se ha subido ningún archivo" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No se encontró archivo" },
+        { status: 400 }
+      );
     }
 
-    // Verificar el tamaño del archivo (4MB máximo)
-    if (file.size > 4 * 1024 * 1024) {
-      return NextResponse.json({ 
-        error: "El archivo es demasiado grande. Máximo 4MB permitido." 
-      }, { status: 400 });
+    // Validar tipo de archivo
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: "Tipo de archivo no permitido. Solo se permiten imágenes." },
+        { status: 400 }
+      );
     }
 
-    // Verificar que sea una imagen
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ 
-        error: "El archivo debe ser una imagen." 
-      }, { status: 400 });
+    // Validar tamaño
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "Archivo demasiado grande. Máximo 4MB." },
+        { status: 400 }
+      );
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = `${uuidv4()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const relativeUploadDir = `/uploads/${userId}`;
-    const uploadDir = path.join(process.cwd(), "public", relativeUploadDir);
-    
-    // Asegúrate de que el directorio exista
+    // Crear directorio si no existe
     try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
-      console.error("Error al crear el directorio:", error);
-      return NextResponse.json({ 
-        error: "Error al crear el directorio de uploads" 
-      }, { status: 500 });
+      await fs.access(UPLOAD_DIR);
+    } catch {
+      await fs.mkdir(UPLOAD_DIR, { recursive: true });
     }
-    
-    const filePath = path.join(uploadDir, filename);
-    
+
+    // Crear subdirectorio para el usuario
+    const userDir = path.join(UPLOAD_DIR, user.id);
     try {
-      await writeFile(filePath, buffer);
-    } catch (error) {
-      console.error("Error al escribir el archivo:", error);
-      return NextResponse.json({ 
-        error: "Error al guardar el archivo" 
-      }, { status: 500 });
+      await fs.access(userDir);
+    } catch {
+      await fs.mkdir(userDir, { recursive: true });
     }
-    
-    // La URL relativa para acceder al archivo
-    const fileUrl = `${relativeUploadDir}/${filename}`;
-    
-    console.log(`Archivo subido exitosamente: ${fileUrl}`);
-    
-    return NextResponse.json({ 
-      success: true, 
-      fileUrl,
-      fileName: filename,
-      fileSize: file.size,
-      fileType: file.type
-    });
+
+    // Generar nombre único para el archivo
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2);
+    const extension = path.extname(file.name).toLowerCase();
+    const filename = `${timestamp}-${random}${extension}`;
+    const filepath = path.join(userDir, filename);
+
+    // Convertir archivo a buffer y guardar
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await fs.writeFile(filepath, buffer);
+
+    // Generar URL pública
+    const fileUrl = `/uploads/${user.id}/${filename}`;
+
+    return NextResponse.json(
+      { 
+        fileUrl,
+        message: "Archivo subido exitosamente",
+        filename 
+      },
+      { status: 200 }
+    );
+
   } catch (error) {
-    console.error("Error al subir el archivo:", error);
-    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
-    return NextResponse.json({ 
-      error: `Error al subir el archivo: ${errorMessage}` 
-    }, { status: 500 });
+    console.error("Error en upload:", error);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
+}
+
+// Configurar el tamaño máximo del body
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '4mb',
+    },
+  },
 } 
