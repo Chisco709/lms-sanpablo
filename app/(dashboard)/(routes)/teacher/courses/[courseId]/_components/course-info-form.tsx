@@ -212,12 +212,14 @@ export const CourseInfoForm = ({
           <div>
             <SmartImageUpload
               value={initialData.imageUrl || ""}
-              onChange={(url) => {
+              courseId={courseId}
+              onSuccess={(url) => {
                 if (url) {
                   onSubmit({ ...form.getValues(), imageUrl: url });
+                } else {
+                  onSubmit({ ...form.getValues(), imageUrl: "" });
                 }
               }}
-              onRemove={() => onSubmit({ ...form.getValues(), imageUrl: "" })}
             />
           </div>
         ) : (

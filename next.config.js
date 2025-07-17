@@ -57,13 +57,6 @@ const nextConfig = {
     ];
   },
 
-  // Configuración para subida de archivos
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-
   // Optimizaciones experimentales estables
   experimental: {
     optimizeCss: true,
