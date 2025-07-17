@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
-
-
 export const columns: ColumnDef<Course>[] = [
   {
     accessorKey: "title",

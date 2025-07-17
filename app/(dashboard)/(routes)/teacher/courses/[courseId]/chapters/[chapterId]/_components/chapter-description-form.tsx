@@ -41,7 +41,6 @@ export const ChapterDescriptionForm = ({
 }: ChapterDescriptionFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
 
-
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const router = useRouter()
@@ -52,7 +51,6 @@ export const ChapterDescriptionForm = ({
             description: initialData?.description || ""    
         }, 
     })
-
 
     const { isSubmitting, isValid } = form.formState;
 

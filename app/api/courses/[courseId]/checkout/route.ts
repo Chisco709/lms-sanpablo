@@ -53,7 +53,6 @@ export async function POST(
       message: "Compra realizada exitosamente" 
     });
   } catch (error) {
-    console.log("[COURSE_ID_CHECKOUT]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

@@ -261,8 +261,7 @@ export const ChapterPdfForm = ({
                 onChange={(url) => {
                   if (url) {
                     setTempPdfUrl(url);
-                    console.log("📎 PDF URL obtenida:", url);
-                  }
+                    }
                 }}
               />
             </div>

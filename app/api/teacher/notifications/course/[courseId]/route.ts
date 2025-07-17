@@ -40,7 +40,6 @@ export async function GET(
 
     return NextResponse.json(notifications);
   } catch (error) {
-    console.log("[TEACHER_NOTIFICATIONS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -71,7 +70,6 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.log("[TEACHER_NOTIFICATIONS_READ_ALL]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

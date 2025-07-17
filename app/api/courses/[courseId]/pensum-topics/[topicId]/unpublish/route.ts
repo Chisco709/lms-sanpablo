@@ -38,7 +38,6 @@ export async function PATCH(
 
     return NextResponse.json(unpublishedTopic);
   } catch (error) {
-    console.log("[PENSUM_TOPIC_ID_UNPUBLISH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

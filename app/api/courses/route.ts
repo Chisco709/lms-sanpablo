@@ -41,7 +41,6 @@ export async function GET() {
 
     return NextResponse.json(courses);
   } catch (error) {
-    console.log("[COURSES_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
@@ -68,7 +67,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(course);
   } catch (error) {
-    console.log("[COURSES_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

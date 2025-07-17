@@ -39,7 +39,6 @@ export async function PATCH(
 
     return NextResponse.json(pensumTopic);
   } catch (error) {
-    console.log("[PENSUM_TOPIC_ID_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -86,7 +85,6 @@ export async function DELETE(
 
     return NextResponse.json(deletedTopic);
   } catch (error) {
-    console.log("[PENSUM_TOPIC_ID_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

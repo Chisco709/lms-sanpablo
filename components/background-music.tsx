@@ -31,8 +31,7 @@ const BackgroundMusic = () => {
     }
 
     const handleError = () => {
-      console.log('Error cargando música de fondo')
-    }
+      }
 
     // Eventos del audio
     audio.addEventListener('canplaythrough', handleCanPlayThrough)
@@ -54,8 +53,7 @@ const BackgroundMusic = () => {
       await audio.play()
       setHasInteracted(true)
     } catch (error) {
-      console.log('Autoplay bloqueado - esperando interacción del usuario')
-    }
+      }
   }
 
   // Detectar primera interacción del usuario para iniciar música
@@ -104,8 +102,7 @@ const BackgroundMusic = () => {
         try {
           await audio.play()
         } catch (error) {
-          console.log('Error reproduciendo audio:', error)
-        }
+          }
       }
       setIsMuted(false)
     } else {

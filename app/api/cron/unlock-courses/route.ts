@@ -18,8 +18,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log("Iniciando verificación de desbloqueo de cursos...");
-    
     // Ejecutar verificación de desbloqueos
     const results = await dailyUnlockCheck();
     
@@ -33,8 +31,6 @@ export async function GET(request: NextRequest) {
         : "No hay cursos para desbloquear en este momento"
     };
 
-    console.log("Verificación completada:", response);
-    
     return NextResponse.json(response, { status: 200 });
     
   } catch (error) {

@@ -82,7 +82,6 @@ export async function PUT(
 
     return NextResponse.json(userProgress);
   } catch (error) {
-    console.log("[CHAPTER_ID_PROGRESS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

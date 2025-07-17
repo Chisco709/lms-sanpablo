@@ -48,7 +48,6 @@ export async function POST(
 
     return NextResponse.json(pensumTopic);
   } catch (error) {
-    console.log("[PENSUM_TOPICS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

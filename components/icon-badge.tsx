@@ -25,7 +25,6 @@ const backgroundsVariants = cva(
     }
 )
 
-
 const iconVariants = cva(
     "",
     {

@@ -32,7 +32,6 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
     }
 
     try {
-      console.log("🖼️ Imagen subida, guardando en BD:", url);
       setIsSaving(true);
       
       // Actualizar estado local inmediatamente
@@ -43,7 +42,6 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
         imageUrl: url 
       });
       
-      console.log("✅ Imagen guardada en BD:", response.data);
       toast.success("🎉 ¡Imagen guardada exitosamente!");
       
       // Llamar callback si existe

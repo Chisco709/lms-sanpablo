@@ -2,17 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Configuración crítica para resolver errores de build
+  // CONFIGURACIÓN DE PRODUCCIÓN SEGURA
   typescript: {
-    // !! WARN !!
-    // Permitir builds de producción aunque haya errores de TypeScript
-    // !! WARN !!
-    ignoreBuildErrors: true,
+    // Solo permitir build si no hay errores críticos
+    ignoreBuildErrors: false,
   },
   
   eslint: {
-    // Ignorar errores de ESLint durante el build
-    ignoreDuringBuilds: true,
+    // Verificar ESLint en build
+    ignoreDuringBuilds: false,
   },
   
   images: {
@@ -23,78 +21,70 @@ const nextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
+        protocol: "https", 
+        hostname: "uploadthing.com",
         pathname: "/**",
       }
     ],
-    // Optimización de imágenes
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 3600, // 1 hora cache
   },
 
-  // Optimizaciones para producción
+  // Optimizaciones de producción
   poweredByHeader: false,
   compress: true,
+  
+  // Headers de seguridad
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ];
+  },
 
   // Configuración para subida de archivos
   api: {
     bodyParser: {
-      sizeLimit: '10mb', // Aumentar límite a 10MB
+      sizeLimit: '10mb',
     },
   },
 
   // Optimizaciones experimentales estables
   experimental: {
     optimizeCss: true,
-    esmExternals: true,
-    // Optimización de paquetes
-    optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-    ],
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
   },
 
-  // Configuración específica para Vercel
-  ...(process.env.VERCEL && {
-    experimental: {
-      optimizeCss: false, // Desactivar en Vercel si causa problemas
-    }
-  }),
-
-  // Bundle analyzer solo en desarrollo
-  ...(process.env.ANALYZE === 'true' && {
-    bundleAnalyzer: {
-      enabled: true,
-    }
-  }),
-
-  // Optimizaciones de webpack para resolver errores de módulos
+  // Configuración de Webpack para producción
   webpack: (config, { dev, isServer }) => {
-    // Resolver problemas de módulos faltantes
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      tls: false,
-      crypto: false,
-    };
-
-    // Optimización para producción
-    if (!dev && !isServer) {
-      config.optimization.splitChunks.cacheGroups = {
-        ...config.optimization.splitChunks.cacheGroups,
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-          maxSize: 244000,
+    if (!dev) {
+      // Optimizaciones para producción
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
         },
       };
     }
-
     return config;
   },
 };

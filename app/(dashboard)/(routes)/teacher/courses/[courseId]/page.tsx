@@ -107,9 +107,7 @@ export default function CourseEditPage({ params }: PageProps) {
 
     const fetchCourse = async () => {
         try {
-            console.log("🔄 Fetching course with ID:", courseId);
             const response = await axios.get(`/api/courses/${courseId}`);
-            console.log("📥 Course data received:", response.data);
             setCourse(response.data);
         } catch (error) {
             console.error("❌ Error fetching course:", error);
@@ -122,32 +120,23 @@ export default function CourseEditPage({ params }: PageProps) {
 
     const updateField = async (field: string, value: any) => {
         if (!course) {
-            console.log("❌ No hay curso cargado");
             return;
         }
         
         try {
-            console.log(`🔄 Actualizando campo "${field}" con valor:`, value);
             setSaving(true);
             
             const payload = { [field]: value };
-            console.log("📤 Enviando a API:", payload);
-            
             const response = await axios.patch(`/api/courses/${courseId}`, payload);
-            console.log("📥 Respuesta de API:", response.data);
-            
             // Actualizar el estado local inmediatamente
             setCourse(prevCourse => {
                 if (!prevCourse) return prevCourse;
                 const updatedCourse = { ...prevCourse, [field]: value };
-                console.log("🔄 Estado local actualizado:", updatedCourse);
                 return updatedCourse;
             });
             
             setEditingField(null);
             setTempValues({});
-            
-            console.log("✅ Campo actualizado exitosamente");
             
             // Solo mostrar toast si no es imageUrl (ya lo mostramos en handleImageUpload)
             if (field !== "imageUrl") {
@@ -197,14 +186,10 @@ export default function CourseEditPage({ params }: PageProps) {
 
     const handleImageUpload = async (url?: string) => {
         try {
-            console.log("🖼️ HandleImageUpload llamado con URL:", url);
-            
             if (!url) {
                 toast.error("❌ Error: No se recibió URL de la imagen");
                 return;
             }
-            
-            console.log("💾 Guardando imagen en curso:", courseId);
             
             // Mostrar toast de progreso
             toast.loading("💾 Guardando imagen...", { id: "image-save" });
@@ -222,9 +207,7 @@ export default function CourseEditPage({ params }: PageProps) {
             toast.dismiss("image-save");
             toast.success("🎉 ¡Imagen guardada exitosamente!");
             
-            console.log("✅ Imagen guardada y estado actualizado");
-            
-        } catch (error) {
+            } catch (error) {
             console.error("❌ Error detallado:", error);
             toast.dismiss("image-save");
             toast.error("❌ Error al guardar la imagen");
@@ -766,6 +749,4 @@ export default function CourseEditPage({ params }: PageProps) {
         </div>
     );
 }
-
-
 

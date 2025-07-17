@@ -64,7 +64,6 @@ export async function POST(
       student: studentPayment
     });
   } catch (error) {
-    console.log("[STUDENTS_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -118,7 +117,6 @@ export async function GET(
 
     return NextResponse.json(formattedStudents);
   } catch (error) {
-    console.log("[STUDENTS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

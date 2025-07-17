@@ -46,8 +46,6 @@ export default function CreateChapterPage({ params }: PageProps) {
 
         try {
             setSaving(true);
-            console.log("🚀 Creando capítulo...", { title, description, topicId });
-            
             const payload = {
                 title: title.trim(),
                 description: description.trim() || null,
@@ -56,8 +54,6 @@ export default function CreateChapterPage({ params }: PageProps) {
             };
 
             const response = await axios.post(`/api/courses/${courseId}/chapters`, payload);
-            console.log("✅ Capítulo creado:", response.data);
-            
             toast.success("🎉 ¡Clase creada exitosamente!");
             
             // Redirigir a la página de edición del capítulo

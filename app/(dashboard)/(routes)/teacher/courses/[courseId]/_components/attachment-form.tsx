@@ -97,7 +97,6 @@ export const AttachmentForm = ({
 
     const currentAttachments = initialData.attachments;
 
-
     return (
         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
             <div className="font-medium flex items-center justify-between text-white">

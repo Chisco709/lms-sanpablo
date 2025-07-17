@@ -38,7 +38,6 @@ export const ChapterTitleForm = ({
 }: ChapterTitleFormProps) => {
     const [isEditing, setIsEditing] = useState(false);
 
-
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const router = useRouter()
@@ -47,7 +46,6 @@ export const ChapterTitleForm = ({
         resolver: zodResolver(formSchema),
         defaultValues: initialData, 
     })
-
 
     const { isSubmitting, isValid } = form.formState;
 

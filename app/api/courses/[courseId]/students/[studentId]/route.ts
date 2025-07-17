@@ -40,7 +40,6 @@ export async function PATCH(
 
     return NextResponse.json(purchase);
   } catch (error) {
-    console.log("[STUDENT_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -79,7 +78,6 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.log("[STUDENT_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 
