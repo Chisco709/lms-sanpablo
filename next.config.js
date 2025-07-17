@@ -38,6 +38,13 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Configuración para subida de archivos
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Aumentar límite a 10MB
+    },
+  },
+
   // Optimizaciones experimentales estables
   experimental: {
     optimizeCss: true,

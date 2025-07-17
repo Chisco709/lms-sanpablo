@@ -1,9 +1,6 @@
 "use client";
 
-import * as z from "zod";
 import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { ImageIcon, Pencil, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation" 
 import Image from "next/image";
@@ -11,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast"
 import { Course } from "@prisma/client";
-import { SimpleImageUpload } from "@/components/simple-image-upload";
+import { FileUpload } from "@/components/file-upload";
 
 interface ImageFormProps {
     initialData: Course
@@ -79,9 +76,9 @@ export const ImageForm = ({
             )}
             {isEditing && (
                 <div>
-                    <SimpleImageUpload 
-                        value={initialData.imageUrl || ""}
-                        onChange={(url) => {
+                    <FileUpload
+                        endpoint="courseImage"
+                        onChange={(url?: string) => {
                             if (url) {
                                 onSubmit({ imageUrl: url })
                             }

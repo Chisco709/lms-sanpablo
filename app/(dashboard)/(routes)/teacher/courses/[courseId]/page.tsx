@@ -31,6 +31,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { use } from "react";
 import { PensumTopicsForm } from "./_components/pensum-topics-form";
+import { FileUpload } from "@/components/file-upload";
 
 // Tipos
 interface Course {
@@ -41,6 +42,13 @@ interface Course {
     price: number | null;
     isPublished: boolean;
     categoryId: string | null;
+    userId: string;
+    programId: string | null;
+    periodId: string | null;
+    unlockDate: Date | null;
+    prerequisiteCourseId: string | null;
+    createdAt: Date;
+    updatedAt: Date;
     chapters: Chapter[];
     pensumTopics: PensumTopic[];
     attachments: Attachment[];
@@ -156,20 +164,14 @@ export default function CourseEditPage({ params }: PageProps) {
         }
     };
 
-    const handleImageUpload = async (file: File) => {
+    const handleImageUpload = async (url?: string) => {
         try {
-            const formData = new FormData();
-            formData.append("file", file);
+            if (!url) {
+                toast.error("Error: No se recibió URL de la imagen");
+                return;
+            }
             
-            const response = await fetch("/api/upload", {
-                method: "POST",
-                body: formData
-            });
-            
-            if (!response.ok) throw new Error("Error al subir imagen");
-            
-            const data = await response.json();
-            await updateField("imageUrl", data.fileUrl);
+            await updateField("imageUrl", url);
             toast.success("Imagen actualizada");
         } catch (error) {
             toast.error("Error al subir la imagen");
@@ -512,40 +514,23 @@ export default function CourseEditPage({ params }: PageProps) {
                                                         className="w-full h-48 object-cover rounded-xl border border-slate-600"
                                                     />
                                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={(e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) handleImageUpload(file);
-                                                            }}
-                                                            className="absolute inset-0 opacity-0 cursor-pointer"
-                                                        />
-                                                        <Button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30">
-                                                            <Upload className="h-4 w-4 mr-2" />
-                                                            Cambiar imagen
-                                                        </Button>
+                                                        <div className="text-center">
+                                                            <p className="text-white text-sm mb-4">¿Cambiar imagen?</p>
+                                                            <Button 
+                                                                onClick={() => updateField("imageUrl", "")}
+                                                                className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 mb-2"
+                                                            >
+                                                                <Upload className="h-4 w-4 mr-2" />
+                                                                Cambiar imagen
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-green-400 transition-colors">
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) handleImageUpload(file);
-                                                        }}
-                                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                                    />
-                                                    <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                                                    <p className="text-white font-medium mb-2">
-                                                        Sube una imagen para tu curso
-                                                    </p>
-                                                    <p className="text-slate-400 text-sm">
-                                                        PNG, JPG, WEBP hasta 4MB
-                                                    </p>
-                                                </div>
+                                                <FileUpload
+                                                    endpoint="courseImage"
+                                                    onChange={handleImageUpload}
+                                                />
                                             )}
                                         </div>
                                     </div>
