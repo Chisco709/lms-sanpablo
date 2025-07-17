@@ -2,6 +2,61 @@ import { db } from "@/lib/db"
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse, NextRequest } from "next/server"
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ courseId: string }> }
+) {
+  try {
+    const { userId } = await auth();
+    const { courseId } = await params;
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+        userId: userId,
+      },
+      include: {
+        chapters: {
+          orderBy: {
+            position: "asc"
+          }
+        },
+        pensumTopics: {
+          include: {
+            chapters: {
+              orderBy: {
+                position: "asc"
+              }
+            }
+          },
+          orderBy: {
+            position: "asc"
+          }
+        },
+        attachments: {
+          orderBy: {
+            createdAt: "desc"
+          }
+        },
+        category: true
+      }
+    });
+
+    if (!course) {
+      return new NextResponse("Not found", { status: 404 });
+    }
+
+    return NextResponse.json(course);
+  } catch (error) {
+    console.log("[COURSE_ID_GET]", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }

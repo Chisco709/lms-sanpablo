@@ -29,6 +29,8 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { use } from "react";
+import { PensumTopicsForm } from "./_components/pensum-topics-form";
 
 // Tipos
 interface Course {
@@ -72,17 +74,21 @@ interface Attachment {
     url: string;
 }
 
-export default function CourseEditPage() {
+interface PageProps {
+    params: Promise<{ courseId: string }>;
+}
+
+export default function CourseEditPage({ params }: PageProps) {
     const router = useRouter();
+    const resolvedParams = use(params);
+    const courseId = resolvedParams.courseId;
+    
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("overview");
     const [editingField, setEditingField] = useState<string | null>(null);
     const [tempValues, setTempValues] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
-
-    // Obtener courseId de la URL
-    const courseId = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : '';
 
     useEffect(() => {
         if (courseId) {
@@ -92,9 +98,11 @@ export default function CourseEditPage() {
 
     const fetchCourse = async () => {
         try {
+            console.log("Fetching course with ID:", courseId);
             const response = await axios.get(`/api/courses/${courseId}`);
             setCourse(response.data);
         } catch (error) {
+            console.error("Error fetching course:", error);
             toast.error("Error al cargar el curso");
             router.push("/teacher/courses");
         } finally {
@@ -570,67 +578,12 @@ export default function CourseEditPage() {
 
                         {activeTab === "content" && (
                             <div className="space-y-8">
-                                {/* Sección de Temas del Pensum */}
+                                {/* Sección de Temas del Pensum - Componente funcional */}
                                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                            <Layers className="h-5 w-5 text-green-400" />
-                                            Temas del Pensum
-                                        </h3>
-                                        <Link href={`/teacher/courses/${course.id}/pensum-topics/create`}>
-                                            <Button className="bg-green-500 hover:bg-green-600 text-black">
-                                                <Plus className="h-4 w-4 mr-2" />
-                                                Agregar Tema
-                                            </Button>
-                                        </Link>
-                                    </div>
-
-                                    {course.pensumTopics.length > 0 ? (
-                                        <div className="space-y-4">
-                                            {course.pensumTopics.map((topic, index) => (
-                                                <motion.div
-                                                    key={topic.id}
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: index * 0.1 }}
-                                                    className="p-4 bg-slate-900/30 rounded-xl border border-slate-600 hover:border-green-400 transition-colors"
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                                                                <span className="text-green-400 font-bold">{index + 1}</span>
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="text-white font-medium">{topic.title}</h4>
-                                                                <p className="text-slate-400 text-sm">
-                                                                    {topic.chapters.length} clases
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <Badge variant={topic.isPublished ? "default" : "secondary"}>
-                                                            {topic.isPublished ? "Publicado" : "Borrador"}
-                                                        </Badge>
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="text-center py-12">
-                                            <Layers className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                                            <h4 className="text-xl font-medium text-white mb-2">
-                                                Sin temas del pensum
-                                            </h4>
-                                            <p className="text-slate-400 mb-6">
-                                                Organiza tu curso en temas para una mejor estructura
-                                            </p>
-                                            <Link href={`/teacher/courses/${course.id}/pensum-topics/create`}>
-                                                <Button className="bg-green-500 hover:bg-green-600 text-black">
-                                                    <Plus className="h-4 w-4 mr-2" />
-                                                    Crear primer tema
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    )}
+                                    <PensumTopicsForm
+                                        initialData={course}
+                                        courseId={course.id}
+                                    />
                                 </div>
 
                                 {/* Sección de Clases */}
