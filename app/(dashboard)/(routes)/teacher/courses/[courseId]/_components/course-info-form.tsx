@@ -273,7 +273,6 @@ export const CourseInfoForm = ({
                         options={categoryOptions}
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="Selecciona una categoría"
                       />
                     </FormControl>
                     <FormMessage />
