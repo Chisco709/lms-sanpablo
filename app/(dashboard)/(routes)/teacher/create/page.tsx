@@ -11,11 +11,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 import { 
     BookOpen, 
-    Upload, 
     Type, 
     FileText, 
     Image as ImageIcon,
-    Plus,
     Check,
     ArrowRight,
     Sparkles,
@@ -35,12 +33,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SimpleImageUpload } from "@/components/simple-image-upload";
 import Link from "next/link";
 
 const formSchema = z.object({
     title: z.string().min(1, { message: "El título es requerido" }),
     description: z.string().min(10, { message: "La descripción debe tener al menos 10 caracteres" }),
-    imageUrl: z.string().url({ message: "URL de imagen válida requerida" }).optional(),
+    imageUrl: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -54,8 +53,6 @@ const CreatePage = () => {
     const { trackTeacherAction, trackFormSubmission } = useAnalytics();
     usePageTracking();
     useTimeTracking("Teacher - Crear Curso");
-    const [imagePreview, setImagePreview] = useState<string>("");
-    const [dragActive, setDragActive] = useState(false);
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -112,54 +109,6 @@ const CreatePage = () => {
     const prevStep = () => {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
-        }
-    };
-
-    // Manejo de imagen por URL o subida
-    const handleImageUrl = (url: string) => {
-        setImagePreview(url);
-        form.setValue("imageUrl", url);
-    };
-
-    const handleImageUpload = async (file: File) => {
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-            
-            const response = await fetch("/api/upload", {
-                method: "POST",
-                body: formData
-            });
-            
-            if (!response.ok) throw new Error("Error al subir imagen");
-            
-            const data = await response.json();
-            handleImageUrl(data.fileUrl);
-            toast.success("¡Imagen subida con éxito!");
-        } catch (error) {
-            toast.error("Error al subir la imagen");
-            console.error(error);
-        }
-    };
-
-    const handleDrag = (e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
-        } else if (e.type === "dragleave") {
-            setDragActive(false);
-        }
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragActive(false);
-        
-        const files = Array.from(e.dataTransfer.files);
-        if (files[0] && files[0].type.startsWith('image/')) {
-            handleImageUpload(files[0]);
         }
     };
 
@@ -401,102 +350,30 @@ const CreatePage = () => {
                                             transition={{ delay: 0.2 }}
                                             className="space-y-6"
                                         >
-                                            {/* Subida por URL */}
-                                            <div>
-                                                <FormField
-                                                    control={form.control}
-                                                    name="imageUrl"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-white text-lg font-medium">
-                                                                URL de la imagen
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <Input 
-                                                                    {...field}
-                                            disabled={isSubmitting}
-                                                                    placeholder="https://ejemplo.com/imagen.jpg"
-                                                                    className="h-14 text-lg bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20 rounded-xl"
-                                                                    onChange={(e) => {
-                                                                        field.onChange(e);
-                                                                        if (e.target.value) setImagePreview(e.target.value);
-                                                                    }}
-                                                                />
-                                        </FormControl>
-                                        <FormDescription className="text-slate-400">
-                                                                Pega la URL de una imagen desde internet
-                                        </FormDescription>
-                                                            <FormMessage className="text-red-400" />
-                                    </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-
-                                            <div className="text-center">
-                                                <span className="text-slate-400">o</span>
-                                            </div>
-
-                                            {/* Zona de subida por archivo */}
-                                            <div
-                                                className={`relative border-2 border-dashed rounded-xl p-8 transition-all duration-300 ${
-                                                    dragActive 
-                                                        ? 'border-green-400 bg-green-400/10' 
-                                                        : 'border-slate-600 hover:border-slate-500'
-                                                }`}
-                                                onDragEnter={handleDrag}
-                                                onDragLeave={handleDrag}
-                                                onDragOver={handleDrag}
-                                                onDrop={handleDrop}
-                                            >
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) handleImageUpload(file);
-                                                    }}
-                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                />
-                                                <div className="text-center">
-                                                    <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                                                    <p className="text-white font-medium mb-2">
-                                                        Arrastra una imagen aquí o haz clic para seleccionar
-                                                    </p>
-                                                    <p className="text-slate-400 text-sm">
-                                                        PNG, JPG, WEBP hasta 4MB
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Vista previa de imagen */}
-                                            {(imagePreview || watchedFields.imageUrl) && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    className="relative"
-                                                >
-                                                    <img 
-                                                        src={imagePreview || watchedFields.imageUrl}
-                                                        alt="Vista previa"
-                                                        className="w-full h-48 object-cover rounded-xl border border-slate-600"
-                                                        onError={() => {
-                                                            setImagePreview("");
-                                                            form.setValue("imageUrl", "");
-                                                            toast.error("No se pudo cargar la imagen");
-                                                        }}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setImagePreview("");
-                                                            form.setValue("imageUrl", "");
-                                                        }}
-                                                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors"
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                </motion.div>
-                                            )}
+                                            <FormField
+                                                control={form.control}
+                                                name="imageUrl"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-white text-lg font-medium">
+                                                            Imagen del curso
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <SimpleImageUpload
+                                                                value={field.value || ""}
+                                                                onChange={(url) => {
+                                                                    field.onChange(url);
+                                                                }}
+                                                                disabled={isSubmitting}
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription className="text-slate-400">
+                                                            Sube una imagen atractiva para tu curso (opcional)
+                                                        </FormDescription>
+                                                        <FormMessage className="text-red-400" />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </motion.div>
                                     )}
 
@@ -530,13 +407,13 @@ const CreatePage = () => {
                                                         </div>
                                                     </div>
 
-                                                    {(imagePreview || watchedFields.imageUrl) && (
+                                                    {(watchedFields.imageUrl) && (
                                                         <div className="flex items-start gap-3">
                                                             <ImageIcon className="h-5 w-5 text-purple-400 mt-1" />
                                                             <div>
                                                                 <p className="text-purple-400 text-sm font-medium">Imagen</p>
                                                                 <img 
-                                                                    src={imagePreview || watchedFields.imageUrl}
+                                                                    src={watchedFields.imageUrl}
                                                                     alt="Imagen del curso"
                                                                     className="w-24 h-16 object-cover rounded-lg border border-slate-600 mt-2"
                                                                 />

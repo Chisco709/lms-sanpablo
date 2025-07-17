@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast"
 import { Course } from "@prisma/client";
-import { ImageUpload } from "@/components/image-upload";
+import { SimpleImageUpload } from "@/components/simple-image-upload";
 
 interface ImageFormProps {
     initialData: Course
@@ -79,7 +79,7 @@ export const ImageForm = ({
             )}
             {isEditing && (
                 <div>
-                    <ImageUpload 
+                    <SimpleImageUpload 
                         value={initialData.imageUrl || ""}
                         onChange={(url) => {
                             if (url) {
