@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { ArrowLeft, LayoutDashboard, Video, File } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Video, File, Eye } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
@@ -35,15 +35,11 @@ const ChapterIdPage = async ({
       courseId: courseId,
     },
     include: {
-      course: {
-        where: {
-          userId: user.id,
-        },
-      },
+      course: true,
     },
   });
 
-  if (!chapter || !chapter.course) {
+  if (!chapter || !chapter.course || chapter.course.userId !== user.id) {
     return redirect("/teacher/courses");
   }
 
