@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTeacherAuth } from "@/hooks/use-teacher-auth";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Shield, User, Lock } from "lucide-react";
 
 const formSchema = z.object({

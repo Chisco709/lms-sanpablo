@@ -1,140 +1,129 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {Pencil} from "lucide-react";
-import { useRouter } from "next/navigation" 
-
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormMessage,
-    FormItem,
-} from "@/components/ui/form";
+import toast from "react-hot-toast";
+import { Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import toast from "react-hot-toast"
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Preview } from "@/components/preview";
 import { cn } from "@/lib/utils";
 
-import { Chapter } from "@prisma/client";
-import { Editor } from "@/components/editor";
-import { Preview } from "@/components/preview";
+const formSchema = z.object({
+  description: z.string().min(1, "La descripción es requerida"),
+});
 
 interface ChapterDescriptionFormProps {
-    initialData: Chapter
-    courseId: string;
-    chapterId: string
+  initialData: {
+    description: string | null;
+  };
+  courseId: string;
+  chapterId: string;
 }
-
-const formSchema = z.object({
-    description: z.string().min(1)
-})
 
 export const ChapterDescriptionForm = ({
-    initialData,
-    courseId,
-    chapterId
+  initialData,
+  courseId,
+  chapterId,
 }: ChapterDescriptionFormProps) => {
-    const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
 
-    const toggleEdit = () => setIsEditing((current) => !current);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      description: initialData?.description || ""
+    },
+  });
 
-    const router = useRouter()
+  const { isSubmitting, isValid } = form.formState;
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            description: initialData?.description || ""    
-        }, 
-    })
-
-    const { isSubmitting, isValid } = form.formState;
-
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        try {
-            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values)
-            toast.success("Capítulo actualizado")
-            toggleEdit()
-            router.refresh()
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.data) {
-                toast.error(error.response.data);
-            } else {
-                toast.error("Error al actualizar el capítulo");
-            }
-        }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
+      toast.success("Capítulo actualizado");
+      toggleEdit();
+      router.refresh();
+    } catch {
+      toast.error("Error al actualizar el capítulo");
     }
+  };
 
-    return(
-         <div className="mt-6 border border-slate-700 bg-slate-800/50 rounded-md p-4">
-            <div className="font-medium flex items-center justify-between text-white">
-                Descripción del Capítulo
-                <Button onClick={toggleEdit} variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-700">
-                    {isEditing ? (
-                        <>Cancelar</>
-                    )  : (
-                        <>
-                        <Pencil className="h-4 w-4 mr-2"/>
-                        Editar Descripción
-                        </>
-                    )}
-                </Button>
-            </div>
-            {!isEditing && (
-                <div className={cn(
-                    "text-sm mt-2",
-                    !initialData.description && "text-slate-400 italic"
-                )}>
-                    {!initialData.description && "Sin descripción"}
-                    {initialData.description && (
-                        <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-600/40 mt-4 shadow-lg">
-                            <div className="text-slate-200 leading-relaxed text-sm">
-                                <Preview 
-                                    value={initialData.description}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-            {isEditing && (
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4 mt-4"
-                    >
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <Editor
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>    
-                            )}
-                        />
+  const toggleEdit = () => setIsEditing((current) => !current);
 
-                        <div className="flex items-center gap-x-2">
-                            <Button
-                                disabled={!isValid || isSubmitting}
-                                type="submit"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                                Guardar
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            )}
+  return (
+    <div className="mt-6 bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-white">
+          Descripción del capítulo
+        </h3>
+        <Button onClick={toggleEdit} variant="ghost" size="sm" className="text-slate-400 hover:text-white">
+          {isEditing ? (
+            "Cancelar"
+          ) : (
+            <>
+              <Pencil className="h-4 w-4 mr-2" />
+              {initialData.description ? "Editar descripción" : "Agregar descripción"}
+            </>
+          )}
+        </Button>
+      </div>
+      
+      {!isEditing && (
+        <div className={cn(
+          "text-sm mt-2",
+          !initialData.description && "text-slate-400 italic"
+        )}>
+          {!initialData.description && "No hay descripción"}
+          {initialData.description && (
+            <Preview value={initialData.description} />
+          )}
         </div>
-    ) 
-        
-}
+      )}
+      
+      {isEditing && (
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      disabled={isSubmitting}
+                      placeholder="Describe qué aprenderán los estudiantes en este capítulo..."
+                      className="bg-slate-900 border-slate-600 text-white resize-none"
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center gap-x-2">
+              <Button
+                disabled={!isValid || isSubmitting}
+                type="submit"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Guardar
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
+    </div>
+  );
+}; 

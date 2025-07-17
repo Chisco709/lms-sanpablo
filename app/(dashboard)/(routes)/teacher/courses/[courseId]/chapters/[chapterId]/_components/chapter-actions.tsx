@@ -1,79 +1,100 @@
-"use client"
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
-import { Trash } from 'lucide-react';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Trash, Eye, EyeOff } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/modals/confirm-modal";
+
+interface ChapterActionsProps {
+  disabled: boolean;
+  courseId: string;
+  chapterId: string;
+  isPublished: boolean;
+}
 
 export const ChapterActions = ({
   disabled,
   courseId,
   chapterId,
   isPublished
-}: {
-  disabled: boolean;
-  courseId: string;
-  chapterId: string;
-  isPublished: boolean;
-}) => {
+}: ChapterActionsProps) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handlePublish = async () => {
+  const onDelete = async () => {
     try {
-      await axios.patch(
-        `/api/courses/${courseId}/chapters/${chapterId}/${isPublished ? "unpublish" : "publish"}`
-      );
-      
-      toast.success(isPublished ? "✅ Capítulo despublicado exitosamente" : "🎉 ¡Capítulo publicado! Los estudiantes ya pueden verlo");
+      setIsLoading(true);
+      await axios.delete(`/api/courses/${courseId}/chapters/${chapterId}`);
+      toast.success("Capítulo eliminado");
       router.refresh();
-      
-      // Pequeño delay para asegurar que la UI se actualice
-      setTimeout(() => {
-        router.refresh();
-      }, 500);
-      
-    } catch (error) {
-      console.error("Error publishing/unpublishing chapter:", error);
-      if (axios.isAxiosError(error) && error.response?.data) {
-        toast.error(`❌ Error: ${error.response.data}`);
-      } else {
-        const action = isPublished ? "despublicar" : "publicar";
-        toast.error(`❌ Error al ${action} el capítulo. Inténtalo de nuevo.`);
-      }
+      router.push(`/teacher/courses/${courseId}`);
+    } catch {
+      toast.error("Error al eliminar el capítulo");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async () => {
+  const onPublish = async () => {
     try {
-      await axios.delete(`/api/courses/${courseId}/chapters/${chapterId}`);
-      toast.success("Capítulo eliminado");
-      router.push(`/teacher/courses/${courseId}`);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data) {
-        toast.error(error.response.data);
+      setIsLoading(true);
+      
+      if (isPublished) {
+        await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}/unpublish`);
+        toast.success("Capítulo despublicado");
       } else {
-        toast.error("Error al eliminar el capítulo");
+        await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}/publish`);
+        toast.success("Capítulo publicado");
       }
+      
+      router.refresh();
+    } catch {
+      toast.error("Error al cambiar el estado del capítulo");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-x-2">
       <Button
-        onClick={handlePublish}
-        disabled={disabled}
-        variant={isPublished ? "destructive" : "default"}
+        onClick={onPublish}
+        disabled={disabled || isLoading}
+        variant="outline"
+        size="sm"
+        className={`border-slate-600 ${
+          isPublished 
+            ? "text-yellow-400 hover:text-yellow-300 hover:border-yellow-400/50" 
+            : "text-green-400 hover:text-green-300 hover:border-green-400/50"
+        }`}
       >
-        {isPublished ? "Despublicar" : "Publicar"}
+        {isPublished ? (
+          <>
+            <EyeOff className="h-4 w-4 mr-2" />
+            Despublicar
+          </>
+        ) : (
+          <>
+            <Eye className="h-4 w-4 mr-2" />
+            Publicar
+          </>
+        )}
       </Button>
-
-      <Button
-        onClick={handleDelete}
-        variant="destructive"
-        size="icon"
-      >
-        <Trash className="h-4 w-4" />
-      </Button>
+      
+      <ConfirmModal onConfirm={onDelete}>
+        <Button 
+          size="sm" 
+          disabled={isLoading}
+          variant="outline"
+          className="border-red-600 text-red-400 hover:text-red-300 hover:border-red-400/50"
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
+      </ConfirmModal>
     </div>
   );
-};
+}; 

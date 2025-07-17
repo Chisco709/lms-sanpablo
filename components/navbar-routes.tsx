@@ -5,7 +5,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { LogOut, Crown, Home, Shield } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTeacherAuth } from "@/hooks/use-teacher-auth";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const NavbarRoutes = memo(() => {
   const pathname = usePathname();

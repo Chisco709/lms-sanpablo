@@ -39,6 +39,11 @@ const teacherRoutes = [
     label: "Estadísticas",
     href: "/teacher/analytics",
   },
+  {
+    icon: User,
+    label: "Estudiantes",
+    href: "/teacher/students",
+  },
 ];
 
 const buttonClass = "flex items-center gap-2 px-3 py-1 border border-green-400 text-green-500 hover:bg-green-100/10 hover:text-green-700 rounded-md transition-colors text-sm font-medium";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, Play, Volume2, Maximize, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
