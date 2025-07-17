@@ -109,113 +109,118 @@ export default function TeacherCoursesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
+            <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin"></div>
-                    <span className="text-gray-600">Cargando cursos...</span>
+                    <div className="w-8 h-8 border-4 border-green-400/30 border-t-green-400 rounded-full animate-spin"></div>
+                    <span className="text-white">Cargando cursos...</span>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header estilo Platzi */}
-            <div className="bg-white border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                                    <BookOpen className="h-5 w-5 text-white" />
-                                </div>
+        <div className="relative min-h-screen bg-black text-white">
+            {/* Efectos de fondo consistentes con el LMS */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute left-[-15%] top-[-15%] w-[400px] h-[400px] bg-green-500/30 rounded-full blur-[120px] opacity-70" />
+                <div className="absolute right-[-10%] bottom-[-10%] w-[300px] h-[300px] bg-yellow-400/20 rounded-full blur-[100px] opacity-60" />
+                <div className="absolute right-[10%] top-[10%] w-[200px] h-[200px] bg-green-400/10 rounded-full blur-[80px] opacity-50" />
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header consistente con el LMS */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-12"
+                >
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-gradient-to-r from-green-500 to-yellow-500 rounded-2xl">
+                                <BookOpen className="h-8 w-8 text-black" />
                             </div>
-                            <div className="ml-4">
-                                <h1 className="text-xl font-semibold text-gray-900">Mis Cursos</h1>
-                                <p className="text-sm text-gray-500">Gestiona tus cursos y contenido</p>
+                            <div>
+                                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                                    Mis Cursos
+                                </h1>
+                                <p className="text-slate-400">
+                                    Gestiona y crea experiencias educativas increíbles
+                                </p>
                             </div>
                         </div>
                         
                         <Link href="/teacher/create">
-                            <Button className="bg-green-600 hover:bg-green-700">
-                                <Plus className="h-4 w-4 mr-2" />
-                                Crear Curso
-                            </Button>
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Button className="bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-black font-bold px-6 py-3 rounded-xl shadow-lg">
+                                    <Plus className="h-5 w-5 mr-2" />
+                                    Crear Curso
+                                </Button>
+                            </motion.div>
                         </Link>
                     </div>
-                </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Estadísticas */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-lg p-6 border">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <BookOpen className="h-5 w-5 text-blue-600" />
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Total</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                            </div>
-                        </div>
+                    {/* Estadísticas animadas */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+                        {[
+                            { label: "Total Cursos", value: stats.total, icon: BookOpen, color: "from-blue-500 to-purple-500" },
+                            { label: "Publicados", value: stats.published, icon: CheckCircle, color: "from-green-500 to-emerald-500" },
+                            { label: "Borradores", value: stats.draft, icon: Clock, color: "from-yellow-500 to-orange-500" },
+                            { label: "Estudiantes", value: stats.students, icon: Users, color: "from-pink-500 to-rose-500" }
+                        ].map((stat, index) => (
+                            <motion.div
+                                key={stat.label}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="bg-black/70 backdrop-blur-xl rounded-2xl p-6 border border-green-400/30"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-slate-400 text-sm">{stat.label}</p>
+                                        <motion.p 
+                                            className="text-2xl font-bold text-white"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: index * 0.1 + 0.2, type: "spring" }}
+                                        >
+                                            {stat.value}
+                                        </motion.p>
+                                    </div>
+                                    <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color}`}>
+                                        <stat.icon className="h-6 w-6 text-white" />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
+                </motion.div>
 
-                    <div className="bg-white rounded-lg p-6 border">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                                <CheckCircle className="h-5 w-5 text-green-600" />
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Publicados</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.published}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg p-6 border">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-yellow-100 rounded-lg">
-                                <Clock className="h-5 w-5 text-yellow-600" />
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Borradores</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.draft}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg p-6 border">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-purple-100 rounded-lg">
-                                <Users className="h-5 w-5 text-purple-600" />
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Estudiantes</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.students}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Controles */}
-                <div className="bg-white rounded-lg border p-6 mb-6">
+                {/* Controles de búsqueda y filtros */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-black/70 backdrop-blur-xl rounded-2xl border border-green-400/30 p-6 mb-8"
+                >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
                         <div className="flex items-center space-x-4">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                                 <Input
                                     placeholder="Buscar cursos..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 w-64"
+                                    className="pl-9 w-64 bg-slate-800/50 border-slate-700 text-white"
                                 />
                             </div>
                             
                             <select
                                 value={filterStatus}
                                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                className="bg-slate-800/50 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-green-400"
                             >
                                 <option value="all">Todos</option>
                                 <option value="published">Publicados</option>
@@ -228,6 +233,7 @@ export default function TeacherCoursesPage() {
                                 variant={viewMode === "grid" ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => setViewMode("grid")}
+                                className="bg-slate-800/50 border-slate-700"
                             >
                                 <Grid3X3 className="h-4 w-4" />
                             </Button>
@@ -235,21 +241,27 @@ export default function TeacherCoursesPage() {
                                 variant={viewMode === "list" ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => setViewMode("list")}
+                                className="bg-slate-800/50 border-slate-700"
                             >
                                 <List className="h-4 w-4" />
                             </Button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Lista de cursos */}
                 {filteredCourses.length === 0 ? (
-                    <div className="bg-white rounded-lg border p-12 text-center">
-                        <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        className="bg-black/70 backdrop-blur-xl rounded-2xl border border-green-400/30 p-12 text-center"
+                    >
+                        <BookOpen className="h-16 w-16 text-green-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-white mb-2">
                             {courses.length === 0 ? "No tienes cursos aún" : "No se encontraron cursos"}
                         </h3>
-                        <p className="text-gray-500 mb-6">
+                        <p className="text-slate-400 mb-6">
                             {courses.length === 0 
                                 ? "Crea tu primer curso para comenzar a enseñar"
                                 : "Prueba con otros términos de búsqueda"
@@ -257,13 +269,13 @@ export default function TeacherCoursesPage() {
                         </p>
                         {courses.length === 0 && (
                             <Link href="/teacher/create">
-                                <Button className="bg-green-600 hover:bg-green-700">
+                                <Button className="bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-black font-bold">
                                     <Plus className="h-4 w-4 mr-2" />
                                     Crear tu primer curso
                                 </Button>
                             </Link>
                         )}
-                    </div>
+                    </motion.div>
                 ) : (
                     <div className={viewMode === "grid" 
                         ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -276,13 +288,13 @@ export default function TeacherCoursesPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 className={viewMode === "grid"
-                                    ? "bg-white rounded-lg border overflow-hidden hover:shadow-lg transition-shadow"
-                                    : "bg-white rounded-lg border p-6 flex items-center space-x-4 hover:shadow-lg transition-shadow"
+                                    ? "bg-black/70 backdrop-blur-xl rounded-2xl border border-green-400/30 overflow-hidden hover:border-green-400/50 transition-all"
+                                    : "bg-black/70 backdrop-blur-xl rounded-2xl border border-green-400/30 p-6 flex items-center space-x-4 hover:border-green-400/50 transition-all"
                                 }
                             >
                                 {viewMode === "grid" ? (
                                     <>
-                                        <div className="relative h-48 bg-gray-200">
+                                        <div className="relative h-48 bg-slate-800">
                                             {course.imageUrl ? (
                                                 <Image
                                                     src={course.imageUrl}
@@ -292,23 +304,29 @@ export default function TeacherCoursesPage() {
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <BookOpen className="h-12 w-12 text-gray-400" />
+                                                    <BookOpen className="h-12 w-12 text-slate-400" />
                                                 </div>
                                             )}
                                             <div className="absolute top-3 right-3">
-                                                <Badge variant={course.isPublished ? "default" : "secondary"}>
+                                                <Badge 
+                                                    variant={course.isPublished ? "default" : "secondary"}
+                                                    className={course.isPublished 
+                                                        ? "bg-green-500/20 text-green-400 border-green-400/30" 
+                                                        : "bg-yellow-500/20 text-yellow-400 border-yellow-400/30"
+                                                    }
+                                                >
                                                     {course.isPublished ? "Publicado" : "Borrador"}
                                                 </Badge>
                                             </div>
                                         </div>
                                         <div className="p-6">
-                                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                                            <h3 className="font-semibold text-white mb-2 line-clamp-2">
                                                 {course.title}
                                             </h3>
-                                            <p className="text-sm text-gray-500 mb-4">
+                                            <p className="text-sm text-slate-400 mb-4">
                                                 {course.category?.name || 'Sin categoría'} • {formatDate(course.createdAt)}
                                             </p>
-                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                            <div className="flex items-center justify-between text-sm text-slate-400 mb-4">
                                                 <span className="flex items-center">
                                                     <BookOpen className="h-4 w-4 mr-1" />
                                                     {course._count?.chapters || 0} capítulos
@@ -320,28 +338,28 @@ export default function TeacherCoursesPage() {
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <Link href={`/teacher/courses/${course.id}`} className="flex-1">
-                                                    <Button variant="outline" size="sm" className="w-full">
+                                                    <Button variant="outline" size="sm" className="w-full bg-slate-800/50 border-slate-700">
                                                         <Settings className="h-4 w-4 mr-2" />
                                                         Editar
                                                     </Button>
                                                 </Link>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" size="sm">
+                                                        <Button variant="outline" size="sm" className="bg-slate-800/50 border-slate-700">
                                                             <MoreVertical className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
+                                                    <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/courses/${course.id}`}>
+                                                            <Link href={`/courses/${course.id}`} className="text-white">
                                                                 <Eye className="h-4 w-4 mr-2" />
                                                                 Ver como estudiante
                                                             </Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuSeparator className="bg-slate-700" />
                                                         <DropdownMenuItem 
                                                             onClick={() => deleteCourse(course.id)}
-                                                            className="text-red-600"
+                                                            className="text-red-400"
                                                         >
                                                             <Trash2 className="h-4 w-4 mr-2" />
                                                             Eliminar
@@ -353,7 +371,7 @@ export default function TeacherCoursesPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className="relative w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                        <div className="relative w-20 h-20 bg-slate-800 rounded-lg overflow-hidden flex-shrink-0">
                                             {course.imageUrl ? (
                                                 <Image
                                                     src={course.imageUrl}
@@ -363,18 +381,18 @@ export default function TeacherCoursesPage() {
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <BookOpen className="h-8 w-8 text-gray-400" />
+                                                    <BookOpen className="h-8 w-8 text-slate-400" />
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-start justify-between">
                                                 <div>
-                                                    <h3 className="font-semibold text-gray-900">{course.title}</h3>
-                                                    <p className="text-sm text-gray-500 mt-1">
+                                                    <h3 className="font-semibold text-white">{course.title}</h3>
+                                                    <p className="text-sm text-slate-400 mt-1">
                                                         {course.category?.name || 'Sin categoría'} • {formatDate(course.createdAt)}
                                                     </p>
-                                                    <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
+                                                    <div className="flex items-center space-x-4 text-sm text-slate-400 mt-2">
                                                         <span className="flex items-center">
                                                             <BookOpen className="h-4 w-4 mr-1" />
                                                             {course._count?.chapters || 0} capítulos
@@ -386,32 +404,38 @@ export default function TeacherCoursesPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
-                                                    <Badge variant={course.isPublished ? "default" : "secondary"}>
+                                                    <Badge 
+                                                        variant={course.isPublished ? "default" : "secondary"}
+                                                        className={course.isPublished 
+                                                            ? "bg-green-500/20 text-green-400 border-green-400/30" 
+                                                            : "bg-yellow-500/20 text-yellow-400 border-yellow-400/30"
+                                                        }
+                                                    >
                                                         {course.isPublished ? "Publicado" : "Borrador"}
                                                     </Badge>
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="outline" size="sm">
+                                                            <Button variant="outline" size="sm" className="bg-slate-800/50 border-slate-700">
                                                                 <MoreVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
+                                                        <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700">
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/teacher/courses/${course.id}`}>
+                                                                <Link href={`/teacher/courses/${course.id}`} className="text-white">
                                                                     <Settings className="h-4 w-4 mr-2" />
                                                                     Editar curso
                                                                 </Link>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/courses/${course.id}`}>
+                                                                <Link href={`/courses/${course.id}`} className="text-white">
                                                                     <Eye className="h-4 w-4 mr-2" />
                                                                     Ver como estudiante
                                                                 </Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuSeparator className="bg-slate-700" />
                                                             <DropdownMenuItem 
                                                                 onClick={() => deleteCourse(course.id)}
-                                                                className="text-red-600"
+                                                                className="text-red-400"
                                                             >
                                                                 <Trash2 className="h-4 w-4 mr-2" />
                                                                 Eliminar
