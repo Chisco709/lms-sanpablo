@@ -32,6 +32,7 @@ import { toast } from "react-hot-toast";
 import { use } from "react";
 import { PensumTopicsForm } from "./_components/pensum-topics-form";
 import { FileUpload } from "@/components/file-upload";
+import { SmartImageUpload } from "@/components/smart-image-upload";
 
 // Tipos
 interface Course {
@@ -106,11 +107,12 @@ export default function CourseEditPage({ params }: PageProps) {
 
     const fetchCourse = async () => {
         try {
-            console.log("Fetching course with ID:", courseId);
+            console.log("🔄 Fetching course with ID:", courseId);
             const response = await axios.get(`/api/courses/${courseId}`);
+            console.log("📥 Course data received:", response.data);
             setCourse(response.data);
         } catch (error) {
-            console.error("Error fetching course:", error);
+            console.error("❌ Error fetching course:", error);
             toast.error("Error al cargar el curso");
             router.push("/teacher/courses");
         } finally {
@@ -119,17 +121,46 @@ export default function CourseEditPage({ params }: PageProps) {
     };
 
     const updateField = async (field: string, value: any) => {
-        if (!course) return;
+        if (!course) {
+            console.log("❌ No hay curso cargado");
+            return;
+        }
         
         try {
+            console.log(`🔄 Actualizando campo "${field}" con valor:`, value);
             setSaving(true);
-            await axios.patch(`/api/courses/${courseId}`, { [field]: value });
-            setCourse({ ...course, [field]: value });
+            
+            const payload = { [field]: value };
+            console.log("📤 Enviando a API:", payload);
+            
+            const response = await axios.patch(`/api/courses/${courseId}`, payload);
+            console.log("📥 Respuesta de API:", response.data);
+            
+            // Actualizar el estado local inmediatamente
+            setCourse(prevCourse => {
+                if (!prevCourse) return prevCourse;
+                const updatedCourse = { ...prevCourse, [field]: value };
+                console.log("🔄 Estado local actualizado:", updatedCourse);
+                return updatedCourse;
+            });
+            
             setEditingField(null);
             setTempValues({});
-            toast.success("Campo actualizado exitosamente");
+            
+            console.log("✅ Campo actualizado exitosamente");
+            
+            // Solo mostrar toast si no es imageUrl (ya lo mostramos en handleImageUpload)
+            if (field !== "imageUrl") {
+                toast.success("✅ Campo actualizado exitosamente");
+            }
         } catch (error) {
-            toast.error("Error al actualizar");
+            console.error("❌ Error al actualizar campo:", error);
+            if (axios.isAxiosError(error)) {
+                console.error("❌ Error de API:", error.response?.data);
+                toast.error(`❌ Error: ${error.response?.data?.message || "Error al actualizar"}`);
+            } else {
+                toast.error("❌ Error al actualizar");
+            }
         } finally {
             setSaving(false);
         }
@@ -166,15 +197,45 @@ export default function CourseEditPage({ params }: PageProps) {
 
     const handleImageUpload = async (url?: string) => {
         try {
+            console.log("🖼️ HandleImageUpload llamado con URL:", url);
+            
             if (!url) {
-                toast.error("Error: No se recibió URL de la imagen");
+                toast.error("❌ Error: No se recibió URL de la imagen");
                 return;
             }
             
+            console.log("💾 Guardando imagen en curso:", courseId);
+            
+            // Mostrar toast de progreso
+            toast.loading("💾 Guardando imagen...", { id: "image-save" });
+            
+            // Actualizar estado local primero para UI inmediata
+            setCourse(prevCourse => {
+                if (!prevCourse) return prevCourse;
+                return { ...prevCourse, imageUrl: url };
+            });
+            
+            // Luego guardar en la base de datos
             await updateField("imageUrl", url);
-            toast.success("Imagen actualizada");
+            
+            // Limpiar loading toast y mostrar éxito
+            toast.dismiss("image-save");
+            toast.success("🎉 ¡Imagen guardada exitosamente!");
+            
+            console.log("✅ Imagen guardada y estado actualizado");
+            
         } catch (error) {
-            toast.error("Error al subir la imagen");
+            console.error("❌ Error detallado:", error);
+            toast.dismiss("image-save");
+            toast.error("❌ Error al guardar la imagen");
+            
+            // Revertir estado local si falló
+            if (course?.imageUrl !== url) {
+                setCourse(prevCourse => {
+                    if (!prevCourse) return prevCourse;
+                    return { ...prevCourse, imageUrl: prevCourse.imageUrl };
+                });
+            }
         }
     };
 
@@ -506,6 +567,15 @@ export default function CourseEditPage({ params }: PageProps) {
                                         </h3>
 
                                         <div className="relative">
+                                            {saving && (
+                                                <div className="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center z-10">
+                                                    <div className="text-center">
+                                                        <div className="w-8 h-8 border-4 border-green-400/30 border-t-green-400 rounded-full animate-spin mx-auto mb-2"></div>
+                                                        <p className="text-white text-sm">Guardando imagen...</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
                                             {course.imageUrl ? (
                                                 <div className="relative group">
                                                     <img
@@ -518,6 +588,7 @@ export default function CourseEditPage({ params }: PageProps) {
                                                             <p className="text-white text-sm mb-4">¿Cambiar imagen?</p>
                                                             <Button 
                                                                 onClick={() => updateField("imageUrl", "")}
+                                                                disabled={saving}
                                                                 className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 mb-2"
                                                             >
                                                                 <Upload className="h-4 w-4 mr-2" />
@@ -527,10 +598,17 @@ export default function CourseEditPage({ params }: PageProps) {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <FileUpload
-                                                    endpoint="courseImage"
-                                                    onChange={handleImageUpload}
-                                                />
+                                                <div className="space-y-4">
+                                                    <SmartImageUpload
+                                                        endpoint="courseImage"
+                                                        onSuccess={handleImageUpload}
+                                                    />
+                                                    <div className="text-center">
+                                                        <p className="text-slate-400 text-sm">
+                                                            La imagen se guardará automáticamente después de subirla
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>

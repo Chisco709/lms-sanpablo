@@ -62,6 +62,7 @@
     "@types/uuid": "^10.0.0",
     "@uiw/react-md-editor": "^4.0.6",
     "@uploadthing/react": "^7.3.1",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

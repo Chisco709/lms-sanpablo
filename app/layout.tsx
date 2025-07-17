@@ -4,6 +4,7 @@ import "./globals.css"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ToastProvider } from "@/components/providers/toaster-providers"
 import GoogleAnalytics from "@/components/google-analytics"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -49,6 +50,7 @@ export default function RootLayout({
           <GoogleAnalytics />
           <ToastProvider />
           {children}
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
