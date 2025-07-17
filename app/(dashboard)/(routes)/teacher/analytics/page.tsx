@@ -62,6 +62,7 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedPeriod, setSelectedPeriod] = useState<"7d" | "30d" | "90d" | "1y">("30d");
     const [refreshing, setRefreshing] = useState(false);
+    const [dataCache, setDataCache] = useState<Record<string, AnalyticsData>>({});
 
     useEffect(() => {
         fetchAnalyticsData();
@@ -69,8 +70,22 @@ export default function AnalyticsPage() {
 
     const fetchAnalyticsData = async () => {
         try {
+            // Verificar cache primero
+            if (dataCache[selectedPeriod]) {
+                setAnalyticsData(dataCache[selectedPeriod]);
+                setLoading(false);
+                return;
+            }
+
             setLoading(true);
             const response = await axios.get(`/api/teacher/analytics?period=${selectedPeriod}`);
+            
+            // Guardar en cache
+            setDataCache(prev => ({
+                ...prev,
+                [selectedPeriod]: response.data
+            }));
+            
             setAnalyticsData(response.data);
         } catch (error) {
             console.error("Error fetching analytics:", error);
@@ -82,6 +97,11 @@ export default function AnalyticsPage() {
 
     const refreshData = async () => {
         setRefreshing(true);
+        // Limpiar cache para forzar nueva carga
+        setDataCache(prev => ({
+            ...prev,
+            [selectedPeriod]: undefined as any
+        }));
         await fetchAnalyticsData();
         setRefreshing(false);
         toast.success("Datos actualizados");

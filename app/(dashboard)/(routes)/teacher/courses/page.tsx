@@ -58,6 +58,7 @@ export default function TeacherCoursesPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [filterStatus, setFilterStatus] = useState<"all" | "published" | "draft">("all");
+    const [coursesCache, setCoursesCache] = useState<Course[] | null>(null);
 
     useEffect(() => {
         fetchCourses();
@@ -65,8 +66,16 @@ export default function TeacherCoursesPage() {
 
     const fetchCourses = async () => {
         try {
+            // Usar cache si existe
+            if (coursesCache) {
+                setCourses(coursesCache);
+                setLoading(false);
+                return;
+            }
+
             const response = await axios.get("/api/courses");
             setCourses(response.data);
+            setCoursesCache(response.data); // Guardar en cache
         } catch (error) {
             toast.error("Error al cargar los cursos");
         } finally {
@@ -79,7 +88,9 @@ export default function TeacherCoursesPage() {
         
         try {
             await axios.delete(`/api/courses/${courseId}`);
-            setCourses(courses.filter(course => course.id !== courseId));
+            const updatedCourses = courses.filter(course => course.id !== courseId);
+            setCourses(updatedCourses);
+            setCoursesCache(updatedCourses); // Actualizar cache
             toast.success("Curso eliminado exitosamente");
         } catch (error) {
             toast.error("Error al eliminar el curso");
