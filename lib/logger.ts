@@ -124,6 +124,18 @@ class ProductionLogger {
 // Singleton logger
 export const logger = new ProductionLogger();
 
+// Alias para compatibilidad con database.ts
+export const dbLogger = logger;
+
+// Interfaz para contexto de logs
+export interface LogContext {
+  userId?: string;
+  courseId?: string;
+  chapterId?: string;
+  operation?: string;
+  [key: string]: any;
+}
+
 // Utilidad para envolver APIs con logging
 export function withApiLogging<T extends (...args: any[]) => Promise<any>>(
   handler: T,

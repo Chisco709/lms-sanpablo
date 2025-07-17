@@ -15,8 +15,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  isFree: z.boolean().default(false)
+  isFree: z.boolean()
 });
+
+type FormData = {
+  isFree: boolean;
+};
 
 interface ChapterAccessFormProps {
   initialData: {
@@ -34,16 +38,16 @@ export const ChapterAccessForm = ({
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      isFree: !!initialData.isFree
+      isFree: Boolean(initialData.isFree)
     }
   });
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormData) => {
     try {
       await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
       toast.success("Capítulo actualizado");
