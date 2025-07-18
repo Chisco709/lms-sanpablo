@@ -7,6 +7,7 @@ const BackgroundMusic = () => {
   const [isMuted, setIsMuted] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // URLs de música lofi gratuita y sin derechos de autor
@@ -18,6 +19,12 @@ const BackgroundMusic = () => {
   const [currentTrack] = useState(0)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+    
     const audio = audioRef.current
     if (!audio) return
 
@@ -31,7 +38,8 @@ const BackgroundMusic = () => {
     }
 
     const handleError = () => {
-      }
+      // Silenciar errores de audio
+    }
 
     // Eventos del audio
     audio.addEventListener('canplaythrough', handleCanPlayThrough)
@@ -42,10 +50,12 @@ const BackgroundMusic = () => {
       audio.removeEventListener('canplaythrough', handleCanPlayThrough)
       audio.removeEventListener('error', handleError)
     }
-  }, [])
+  }, [isClient])
 
   // Función para iniciar música después de interacción del usuario
   const initializeMusic = async () => {
+    if (!isClient) return
+    
     const audio = audioRef.current
     if (!audio || hasInteracted) return
 
@@ -53,12 +63,13 @@ const BackgroundMusic = () => {
       await audio.play()
       setHasInteracted(true)
     } catch (error) {
-      }
+      // Silenciar errores de reproducción
+    }
   }
 
   // Detectar primera interacción del usuario para iniciar música
   useEffect(() => {
-    if (!isLoaded || hasInteracted) return
+    if (!isClient || !isLoaded || hasInteracted || typeof document === 'undefined') return
 
     const handleFirstInteraction = () => {
       initializeMusic()
@@ -84,9 +95,11 @@ const BackgroundMusic = () => {
       document.removeEventListener('scroll', handleFirstInteraction)
       document.removeEventListener('keydown', handleFirstInteraction)
     }
-  }, [isLoaded, hasInteracted])
+  }, [isClient, isLoaded, hasInteracted])
 
   const toggleMute = async () => {
+    if (!isClient) return
+    
     const audio = audioRef.current
     if (!audio) return
 
@@ -102,7 +115,8 @@ const BackgroundMusic = () => {
         try {
           await audio.play()
         } catch (error) {
-          }
+          // Silenciar errores de reproducción
+        }
       }
       setIsMuted(false)
     } else {
@@ -112,57 +126,35 @@ const BackgroundMusic = () => {
     }
   }
 
-  // No mostrar nada si no está cargado
-  if (!isLoaded) return null
+  // No mostrar nada si no está cargado o no está en el cliente
+  if (!isLoaded || !isClient) return null
 
   return (
-    <>
-      {/* Elemento de audio oculto */}
+    <div className="fixed bottom-4 right-4 z-50">
+      <button
+        onClick={toggleMute}
+        className="bg-black/30 hover:bg-black/50 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-110"
+        title={isMuted ? "Activar música de fondo" : "Silenciar música de fondo"}
+        type="button"
+      >
+        {isMuted ? (
+          <VolumeX className="w-5 h-5" />
+        ) : (
+          <Volume2 className="w-5 h-5" />
+        )}
+      </button>
+      
+      {/* Audio element */}
       <audio
         ref={audioRef}
-        src={musicTracks[currentTrack]}
-        loop
         preload="auto"
-        style={{ display: 'none' }}
-        playsInline
         muted={isMuted}
-      />
-
-      {/* Botón flotante profesional */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <button
-          onClick={toggleMute}
-          className={`
-            w-12 h-12 rounded-full shadow-2xl flex items-center justify-center 
-            transition-all duration-300 backdrop-blur-sm hover:scale-110 active:scale-95
-            ${isMuted 
-              ? 'bg-red-500/90 hover:bg-red-400/90 text-white border-2 border-red-400/50 shadow-red-500/25' 
-              : 'bg-green-400/90 hover:bg-green-300/90 text-black border-2 border-green-400/50 shadow-green-400/25'
-            }
-          `}
-          title={isMuted ? 'Activar música de fondo' : 'Silenciar música de fondo'}
-          aria-label={isMuted ? 'Activar música de fondo' : 'Silenciar música de fondo'}
-        >
-          {isMuted ? (
-            <VolumeX className="w-5 h-5" />
-          ) : (
-            <Volume2 className="w-5 h-5" />
-          )}
-        </button>
-
-        {/* Indicador visual discreto cuando está activo */}
-        {!isMuted && hasInteracted && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
-        )}
-
-        {/* Tooltip de ayuda para primera vez */}
-        {!hasInteracted && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
-            Música ambiente del Instituto San Pablo
-          </div>
-        )}
-      </div>
-    </>
+        style={{ display: 'none' }}
+      >
+        <source src={musicTracks[currentTrack]} type="audio/mpeg" />
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+    </div>
   )
 }
 

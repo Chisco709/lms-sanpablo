@@ -10,7 +10,9 @@ export default function LandingProfessionalEnhanced() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    // Inyectar estilos CSS directamente
+    // Inyectar estilos CSS directamente solo en el cliente
+    if (typeof document === 'undefined') return;
+    
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
       @keyframes float {
@@ -175,15 +177,21 @@ export default function LandingProfessionalEnhanced() {
     document.head.appendChild(styleSheet);
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 100);
+      if (typeof window === 'undefined') return;
       
-      // Intersection Observer para animaciones en scroll
+      setScrolled(window.scrollY > 100);
+    };
+
+    // Configurar Intersection Observer para animaciones en scroll
+    let observer: IntersectionObserver | null = null;
+    
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       const observerOptions = {
         threshold: 0.1,
         rootMargin: '-50px 0px'
       };
 
-      const observer = new IntersectionObserver((entries) => {
+      observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-in');
@@ -192,21 +200,29 @@ export default function LandingProfessionalEnhanced() {
       }, observerOptions);
 
       document.querySelectorAll('[data-animate]').forEach((el) => {
-        observer.observe(el);
+        observer?.observe(el);
       });
-
-      return () => observer.disconnect();
-    };
+    }
 
     handleScroll();
-    window.addEventListener('scroll', handleScroll);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll);
+    }
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', handleScroll);
+      }
+      // Cleanup observer
+      if (observer) {
+        observer.disconnect();
+      }
       // Cleanup: remove injected styles
-      const injectedStyles = document.head.querySelector('style');
-      if (injectedStyles && injectedStyles.textContent && injectedStyles.textContent.includes('@keyframes float')) {
-        document.head.removeChild(injectedStyles);
+      if (typeof document !== 'undefined') {
+        const injectedStyles = document.head.querySelector('style');
+        if (injectedStyles && injectedStyles.textContent && injectedStyles.textContent.includes('@keyframes float')) {
+          document.head.removeChild(injectedStyles);
+        }
       }
     };
   }, []);

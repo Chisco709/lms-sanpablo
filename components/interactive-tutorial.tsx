@@ -146,8 +146,8 @@ export const InteractiveTutorial = ({ isOpen, onClose }: InteractiveTutorialProp
 
   const calculateOptimalPosition = (element: HTMLElement, preferredPosition: string): TutorialPosition => {
     const bounds = element.getBoundingClientRect()
-    const windowWidth = window.innerWidth
-    const windowHeight = window.innerHeight
+    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1024
+    const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 768
     const tutorialWidth = 380 // Más compacto
     const tutorialHeight = showDetails ? 420 : 280 // Altura dinámica
     const margin = 30
@@ -293,8 +293,14 @@ export const InteractiveTutorial = ({ isOpen, onClose }: InteractiveTutorialProp
       }
     }
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize)
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize)
+      }
+    }
   }, [highlightedElement, currentStep, isOpen, showDetails])
 
   const handleNext = () => {

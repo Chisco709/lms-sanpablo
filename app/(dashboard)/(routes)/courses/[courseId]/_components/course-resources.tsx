@@ -83,12 +83,14 @@ const ResourceItem = ({ resource }: { resource: CourseResource }) => {
   };
 
   const handleResourceClick = () => {
-    if (resource.type === "pdf") {
-      // Para PDFs, abrir en nueva pestaña para visualización
-      window.open(resource.url, "_blank");
-    } else {
-      // Para formularios y enlaces externos
-      window.open(resource.url, "_blank", "noopener,noreferrer");
+    if (typeof window !== 'undefined') {
+      if (resource.type === "pdf") {
+        // Para PDFs, abrir en nueva pestaña para visualización
+        window.open(resource.url, "_blank");
+      } else {
+        // Para formularios y enlaces externos
+        window.open(resource.url, "_blank", "noopener,noreferrer");
+      }
     }
   };
 
@@ -136,10 +138,12 @@ const ResourceItem = ({ resource }: { resource: CourseResource }) => {
             variant="ghost"
             onClick={() => {
               // Crear enlace de descarga
-              const link = document.createElement('a');
-              link.href = resource.url;
-              link.download = resource.name;
-              link.click();
+              if (typeof document !== 'undefined') {
+                const link = document.createElement('a');
+                link.href = resource.url;
+                link.download = resource.name;
+                link.click();
+              }
             }}
             className="p-2 h-auto"
             title="Descargar PDF"

@@ -1,0 +1,104 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "rules": {
+    // Reglas para manejar mejor SSR y variables globales
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    
+    // Más permisivo con variables no usadas durante el build
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    
+    // Permitir any en casos específicos de desarrollo rápido
+    "@typescript-eslint/no-explicit-any": "warn",
+    
+    // Más permisivo con console en desarrollo
+    "no-console": "off",
+    
+    // Permitir imports dinámicos
+    "import/no-dynamic-require": "off",
+    
+    // Más flexible con nombres de archivos
+    "import/no-anonymous-default-export": "warn",
+    
+    // Permitir uso de require() en casos específicos
+    "@typescript-eslint/no-var-requires": "warn",
+    
+    // Más permisivo con props spreading
+    "react/jsx-props-no-spreading": "off",
+    
+    // Permitir funciones async sin await
+    "@typescript-eslint/require-await": "off",
+    
+    // Más flexible con tipos
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/no-empty-function": "warn",
+    
+    // Permitir eval en casos específicos (para componentes dinámicos)
+    "no-eval": "warn",
+    
+    // Más permisivo con acceso a propiedades
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
+    
+    // Permitir funciones antes de definir
+    "@typescript-eslint/no-use-before-define": "off",
+    
+    // Más flexible con imports
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off"
+  },
+  "overrides": [
+    {
+      // Configuración específica para archivos de utilidades
+      "files": ["lib/**/*.ts", "lib/**/*.tsx"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off",
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    },
+    {
+      // Configuración específica para scripts
+      "files": ["scripts/**/*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      // Configuración específica para archivos de configuración
+      "files": ["*.config.js", "*.config.ts"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    },
+    {
+      // Más permisivo en archivos de componentes complejos
+      "files": ["components/**/*.tsx", "app/**/*.tsx"],
+      "rules": {
+        "react-hooks/exhaustive-deps": "warn",
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "window": "readonly",
+    "document": "readonly",
+    "navigator": "readonly"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+} 

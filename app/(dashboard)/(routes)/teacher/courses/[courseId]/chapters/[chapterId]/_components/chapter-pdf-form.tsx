@@ -82,7 +82,11 @@ export const ChapterPdfForm = ({
                 <p className="text-slate-400 text-sm">Archivo PDF disponible</p>
               </div>
               <Button
-                onClick={() => window.open(initialData.pdfUrl!, '_blank')}
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open(initialData.pdfUrl!, '_blank')
+                  }
+                }}
                 variant="ghost"
                 size="sm"
                 className="text-slate-400 hover:text-white"

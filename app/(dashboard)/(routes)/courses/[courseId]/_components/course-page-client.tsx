@@ -63,9 +63,11 @@ export const CoursePageClient = ({
       setExpandedTopics({ [course.pensumTopics[0].id]: true });
     }
     
-    // Track course view
-    trackLMSEvent.courseView(courseId, course.title);
-  }, [course.pensumTopics, courseId, course.title, trackLMSEvent]);
+    // Track course view solo en el cliente
+    if (mounted && typeof window !== 'undefined') {
+      trackLMSEvent.courseView(courseId, course.title);
+    }
+  }, [course.pensumTopics, courseId, course.title, trackLMSEvent, mounted]);
 
   const handleBackNavigation = () => {
     if (canGoBack) {
