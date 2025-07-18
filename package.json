@@ -20,6 +20,7 @@
     "cleanup-unwanted": "node scripts/cleanup-unwanted-courses.js",
     "improve-professor": "node scripts/improve-professor-mode.js",
     "optimize": "node scripts/optimize-performance.js",
+    "fix-publication": "node scripts/fix-publication-requirements.js",
     "clean": "rm -rf .next && rm -rf node_modules && rm -f package-lock.json",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",

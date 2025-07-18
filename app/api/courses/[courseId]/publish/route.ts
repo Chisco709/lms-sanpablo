@@ -18,17 +18,15 @@ export async function PATCH(
       where: {
         id: courseId,
         userId
-      },
-      include: {
-        chapters: true
       }
+      // ✅ Ya no necesitamos incluir capítulos para la validación
     });
 
     if (!course) {
       return new NextResponse("Curso no encontrado", { status: 404 });
     }
 
-    // Validar campos requeridos
+    // Validar campos requeridos - Solo 3 campos básicos según MODO_PROFESOR_MEJORADO
     const missingFields = [];
     if (!course.title) missingFields.push("título");
     if (!course.description) missingFields.push("descripción");
@@ -41,14 +39,8 @@ export async function PATCH(
       );
     }
 
-    const hasPublishedChapters = course.chapters.some(chapter => chapter.isPublished);
-
-    if (!hasPublishedChapters) {
-      return new NextResponse(
-        "Se requiere al menos un capítulo publicado. Por favor, publica al menos un capítulo antes de publicar el curso.",
-        { status: 400 }
-      );
-    }
+    // ✅ ARREGLADO: Ya no se requieren capítulos publicados
+    // Los capítulos son opcionales según las mejoras del modo profesor
 
     const publishedCourse = await db.course.update({
       where: {
