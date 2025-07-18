@@ -21,6 +21,7 @@
     "improve-professor": "node scripts/improve-professor-mode.js",
     "optimize": "node scripts/optimize-performance.js",
     "fix-publication": "node scripts/fix-publication-requirements.js",
+    "ultra-simple": "node scripts/ultra-simple-publication.js",
     "clean": "rm -rf .next && rm -rf node_modules && rm -f package-lock.json",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",

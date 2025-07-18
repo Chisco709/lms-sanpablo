@@ -73,10 +73,9 @@ const CourseIdPage = async ({
     },
   });
 
+  // ✅ SIMPLIFICADO: Solo título es requerido para publicar
   const requiredFields = [
     course.title,
-    course.description,
-    course.imageUrl,
   ];
 
   const totalFields = requiredFields.length;
@@ -84,6 +83,14 @@ const CourseIdPage = async ({
 
   const completionText = `(${completedFields}/${totalFields})`;
   const isComplete = requiredFields.every(Boolean);
+
+  // Debug: Mostrar qué campos están completados
+  console.log('🔍 DEBUG - Campos del curso:', {
+    title: course.title ? '✅' : '❌',
+    description: course.description ? '✅' : '❌', 
+    imageUrl: course.imageUrl ? '✅' : '❌',
+    isComplete
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -103,7 +110,7 @@ const CourseIdPage = async ({
               Configurar Curso
             </h1>
             <p className="text-slate-400">
-              Completa todos los campos {completionText}
+              Solo título requerido para publicar {completionText}
             </p>
           </div>
         </div>
@@ -138,7 +145,7 @@ const CourseIdPage = async ({
         </div>
         {!isComplete && (
           <p className="text-sm text-yellow-400 mt-2">
-            Completa todos los campos para poder publicar el curso
+            Solo necesitas completar el título para poder publicar el curso
           </p>
         )}
       </div>
@@ -175,8 +182,8 @@ const CourseIdPage = async ({
             <ul className="text-blue-300/80 space-y-1 text-sm">
               <li>• <strong>Paso 1:</strong> Crea temas del pensum para organizar</li>
               <li>• <strong>Paso 2:</strong> Agrega capítulos a cada tema</li>
-              <li>• <strong>Paso 3:</strong> Completa título, descripción e imagen</li>
-              <li>• <strong>¿Listo?</strong> Publica cuando tengas contenido básico</li>
+              <li>• <strong>Paso 3:</strong> Solo necesitas el título para publicar</li>
+              <li>• <strong>¿Listo?</strong> ¡Publica cuando quieras!</li>
             </ul>
           </div>
         </div>

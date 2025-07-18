@@ -26,15 +26,10 @@ export async function PATCH(
       return new NextResponse("Curso no encontrado", { status: 404 });
     }
 
-    // Validar campos requeridos - Solo 3 campos básicos según MODO_PROFESOR_MEJORADO
-    const missingFields = [];
-    if (!course.title) missingFields.push("título");
-    if (!course.description) missingFields.push("descripción");
-    if (!course.imageUrl) missingFields.push("imagen");
-
-    if (missingFields.length > 0) {
+    // ✅ ULTRA SIMPLIFICADO: Solo título es requerido para publicar
+    if (!course.title) {
       return new NextResponse(
-        `Faltan los siguientes campos: ${missingFields.join(", ")}`,
+        "El título del curso es requerido para publicar",
         { status: 400 }
       );
     }
