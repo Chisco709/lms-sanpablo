@@ -58,76 +58,12 @@ interface Activity {
   courseTitle?: string
 }
 
-const mockCourses: Course[] = [
-  {
-    id: '1',
-    title: 'Técnico en Primera Infancia',
-    progress: 65,
-    totalChapters: 12,
-    completedChapters: 8,
-    instructor: 'Prof. María González',
-    image: '/curso-primera-infancia.jpg',
-    category: 'Certificación ',
-    nextChapter: 'Desarrollo Cognitivo 0-3 años',
-    lastAccessed: new Date(),
-    estimatedTime: 45
-  },
-  {
-    id: '2',
-    title: 'Inglés Certificado B2',
-    progress: 30,
-    totalChapters: 16,
-    completedChapters: 5,
-    instructor: 'Prof. John Smith',
-    image: '/curso-ingles.jpg',
-    category: 'Idiomas',
-    nextChapter: 'Present Perfect Continuous',
-    lastAccessed: new Date(Date.now() - 86400000),
-    estimatedTime: 30
-  }
-]
+// Datos mock comentados - usar datos reales en producción
+const mockCourses: Course[] = [];
 
-const mockAchievements: Achievement[] = [
-  {
-    id: '1',
-    title: 'Primera Certificación',
-    description: 'Completaste tu primer curso',
-    icon: '🎓',
-    unlockedAt: new Date()
-  },
-  {
-    id: '2',
-    title: 'Estudiante Dedicado',
-    description: 'Completa 5 capítulos en una semana',
-    icon: '📚',
-    progress: 80
-  },
-  {
-    id: '3',
-    title: 'Racha de Fuego',
-    description: 'Estudia 7 días consecutivos',
-    icon: '🔥',
-    progress: 57
-  }
-]
+const mockAchievements: Achievement[] = [];
 
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    type: 'completed_chapter',
-    title: 'Capítulo completado',
-    subtitle: 'Nutrición en la Primera Infancia',
-    timestamp: new Date(),
-    courseTitle: 'Técnico en Primera Infancia'
-  },
-  {
-    id: '2',
-    type: 'achievement',
-    title: 'Nuevo logro desbloqueado',
-    subtitle: '🎓 Primera Certificación',
-    timestamp: new Date(Date.now() - 3600000)
-  }
-]
+const mockActivities: Activity[] = [];
 
 interface MobileStudentDashboardProps {
   courses?: Course[]

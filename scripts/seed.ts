@@ -6,24 +6,21 @@ async function main() {
     try {
         console.log("🌱 Iniciando población de la base de datos...");
 
-        // Crear categorías específicas para programas técnicos
+        // Crear categorías específicas para Instituto San Pablo
         const categories = [
-            { name: "Técnico en Computación" },
-            { name: "Técnico en Electrónica" },
-            { name: "Técnico en Mecánica" },
-            { name: "Técnico en Electricidad" },
-            { name: "Técnico en Soldadura" },
-            { name: "Técnico en Refrigeración" },
-            { name: "Técnico en Automotriz" },
-            { name: "Técnico en Construcción" },
             { name: "Primera Infancia" },
             { name: "Inglés" },
-            { name: "Matemáticas" },
-            { name: "Química" },
-            { name: "Física" }
+            { name: "Pedagogía" },
+            { name: "Educación" },
+            { name: "Desarrollo Infantil" },
+            { name: "Psicología Infantil" },
+            { name: "Metodologías de Enseñanza" },
+            { name: "Estimulación Temprana" },
+            { name: "Cuidado Infantil" },
+            { name: "Desarrollo Cognitivo" }
         ];
 
-        console.log("📚 Creando categorías técnicas...");
+        console.log("📚 Creando categorías educativas...");
         for (const category of categories) {
             await database.category.upsert({
                 where: { name: category.name },
@@ -32,11 +29,11 @@ async function main() {
             });
         }
 
-        console.log("✅ Categorías técnicas creadas exitosamente");
+        console.log("✅ Categorías educativas creadas exitosamente");
 
         // ⚠️  CURSOS AUTOMÁTICOS DESHABILITADOS
         console.log("ℹ️  Los cursos automáticos han sido deshabilitados");
-        console.log("ℹ️  Para crear cursos de demostración, usa el modo profesor en la interfaz web");
+        console.log("ℹ️  Para crear cursos, usa el modo profesor en la interfaz web");
         
         // Mostrar resumen
         const totalCategories = await database.category.count();
@@ -45,7 +42,7 @@ async function main() {
         console.log("\n📊 RESUMEN:");
         console.log(`   📚 Categorías disponibles: ${totalCategories}`);
         console.log(`   🎓 Cursos existentes: ${totalCourses}`);
-        console.log("\n✅ Base de datos lista para usar");
+        console.log("\n✅ Base de datos lista para Instituto San Pablo");
         
     } catch (error) {
         console.error("❌ Error poblando la base de datos:", error);
@@ -54,10 +51,4 @@ async function main() {
     }
 }
 
-// Ejecutar la función main
-main()
-    .then(() => console.log("\n✨ Seeding completado exitosamente"))
-    .catch((e) => {
-        console.error("💥 Error durante el seeding:", e);
-        process.exit(1);
-    });
+main();

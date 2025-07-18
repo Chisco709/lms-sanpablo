@@ -17,6 +17,7 @@
     "precheck": "npm run type-check && npm run lint:check",
     "seed": "tsx scripts/seed.ts",
     "cleanup": "tsx scripts/cleanup-database.ts",
+    "cleanup-unwanted": "node scripts/cleanup-unwanted-courses.js",
     "optimize": "node scripts/optimize-performance.js",
     "clean": "rm -rf .next && rm -rf node_modules && rm -f package-lock.json",
     "prisma:generate": "prisma generate",

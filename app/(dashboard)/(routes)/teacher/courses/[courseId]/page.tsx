@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CourseActions } from "./_components/course-actions";
 import { CourseInfoForm } from "./_components/course-info-form";
 import { ChaptersList } from "./_components/chapters-list";
+import { PensumTopicsList } from "./_components/pensum-topics-list";
 
 const CourseIdPage = async ({
   params
@@ -76,12 +77,11 @@ const CourseIdPage = async ({
     course.title,
     course.description,
     course.imageUrl,
-    course.categoryId,
-    course.chapters.some(chapter => chapter.isPublished),
   ];
 
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
+
   const completionText = `(${completedFields}/${totalFields})`;
   const isComplete = requiredFields.every(Boolean);
 
@@ -160,16 +160,21 @@ const CourseIdPage = async ({
             initialData={course.chapters}
             courseId={course.id}
           />
+
+          <PensumTopicsList 
+            initialData={course.pensumTopics}
+            courseId={course.id}
+          />
           
           {/* Información adicional */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <h3 className="text-blue-400 font-medium mb-2">💡 Próximos pasos</h3>
+            <h3 className="text-blue-400 font-medium mb-2">💡 Guía rápida de publicación</h3>
             <ul className="text-blue-300/80 space-y-1 text-sm">
-              <li>• Agrega una descripción atractiva del curso</li>
-              <li>• Sube una imagen representativa</li>
-              <li>• Crea capítulos con contenido de YouTube y PDFs</li>
-              <li>• Organiza el contenido en temas del pensum</li>
-              <li>• Publica cuando esté todo listo</li>
+              <li>• <strong>Campos obligatorios:</strong> Título, descripción e imagen</li>
+              <li>• <strong>Categoría:</strong> Opcional pero recomendada</li>
+              <li>• <strong>Capítulos:</strong> No son obligatorios para publicar</li>
+              <li>• <strong>Temas de pensum:</strong> Organiza el contenido por módulos</li>
+              <li>• <strong>¿Listo?</strong> Publica cuando tengas el contenido básico</li>
             </ul>
           </div>
         </div>

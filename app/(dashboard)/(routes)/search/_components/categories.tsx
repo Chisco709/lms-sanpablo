@@ -1,44 +1,35 @@
-"use client"
+"use client";
 
-import { Category } from "@prisma/client"
-import { IconType } from "react-icons"
 import {
-  FcEngineering,
-  FcFilmReel,
-  FcMultipleDevices,
-  FcMusic,
-  FcOldTimeCamera,
-  FcSalesPerformance,
+  FcGlobe,
+  FcSupport,
   FcSportsMode,
-  FcElectronics,
-  FcAutomotive,
-  FcBusiness
-} from "react-icons/fc"
-import { CategoryItem } from "./category-item"
+  FcManager,
+  FcMultipleDevices,
+  FcMindMap,
+  FcMusic,
+  FcBusinessContact,
+} from "react-icons/fc";
+import { IconType } from "react-icons";
+import { Category } from "@prisma/client";
+import { CategoryItem } from "./category-item";
 
 interface CategoriesProps {
-  items: Category[]
+  items: Category[];
 }
 
-const iconMap: Record<Category["name"], IconType> = {
-  // Categorías técnicas en español
-  "Técnico en Computación": FcMultipleDevices,
-  "Técnico en Electrónica": FcElectronics,
-  "Técnico en Mecánica": FcEngineering,
-  "Técnico en Electricidad": FcEngineering,
-  "Técnico en Soldadura": FcEngineering,
-  "Técnico en Refrigeración": FcEngineering,
-  "Técnico en Automotriz": FcAutomotive,
-  "Técnico en Construcción": FcBusiness,
-  // Categorías antiguas por compatibilidad
-  "Music": FcMusic,
-  "Photography": FcOldTimeCamera,
-  "Fitness": FcSportsMode,
-  "Accounting": FcSalesPerformance,
-  "Computer Science": FcMultipleDevices,
-  "Filming": FcFilmReel,
-  "Engineering": FcEngineering,
-}
+const iconMap: Record<string, IconType> = {
+  "Primera Infancia": FcSupport,
+  "Inglés": FcGlobe,
+  "Pedagogía": FcManager,
+  "Educación": FcBusinessContact,
+  "Desarrollo Infantil": FcSportsMode,
+  "Psicología Infantil": FcMindMap,
+  "Metodologías de Enseñanza": FcMultipleDevices,
+  "Estimulación Temprana": FcMusic,
+  "Cuidado Infantil": FcSupport,
+  "Desarrollo Cognitivo": FcMindMap,
+};
 
 export const Categories = ({ items }: CategoriesProps) => {
   return (
@@ -52,5 +43,5 @@ export const Categories = ({ items }: CategoriesProps) => {
         />
       ))}
     </div>
-  )
-} 
+  );
+}; 
