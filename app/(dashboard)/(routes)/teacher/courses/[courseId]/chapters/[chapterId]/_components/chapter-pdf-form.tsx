@@ -97,7 +97,7 @@ export const ChapterPdfForm = ({
       {isEditing && (
         <div>
           <FileUpload
-            endpoint="coursePdf"
+            endpoint="chapterPdf"
             onChange={(url) => {
               if (url) {
                 onSubmit({ pdfUrl: url });
