@@ -156,25 +156,27 @@ const CourseIdPage = async ({
 
         {/* Columna derecha - Capítulos y contenido */}
         <div className="space-y-6">
-          <ChaptersList 
-            initialData={course.chapters}
-            courseId={course.id}
-          />
-
+          {/* Primero: Temas del pensum */}
           <PensumTopicsList 
             initialData={course.pensumTopics}
             courseId={course.id}
+          />
+
+          {/* Segundo: Capítulos (dependen de temas) */}
+          <ChaptersList 
+            initialData={course.chapters}
+            courseId={course.id}
+            pensumTopics={course.pensumTopics}
           />
           
           {/* Información adicional */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <h3 className="text-blue-400 font-medium mb-2">💡 Guía rápida de publicación</h3>
             <ul className="text-blue-300/80 space-y-1 text-sm">
-              <li>• <strong>Campos obligatorios:</strong> Título, descripción e imagen</li>
-              <li>• <strong>Categoría:</strong> Opcional pero recomendada</li>
-              <li>• <strong>Capítulos:</strong> No son obligatorios para publicar</li>
-              <li>• <strong>Temas de pensum:</strong> Organiza el contenido por módulos</li>
-              <li>• <strong>¿Listo?</strong> Publica cuando tengas el contenido básico</li>
+              <li>• <strong>Paso 1:</strong> Crea temas del pensum para organizar</li>
+              <li>• <strong>Paso 2:</strong> Agrega capítulos a cada tema</li>
+              <li>• <strong>Paso 3:</strong> Completa título, descripción e imagen</li>
+              <li>• <strong>¿Listo?</strong> Publica cuando tengas contenido básico</li>
             </ul>
           </div>
         </div>

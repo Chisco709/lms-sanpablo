@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -8,18 +8,18 @@ export async function PATCH(
   { params }: { params: Promise<{ courseId: string; topicId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { ...values } = await req.json();
     const { courseId, topicId } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const courseOwner = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       }
     });
 
@@ -48,17 +48,17 @@ export async function DELETE(
   { params }: { params: Promise<{ courseId: string; topicId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const user = await currentUser();
     const { courseId, topicId } = await params;
 
-    if (!userId) {
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const courseOwner = await db.course.findUnique({
       where: {
         id: courseId,
-        userId: userId,
+        userId: user.id,
       }
     });
 
@@ -85,6 +85,7 @@ export async function DELETE(
 
     return NextResponse.json(deletedTopic);
   } catch (error) {
+    console.log("[PENSUM_TOPIC_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

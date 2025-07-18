@@ -7,27 +7,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Plus, BookOpen, Edit, Eye, EyeOff, Grip, Trash } from "lucide-react";
+import { Plus, BookOpen, Edit, Grip, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Chapter } from "@prisma/client";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Chapter, PensumTopic } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const formSchema = z.object({
   title: z.string().min(1, "El título es requerido"),
+  pensumTopicId: z.string().min(1, "Debes seleccionar un tema del pensum"),
 });
 
 interface ChaptersListProps {
   initialData: Chapter[];
   courseId: string;
+  pensumTopics?: PensumTopic[];
 }
 
 export const ChaptersList = ({
   initialData,
-  courseId
+  courseId,
+  pensumTopics = []
 }: ChaptersListProps) => {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
@@ -37,10 +41,12 @@ export const ChaptersList = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      pensumTopicId: "",
     },
   });
 
   const { isSubmitting, isValid } = form.formState;
+  const hasPensumTopics = pensumTopics && pensumTopics.length > 0;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -80,22 +86,51 @@ export const ChaptersList = ({
           <BookOpen className="h-4 w-4 text-green-400" />
           Capítulos del curso
         </h2>
-        <Button
-          onClick={() => setIsCreating(!isCreating)}
-          variant="ghost"
-          size="sm"
-          className="text-slate-400 hover:text-white"
-        >
-          {isCreating ? "Cancelar" : (
-            <>
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar capítulo
-            </>
-          )}
-        </Button>
+        
+        {hasPensumTopics ? (
+          <Button
+            onClick={() => setIsCreating(!isCreating)}
+            variant="ghost"
+            size="sm"
+            className="text-slate-400 hover:text-white"
+          >
+            {isCreating ? "Cancelar" : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                Agregar capítulo
+              </>
+            )}
+          </Button>
+        ) : (
+          <div className="text-slate-500 text-sm">
+            Primero crea temas de pensum
+          </div>
+        )}
       </div>
 
-      {isCreating && (
+      {/* Mensaje cuando no hay temas de pensum */}
+      {!hasPensumTopics && (
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="text-yellow-400 font-medium mb-2">
+                ⚡ Flujo de trabajo mejorado
+              </h3>
+              <div className="text-yellow-300/80 text-sm space-y-1">
+                <p><strong>1. Crea temas de pensum primero</strong> (ej: "Fundamentos", "Práctica")</p>
+                <p><strong>2. Luego crea capítulos</strong> y asígnalos a cada tema</p>
+                <p><strong>3. Organiza mejor</strong> el contenido para los estudiantes</p>
+              </div>
+              <p className="text-yellow-400 text-sm mt-3">
+                👆 Desplázate hacia abajo para crear tu primer tema de pensum
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isCreating && hasPensumTopics && (
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -103,9 +138,35 @@ export const ChaptersList = ({
           >
             <FormField
               control={form.control}
+              name="pensumTopicId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Tema del pensum</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                        <SelectValue placeholder="Selecciona un tema del pensum" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {pensumTopics.map((topic) => (
+                        <SelectItem key={topic.id} value={topic.id}>
+                          {topic.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-white">Título del capítulo</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
@@ -118,6 +179,7 @@ export const ChaptersList = ({
                 </FormItem>
               )}
             />
+            
             <div className="flex items-center gap-x-2">
               <Button
                 disabled={!isValid || isSubmitting}
@@ -125,7 +187,7 @@ export const ChaptersList = ({
                 size="sm"
                 className="bg-green-600 hover:bg-green-700"
               >
-                Crear
+                Crear capítulo
               </Button>
             </div>
           </form>
@@ -136,7 +198,7 @@ export const ChaptersList = ({
         "space-y-2",
         isUpdating && "pointer-events-none opacity-60"
       )}>
-        {initialData.length === 0 && (
+        {initialData.length === 0 && hasPensumTopics && (
           <div className="text-center py-8">
             <BookOpen className="h-8 w-8 text-slate-400 mx-auto mb-2" />
             <p className="text-slate-400">No hay capítulos creados</p>
