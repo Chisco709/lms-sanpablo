@@ -15,6 +15,19 @@ import { Metadata } from "next"
 export const metadata: Metadata = {
   title: 'Mi Dashboard - Estudiante',
   description: 'Accede a tus cursos, revisa tu progreso y descubre nuevas oportunidades de aprendizaje en el Instituto San Pablo.',
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 const StudentPage = async () => {

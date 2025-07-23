@@ -2,6 +2,25 @@
 import { SignIn } from "@clerk/nextjs"
 import Image from "next/image"
 
+// Metadata para páginas de autenticación - NO INDEXAR
+// export const metadata: Metadata = {
+//   title: 'Iniciar Sesión - Instituto San Pablo',
+//   description: 'Accede a tu cuenta del Instituto San Pablo para continuar con tu formación técnica.',
+//   robots: {
+//     index: true,
+//     follow: true,
+//     nocache: false,
+//     googleBot: {
+//       index: true,
+//       follow: true,
+//       noimageindex: false,
+//       'max-video-preview': -1,
+//       'max-image-preview': 'large',
+//       'max-snippet': -1,
+//     },
+//   },
+// }
+
 export default function Page() {
   return (
     <div className="min-h-screen w-full bg-black relative overflow-hidden">

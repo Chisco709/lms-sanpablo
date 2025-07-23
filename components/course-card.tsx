@@ -5,7 +5,7 @@ import Link from "next/link"
 import { BookOpen, Play, CheckCircle, Star, Clock } from "lucide-react"
 import { formatPrice } from "@/lib/format"
 import { CourseProgress } from "@/components/course-progress"
-import { useState, memo, useMemo } from "react"
+import { useState, memo, useMemo, useEffect } from "react"
 
 interface CourseCardProps {
   id: string
@@ -31,6 +31,12 @@ export const CourseCard = memo(({
   isPurchased
 }: CourseCardProps) => {
   const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  
+  // Debug: Log image URL for troubleshooting
+  useEffect(() => {
+    console.log(`CourseCard ${id} - imageUrl:`, imageUrl)
+  }, [id, imageUrl])
   
   // Memoizar cálculos costosos
   const courseState = useMemo(() => ({
@@ -44,14 +50,28 @@ export const CourseCard = memo(({
 
   // Determinar la imagen a usar con fallbacks mejorados
   const getImageSrc = useMemo(() => {
+    // Si hay error de carga, usar fallback
     if (imageError) {
-      return "/logo-sanpablo.jpg" // Fallback principal
+      console.log(`CourseCard ${id} - Using fallback due to image error`)
+      return "/logo-sanpablo.jpg"
     }
+    
+    // Si no hay URL o está vacía, usar fallback
     if (!imageUrl || imageUrl.trim() === '' || imageUrl === '/placeholder-course.jpg') {
-      return "/logo-sanpablo.jpg" // URL limpia para casos vacíos y placeholder
+      console.log(`CourseCard ${id} - Using fallback due to empty imageUrl:`, imageUrl)
+      return "/logo-sanpablo.jpg"
     }
-    return imageUrl
-  }, [imageError, imageUrl])
+    
+    // Validar que la URL sea válida
+    try {
+      new URL(imageUrl)
+      console.log(`CourseCard ${id} - Using imageUrl:`, imageUrl)
+      return imageUrl
+    } catch (error) {
+      console.log(`CourseCard ${id} - Invalid URL, using fallback:`, imageUrl)
+      return "/logo-sanpablo.jpg"
+    }
+  }, [imageError, imageUrl, id])
 
   const courseUrl = `/courses/${id}`
 
@@ -74,12 +94,17 @@ export const CourseCard = memo(({
                 src={getImageSrc}
                 alt={`Imagen del curso ${title}`}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 onError={() => setImageError(true)}
-                loading="lazy"
-                quality={75}
+                onLoad={() => setImageLoaded(true)}
+                priority
               />
+              
+              {/* Loading state */}
+              {!imageLoaded && !imageError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+                </div>
+              )}
               
               {/* Overlay con gradiente */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>

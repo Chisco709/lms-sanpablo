@@ -333,3 +333,18 @@ model Certificate {
   
   @@index([userId])
 }
+
+// Modelo para cédulas/TI autorizadas
+model AuthorizedDocument {
+  id String @id @default(uuid())
+  documentNumber String @unique // Número de cédula o TI
+  documentType String // "CC" (Cédula de Ciudadanía) o "TI" (Tarjeta de Identidad)
+  fullName String // Nombre completo del estudiante
+  isActive Boolean @default(true)
+  notes String? // Notas adicionales
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([documentNumber])
+  @@index([documentType])
+}

@@ -19,12 +19,20 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Debug: Log current state
+  useEffect(() => {
+    console.log(`SmartImageUpload ${courseId} - value:`, value);
+    console.log(`SmartImageUpload ${courseId} - currentImage:`, currentImage);
+  }, [courseId, value, currentImage]);
+
   // Sincronizar con el prop value
   useEffect(() => {
     setCurrentImage(value);
   }, [value]);
 
   const handleUploadComplete = async (url?: string) => {
+    console.log(`SmartImageUpload ${courseId} - Upload complete, URL:`, url);
+    
     if (!url) {
       toast.error("❌ Error: No se recibió URL de la imagen");
       setIsUploading(false);
@@ -37,10 +45,14 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
       // Actualizar estado local inmediatamente
       setCurrentImage(url);
       
+      console.log(`SmartImageUpload ${courseId} - Saving to database:`, url);
+      
       // Guardar en base de datos
       const response = await axios.patch(`/api/courses/${courseId}`, { 
         imageUrl: url 
       });
+      
+      console.log(`SmartImageUpload ${courseId} - Database response:`, response.data);
       
       toast.success("🎉 ¡Imagen guardada exitosamente!");
       
@@ -48,7 +60,7 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
       onSuccess?.(url);
       
     } catch (error) {
-      console.error("❌ Error al guardar imagen:", error);
+      console.error(`SmartImageUpload ${courseId} - Error saving image:`, error);
       toast.error("❌ Error al guardar la imagen");
       
       // Revertir estado local
@@ -60,6 +72,8 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
   };
 
   const handleRemove = async () => {
+    console.log(`SmartImageUpload ${courseId} - Removing image`);
+    
     try {
       setIsSaving(true);
       
@@ -75,7 +89,7 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
       onSuccess?.("");
       
     } catch (error) {
-      console.error("❌ Error al remover imagen:", error);
+      console.error(`SmartImageUpload ${courseId} - Error removing image:`, error);
       toast.error("❌ Error al remover la imagen");
       
       // Revertir estado local
@@ -94,6 +108,12 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
             className="object-cover"
             alt="Imagen del curso"
             src={currentImage}
+            onError={(e) => {
+              console.error(`SmartImageUpload ${courseId} - Image display error:`, currentImage);
+            }}
+            onLoad={() => {
+              console.log(`SmartImageUpload ${courseId} - Image displayed successfully:`, currentImage);
+            }}
           />
           
           {/* Overlay de estado */}

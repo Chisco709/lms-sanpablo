@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }).catch(() => [])
 
-  // URLs estáticas principales
+  // URLs estáticas principales - SOLO PÁGINAS PÚBLICAS
   const staticUrls: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -23,33 +23,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 1,
     },
-    {
-      url: `${baseUrl}/student`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/search`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/certificates`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/progress`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
+    // Removidas las URLs privadas del dashboard
+    // /student, /search, /certificates, /progress son áreas privadas
   ]
 
-  // URLs dinámicas de cursos
+  // URLs dinámicas de cursos - SOLO PÁGINAS PÚBLICAS DE CURSOS
   const courseUrls: MetadataRoute.Sitemap = courses.map((course) => ({
     url: `${baseUrl}/courses/${course.id}`,
     lastModified: course.updatedAt,

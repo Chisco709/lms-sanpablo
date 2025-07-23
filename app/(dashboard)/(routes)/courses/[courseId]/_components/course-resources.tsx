@@ -56,6 +56,17 @@ const ResourceButton = ({
 
 // Resource Item Component
 const ResourceItem = ({ resource }: { resource: CourseResource }) => {
+  // Mostrar PDF si el tipo es pdf
+  if (resource.type === "pdf") {
+    return (
+      <a href={resource.url} target="_blank" rel="noopener noreferrer" className="block p-3 bg-red-400/10 border border-red-400/20 rounded-lg mb-2">
+        <FileText className="h-4 w-4 text-red-400 inline-block mr-2" />
+        <span className="font-medium text-slate-300">{resource.name}</span>
+        <span className="ml-2 text-xs text-slate-400">PDF</span>
+      </a>
+    );
+  }
+
   const getResourceIcon = () => {
     switch (resource.type) {
       case "pdf":
@@ -301,4 +312,4 @@ export const useCourseResources = (courseId: string): CourseResource[] => {
       description: "Herramienta online para práctica"
     }
   ];
-}; 
+};

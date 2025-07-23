@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, GraduationCap, BookOpen, Trophy, User, BarChart3 } from "lucide-react";
+import { Layout, GraduationCap, BookOpen, Trophy, User, BarChart3, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
 import { useUser } from "@clerk/nextjs";
@@ -43,6 +43,11 @@ const teacherRoutes = [
     icon: User,
     label: "Estudiantes",
     href: "/teacher/students",
+  },
+  {
+    icon: Shield,
+    label: "Documentos Autorizados",
+    href: "/teacher/manage-documents",
   },
 ];
 

@@ -80,7 +80,12 @@ export async function PATCH(
         courseId: courseId
       },
       data: {
-        ...values
+        title: values.title,
+        description: values.description,
+        videoUrl: values.videoUrl,
+        pdfUrl: values.pdfUrl,
+        googleFormUrl: values.googleFormUrl,
+        isFree: values.isFree,
       }
     });
 
