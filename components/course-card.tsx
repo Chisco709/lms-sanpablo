@@ -50,26 +50,14 @@ export const CourseCard = memo(({
 
   // Determinar la imagen a usar con fallbacks mejorados
   const getImageSrc = useMemo(() => {
-    // Si hay error de carga, usar fallback
-    if (imageError) {
-      console.log(`CourseCard ${id} - Using fallback due to image error`)
-      return "/logo-sanpablo.jpg"
+    if (imageError || !imageUrl || imageUrl.trim() === '' || imageUrl === '/placeholder-course.jpg') {
+      return "/logo-sanpablo.jpg";
     }
-    
-    // Si no hay URL o está vacía, usar fallback
-    if (!imageUrl || imageUrl.trim() === '' || imageUrl === '/placeholder-course.jpg') {
-      console.log(`CourseCard ${id} - Using fallback due to empty imageUrl:`, imageUrl)
-      return "/logo-sanpablo.jpg"
-    }
-    
-    // Validar que la URL sea válida
     try {
-      new URL(imageUrl)
-      console.log(`CourseCard ${id} - Using imageUrl:`, imageUrl)
-      return imageUrl
+      new URL(imageUrl);
+      return imageUrl;
     } catch (error) {
-      console.log(`CourseCard ${id} - Invalid URL, using fallback:`, imageUrl)
-      return "/logo-sanpablo.jpg"
+      return "/logo-sanpablo.jpg";
     }
   }, [imageError, imageUrl, id])
 
