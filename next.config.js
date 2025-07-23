@@ -26,6 +26,7 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 3600,
+    domains: ['res.cloudinary.com'],
   },
 
   poweredByHeader: false,
