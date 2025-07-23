@@ -123,9 +123,25 @@ export async function PATCH(
       return new NextResponse("Course not found", { status: 404 });
     }
 
-    // Validar y actualizar solo la descripción
-    if (typeof values.description !== "string" || values.description.trim() === "") {
-      return new NextResponse("Description is required and must be a string", { status: 400 });
+    // Construir objeto data dinámicamente
+    const data: any = {};
+    if (values.description !== undefined) {
+      if (typeof values.description === "string") {
+        data.description = values.description;
+      } else if (values.description === null) {
+        data.description = null;
+      }
+    }
+    if (values.imageUrl !== undefined) {
+      if (typeof values.imageUrl === "string") {
+        data.imageUrl = values.imageUrl;
+      } else if (values.imageUrl === null) {
+        data.imageUrl = null;
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return new NextResponse("No valid fields to update", { status: 400 });
     }
 
     const updatedCourse = await db.course.update({
@@ -133,9 +149,7 @@ export async function PATCH(
         id: courseId,
         userId: userId
       },
-      data: {
-        description: values.description
-      }
+      data
     });
 
     return NextResponse.json(updatedCourse);
