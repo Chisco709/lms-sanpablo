@@ -145,23 +145,25 @@ export async function PATCH(
             }
         }
 
+        // Construir objeto data dinámicamente
+        const data: any = {};
+        if (values.title !== undefined) data.title = values.title;
+        if (values.description !== undefined) data.description = values.description;
+        if (values.imageUrl !== undefined) data.imageUrl = values.imageUrl;
+        if (values.categoryId !== undefined) data.categoryId = values.categoryId;
+
         const course = await db.course.update({
             where: {
                 id: courseId,
                 userId
             },
-            data: {
-                title: values.title,
-                description: values.description,
-                imageUrl: values.imageUrl,
-                categoryId: values.categoryId,
-            }
+            data
         }) 
 
         console.log(`API PATCH /api/courses/${courseId} - Update successful:`, course);
         return NextResponse.json(course)
     } catch (error) {
-        console.error(`API PATCH /api/courses/${courseId} - Error:`, error);
+        console.error(`API PATCH /api/courses/ - Error:`, error);
         return new NextResponse("Internal Error", { status: 500 })
     }
 }
