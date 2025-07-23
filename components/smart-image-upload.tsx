@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileUpload } from "@/components/file-upload";
+import { LocalFileUpload } from "@/components/local-file-upload";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, X, CheckCircle, Loader2, Upload } from "lucide-react";
 import Image from "next/image";
@@ -187,11 +187,11 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
       {isUploading && (
         <div className="space-y-4">
           <div className="relative">
-            <FileUpload
-              endpoint="courseImage"
+            <LocalFileUpload
+              endpoint="/api/upload-image"
+              accept="image/*"
               onChange={handleUploadComplete}
             />
-            
             {isSaving && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 flex items-center gap-2">
@@ -215,4 +215,4 @@ export const SmartImageUpload = ({ value, courseId, onSuccess }: SmartImageUploa
       )}
     </div>
   );
-}; 
+};
