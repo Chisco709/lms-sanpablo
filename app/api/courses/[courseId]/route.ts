@@ -148,7 +148,16 @@ export async function PATCH(
         // Construir objeto data dinámicamente
         const data: any = {};
         if (values.title !== undefined) data.title = values.title;
-        if (values.description !== undefined) data.description = values.description;
+        // Limpieza y validación de campos
+        if (values.description !== undefined && values.description !== null) {
+          if (typeof values.description !== "string") {
+            data.description = String(values.description);
+          } else {
+            data.description = values.description;
+          }
+        } else if (values.description === null) {
+          data.description = null;
+        }
         if (values.imageUrl !== undefined) data.imageUrl = values.imageUrl;
         if (values.categoryId !== undefined) data.categoryId = values.categoryId;
 
