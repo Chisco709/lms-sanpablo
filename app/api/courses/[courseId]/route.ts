@@ -149,11 +149,11 @@ export async function PATCH(
         const data: any = {};
         if (values.title !== undefined) data.title = values.title;
         // Limpieza y validación de campos
-        if (values.description !== undefined && values.description !== null) {
-          if (typeof values.description !== "string") {
-            data.description = String(values.description);
+        if (values.description !== undefined) {
+          if (values.description === null || values.description === "") {
+            data.description = null;
           } else {
-            data.description = values.description;
+            data.description = String(values.description);
           }
         } else if (values.description === null) {
           data.description = null;
