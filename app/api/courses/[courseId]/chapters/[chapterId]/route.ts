@@ -80,10 +80,12 @@ export async function PATCH(
         courseId: courseId
       },
       data: {
+        // Solo actualiza pdfUrl si se envía
+        pdfUrl: typeof values.pdfUrl === "string" && values.pdfUrl.trim() !== "" ? values.pdfUrl : undefined,
+        // Mantener los demás campos si se envían
         title: values.title,
         description: values.description,
         videoUrl: values.videoUrl,
-        pdfUrl: values.pdfUrl,
         googleFormUrl: values.googleFormUrl,
         isFree: values.isFree,
       }

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: "dqzjwkkms",
+  api_key: "277645133612919",
+  api_secret: "Z0fT18rKqWFOv1WKYz4XfFIflVA",
+});
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
@@ -15,12 +20,16 @@ export async function POST(request: NextRequest) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name);
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}${ext}`;
-  const filePath = path.join(process.cwd(), "public", "uploads", fileName);
+  const base64 = buffer.toString("base64");
+  const dataUri = `data:application/pdf;base64,${base64}`;
 
-  await writeFile(filePath, buffer);
-
-  const url = `/uploads/${fileName}`;
-  return NextResponse.json({ url });
+  try {
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "pdfs",
+      resource_type: "raw",
+    });
+    return NextResponse.json({ url: result.secure_url });
+  } catch (error) {
+    return NextResponse.json({ error: "Error uploading PDF to Cloudinary" }, { status: 500 });
+  }
 }
