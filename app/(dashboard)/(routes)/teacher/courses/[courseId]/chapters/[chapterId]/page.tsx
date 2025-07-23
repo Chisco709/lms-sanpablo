@@ -1,16 +1,19 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { ArrowLeft, LayoutDashboard, Video, File, Eye } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Video, Eye } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
-import { ChapterPdfForm } from "./_components/chapter-pdf-form";
+import { SimplePdfUpload } from "@/components/simple-pdf-upload";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterActions } from "./_components/chapter-actions";
 import { Banner } from "@/components/banner";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import axios from "axios";
 
 const ChapterIdPage = async ({
   params
@@ -53,6 +56,24 @@ const ChapterIdPage = async ({
   const completedFields = requiredFields.filter(Boolean).length;
   const completionText = `(${completedFields}/${totalFields})`;
   const isComplete = requiredFields.every(Boolean);
+
+  // Estados para PDF
+  const [isSavingPdf, setIsSavingPdf] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(chapter.pdfUrl || "");
+
+  // Manejar subida y guardado de PDF
+  const handlePdfUploadComplete = async (url?: string) => {
+    if (!url) return;
+    setIsSavingPdf(true);
+    try {
+      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { pdfUrl: url });
+      setPdfUrl(url);
+    } catch (error) {
+      // Puedes mostrar un toast de error aquí
+    } finally {
+      setIsSavingPdf(false);
+    }
+  };
 
   return (
     <>
@@ -171,11 +192,33 @@ const ChapterIdPage = async ({
                 chapterId={chapterId}
               />
               
-              <ChapterPdfForm
-                initialData={chapter}
-                courseId={courseId}
-                chapterId={chapterId}
-              />
+              <div>
+                <div className="flex items-center gap-x-2 mb-6">
+                  <Video className="h-4 w-4 text-purple-400" />
+                  <h2 className="text-xl text-white">
+                    Subir PDF
+                  </h2>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="relative">
+                    <SimplePdfUpload
+                      onChange={handlePdfUploadComplete}
+                    />
+                    {isSavingPdf && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-white" />
+                          <span className="text-white text-sm font-medium">Guardando PDF...</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {pdfUrl && (
+                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-400 underline">Ver PDF subido</a>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Información adicional */}
@@ -195,4 +238,4 @@ const ChapterIdPage = async ({
   );
 };
 
-export default ChapterIdPage; 
+export default ChapterIdPage;
