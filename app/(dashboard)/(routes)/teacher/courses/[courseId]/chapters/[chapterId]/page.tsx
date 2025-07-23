@@ -32,6 +32,7 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
     },
     include: {
       course: true,
+      pensumTopic: true, // <-- Agrega la relación para obtener el tema de pensum
     },
   });
 
@@ -116,6 +117,11 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
                 <h2 className="text-xl text-white">
                   Personaliza tu capítulo
                 </h2>
+                {chapter.pensumTopic && (
+                  <span className="ml-2 px-2 py-1 rounded bg-yellow-500/20 text-yellow-700 text-xs font-semibold">
+                    Tema de Pensum: {chapter.pensumTopic.title}
+                  </span>
+                )}
               </div>
               <ChapterTitleForm
                 initialData={chapter}

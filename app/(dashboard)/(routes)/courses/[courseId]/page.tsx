@@ -83,7 +83,8 @@ const CourseIdPage = async ({
   let allChapters = [];
   
   if (course.pensumTopics && course.pensumTopics.length > 0) {
-    // Si tiene temas del pensum, usar esos capítulos
+    // Filtrar solo temas con capítulos
+    course.pensumTopics = course.pensumTopics.filter((topic: any) => topic.chapters && topic.chapters.length > 0);
     allChapters = course.pensumTopics.flatMap((topic: any) => topic.chapters);
   } else {
     // Si NO tiene temas del pensum, usar capítulos directos
