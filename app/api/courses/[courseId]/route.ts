@@ -99,80 +99,47 @@ export async function DELETE(
 }
 
 export async function PATCH(
-    req: NextRequest,
-    { params } : { params: Promise<{ courseId: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
-    try{
-        const { userId } = await auth()
-        const { courseId } = await params;
-        const values = await req.json()
-        
-        console.log(`API PATCH /api/courses/${courseId} - User: ${userId}, Values:`, values);
-        
-        if (!userId) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
+  try {
+    const { userId } = await auth();
+    const { courseId } = await params;
+    const values = await req.json();
 
-        // Validar que el curso pertenece al usuario
-        const existingCourse = await db.course.findUnique({
-            where: {
-                id: courseId,
-                userId: userId,
-            },
-        });
-
-        if (!existingCourse) {
-            console.log(`API PATCH /api/courses/${courseId} - Course not found or not owned by user`);
-            return new NextResponse("Course not found", { status: 404 });
-        }
-
-        // Si se está actualizando la imagen, validar la URL
-        if (values.imageUrl !== undefined) {
-            console.log(`API PATCH /api/courses/${courseId} - Updating imageUrl from "${existingCourse.imageUrl}" to "${values.imageUrl}"`);
-            
-            // Si la nueva URL es null o vacía, permitir
-            if (values.imageUrl === null || values.imageUrl === "") {
-                console.log(`API PATCH /api/courses/${courseId} - Clearing imageUrl`);
-            } else {
-                // Validar que la URL sea válida
-                try {
-                    new URL(values.imageUrl);
-                    console.log(`API PATCH /api/courses/${courseId} - Valid imageUrl: ${values.imageUrl}`);
-                } catch (error) {
-                    console.error(`API PATCH /api/courses/${courseId} - Invalid imageUrl: ${values.imageUrl}`);
-                    return new NextResponse("Invalid image URL", { status: 400 });
-                }
-            }
-        }
-
-        // Construir objeto data dinámicamente
-        const data: any = {};
-        if (values.title !== undefined) data.title = values.title;
-        // Limpieza y validación de campos
-        if (values.description !== undefined) {
-          if (values.description === null || values.description === "") {
-            data.description = null;
-          } else {
-            data.description = String(values.description);
-          }
-        } else if (values.description === null) {
-          data.description = null;
-        }
-        if (values.imageUrl !== undefined) data.imageUrl = values.imageUrl;
-        if (values.categoryId !== undefined) data.categoryId = values.categoryId;
-
-        const course = await db.course.update({
-            where: {
-                id: courseId,
-                userId
-            },
-            data
-        }) 
-
-        console.log(`API PATCH /api/courses/${courseId} - Update successful:`, course);
-        return NextResponse.json(course)
-    } catch (error) {
-        console.error(`API PATCH /api/courses/ - Error:`, error);
-        return new NextResponse("Internal Error", { status: 500 })
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    // Validar que el curso pertenece al usuario
+    const existingCourse = await db.course.findUnique({
+      where: {
+        id: courseId,
+        userId: userId
+      }
+    });
+
+    if (!existingCourse) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
+
+    // Validar y actualizar solo la descripción
+    if (typeof values.description !== "string" || values.description.trim() === "") {
+      return new NextResponse("Description is required and must be a string", { status: 400 });
+    }
+
+    const updatedCourse = await db.course.update({
+      where: {
+        id: courseId,
+        userId: userId
+      },
+      data: {
+        description: values.description
+      }
+    });
+
+    return NextResponse.json(updatedCourse);
+  } catch (error) {
+    return new NextResponse("Internal Error", { status: 500 });
+  }
 }
