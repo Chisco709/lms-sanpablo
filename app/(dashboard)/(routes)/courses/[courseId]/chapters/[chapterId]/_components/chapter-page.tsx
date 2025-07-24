@@ -218,10 +218,7 @@ const ChapterPage = ({
                   </a>
                   
                   <a
-                    href={chapter.pdfUrl}
-                    download={`${chapter.title.replace(/\s+/g, '_')}.pdf`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={`/api/download-pdf?url=${encodeURIComponent(chapter.pdfUrl)}&filename=${encodeURIComponent(`${chapter.title.replace(/\s+/g, '_')}.pdf`)}`}
                     className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
                   >
                     📥 Descargar

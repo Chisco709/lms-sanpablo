@@ -20,6 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
+import { CourseContentDropdown } from "@/components/course-content-dropdown";
 
 interface CoursePageClientProps {
   course: any;
@@ -198,19 +199,30 @@ export const CoursePageClient = ({
             >
               <Menu className="h-5 w-5 text-white" />
             </button>
-            {/* Estadísticas del curso - Desktop */}
-            <div className="hidden lg:flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{totalTopics}</div>
-                <div className="text-green-400 text-sm">Temas</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{allChapters.length}</div>
-                <div className="text-green-400 text-sm">Clases</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">{completedChapters}</div>
-                <div className="text-yellow-400 text-sm">Completadas</div>
+            {/* Course Content Dropdown */}
+            <div className="space-y-6">
+              <CourseContentDropdown 
+                topics={pensumTopics.map(topic => ({
+                  ...topic,
+                  chapters: topic.chapters || []
+                }))} 
+                courseId={courseId} 
+              />
+              
+              {/* Course Stats Section */}
+              <div className="hidden lg:flex items-center gap-6 bg-black/50 p-4 rounded-xl">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">{totalTopics}</div>
+                  <div className="text-green-400 text-sm">Temas</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">{allChapters.length}</div>
+                  <div className="text-green-400 text-sm">Clases</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400">{completedChapters}</div>
+                  <div className="text-yellow-400 text-sm">Completadas</div>
+                </div>
               </div>
             </div>
           </div>
