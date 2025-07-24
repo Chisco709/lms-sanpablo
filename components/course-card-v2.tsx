@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { BookOpen, Play, CheckCircle, Clock } from "lucide-react"
@@ -33,9 +33,20 @@ export const CourseCardV2 = ({
   const [imageLoaded, setImageLoaded] = useState(false)
   // Document validation state
   const [documentNumber, setDocumentNumber] = useState("")
-  const [isValidating, setIsValidating] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastSubmitTime, setLastSubmitTime] = useState(0)
+  
+  // Handle modal open/close with cleanup
+  const handleModalOpenChange = useCallback((open: boolean) => {
+    setIsModalOpen(open)
+    if (!open) {
+      // Reset form when modal closes
+      setError(null)
+      setDocumentNumber("")
+    }
+  }, [])
 
 
   const courseState = useMemo(() => ({
@@ -60,67 +71,117 @@ export const CourseCardV2 = ({
 
   const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    // Only allow numbers
-    if (/^\d*$/.test(value)) {
+    // Only allow numbers and limit to 15 digits
+    if (/^\d{0,15}$/.test(value)) {
       setDocumentNumber(value)
-      setError(null) // Clear error when user types
+      // Clear error when user types a valid character
+      if (error && value.length > 0) {
+        setError(null)
+      }
     }
   }
 
-  const validateDocument = async () => {
-    // Local validation
-    if (!documentNumber) {
+  const validateDocument = useCallback((): boolean => {
+    // Reset previous errors
+    setError(null)
+    
+    // Check if empty
+    if (!documentNumber.trim()) {
       setError('Por favor ingresa un número de documento')
       return false
     }
     
+    // Check minimum length
     if (documentNumber.length < 5) {
       setError('El documento debe tener al menos 5 dígitos')
       return false
     }
     
+    // Check maximum length (should be handled by input but just in case)
+    if (documentNumber.length > 15) {
+      setError('El documento no puede tener más de 15 dígitos')
+      return false
+    }
+    
     return true
-  }
+  }, [documentNumber])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!(await validateDocument())) {
+    // Prevent multiple rapid submissions (throttle to 2 seconds)
+    const now = Date.now()
+    if (now - lastSubmitTime < 2000) {
+      return
+    }
+    setLastSubmitTime(now)
+    
+    // Local validation
+    if (!validateDocument()) {
       return
     }
     
-    setIsValidating(true)
+    setIsSubmitting(true)
     setError(null)
     
     try {
       const response = await fetch('/api/verify-document', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
         body: JSON.stringify({ 
           documentNumber: documentNumber.trim(),
           documentType: 'CC' // Default to Cédula de Ciudadanía
-        })
+        }),
+        credentials: 'same-origin'
       })
       
+      // Handle different types of responses
       if (!response.ok) {
-        throw new Error(`Error del servidor: ${response.status}`)
+        if (response.status === 401) {
+          throw new Error('No autorizado. Por favor inicia sesión.')
+        } else if (response.status === 429) {
+          throw new Error('Demasiados intentos. Por favor espera un momento.')
+        } else if (response.status >= 500) {
+          throw new Error('Error del servidor. Por favor inténtalo más tarde.')
+        } else {
+          throw new Error(`Error ${response.status}: ${response.statusText}`)
+        }
       }
       
       const result = await response.json()
       
       if (result.authorized) {
-        // Redirect to course on successful validation
-        window.location.href = `/courses/${id}`
+        // Show success message before redirect
+        toast.success('¡Validación exitosa! Redirigiendo...', {
+          duration: 2000,
+          position: 'top-center'
+        })
+        
+        // Small delay for user to see the success message
+        setTimeout(() => {
+          window.location.href = `/courses/${id}`
+        }, 1000)
       } else {
         setError(result.message || 'Documento no autorizado para este curso')
       }
     } catch (error) {
       console.error('Error al validar documento:', error)
-      setError('Error de conexión. Por favor, inténtalo de nuevo.')
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Ocurrió un error inesperado. Por favor inténtalo de nuevo.'
+      
+      setError(errorMessage)
+      toast.error('Error al validar el documento', {
+        duration: 4000,
+        position: 'top-center'
+      })
     } finally {
-      setIsValidating(false)
+      setIsSubmitting(false)
     }
-  }
+  }, [documentNumber, id, lastSubmitTime, validateDocument])
 
   const CourseAccessButton = () => {
     if (isPurchased) {
@@ -141,7 +202,7 @@ export const CourseCardV2 = ({
     }
 
     return (
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <DialogTrigger asChild>
           <Button 
             className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-medium transition-colors duration-200 text-sm sm:text-base h-9 sm:h-10"
@@ -167,28 +228,38 @@ export const CourseCardV2 = ({
                 placeholder="Ingresa tu número de documento (C.C o T.I)"
                 value={documentNumber}
                 onChange={handleDocumentChange}
-                className={`bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400 ${
-                  error ? 'border-red-500' : ''
+                className={`bg-slate-800 border-2 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
+                  error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
                 }`}
-                disabled={isValidating}
+                disabled={isSubmitting}
+                aria-invalid={!!error}
+                aria-describedby={error ? 'document-error' : undefined}
                 minLength={5}
                 maxLength={15}
                 pattern="\d+"
                 title="Por favor ingresa solo números"
               />
               {error && (
-                <p className="text-red-500 text-sm mt-1">
+                <p 
+                  id="document-error" 
+                  className="text-red-400 text-sm text-center"
+                  role="alert"
+                  aria-live="assertive"
+                >
                   {error}
                 </p>
               )}
             </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-              disabled={isValidating}
-            >
-              {isValidating ? "Validando..." : "Validar acceso"}
-            </Button>
+            <div className="space-y-2">
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
+                disabled={isSubmitting || !documentNumber.trim()}
+                aria-busy={isSubmitting}
+              >
+                {isSubmitting ? "Validando..." : "Validar acceso"}
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
