@@ -69,12 +69,17 @@ export const CourseCardV2 = ({
   }, [imageError, imageUrl])
 
   const handleDocumentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (/^\d{0,15}$/.test(value)) {
-      setDocumentNumber(value)
-      if (error && value.length > 0) {
-        setError(null)
-      }
+    let value = e.target.value.replace(/\D/g, '') // Remove all non-digit characters
+    
+    // Limit to 15 digits
+    if (value.length > 15) {
+      value = value.slice(0, 15)
+    }
+    
+    setDocumentNumber(value)
+    
+    if (error && value.length > 0) {
+      setError(null)
     }
   }, [error])
 
