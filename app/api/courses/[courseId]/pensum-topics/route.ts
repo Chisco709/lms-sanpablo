@@ -51,4 +51,27 @@ export async function POST(
     console.log("[PENSUM_TOPICS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}
+
+export async function GET(req: NextRequest, { params }: { params: { courseId: string } }) {
+  try {
+    const { courseId } = params;
+    // Solo temas publicados y ordenados
+    const topics = await db.pensumTopic.findMany({
+      where: {
+        courseId,
+        isPublished: true,
+      },
+      orderBy: {
+        position: "asc",
+      },
+      include: {
+        chapters: true,
+      },
+    });
+    return NextResponse.json(topics);
+  } catch (error) {
+    console.log("[PENSUM_TOPICS_GET]", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
