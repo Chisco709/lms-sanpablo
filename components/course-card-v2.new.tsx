@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { BookOpen, Play, CheckCircle, Clock } from "lucide-react"
+import { BookOpen, Play, CheckCircle, Clock, Lock } from "lucide-react"
 import { CourseProgress } from "@/components/course-progress"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -29,26 +29,16 @@ export const CourseCardV2 = ({
   description,
   isPurchased = false
 }: CourseCardProps) => {
+  // State management
   const [imageError, setImageError] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  // Document validation state
   const [documentNumber, setDocumentNumber] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastSubmitTime, setLastSubmitTime] = useState(0)
   
-  // Handle modal open/close with cleanup
-  const handleModalOpenChange = useCallback((open: boolean) => {
-    setIsModalOpen(open)
-    if (!open) {
-      // Reset form when modal closes
-      setError(null)
-      setDocumentNumber("")
-    }
-  }, [])
-
-
+  // Memoized values
   const courseState = useMemo(() => ({
     isCompleted: progress === 100,
     isInProgress: progress !== null && progress > 0 && progress < 100,
@@ -57,6 +47,15 @@ export const CourseCardV2 = ({
 
   const { isCompleted, isInProgress, formattedProgress } = courseState
 
+  // Callbacks
+  const handleModalOpenChange = useCallback((open: boolean) => {
+    setIsModalOpen(open)
+    if (!open) {
+      setError(null)
+      setDocumentNumber("")
+    }
+  }, [])
+
   const getImageSrc = useMemo(() => {
     if (imageError || !imageUrl || imageUrl.trim() === '' || imageUrl === '/placeholder-course.jpg') {
       return "/logo-sanpablo.jpg"
@@ -64,40 +63,34 @@ export const CourseCardV2 = ({
     try {
       new URL(imageUrl)
       return imageUrl
-    } catch (error) {
+    } catch {
       return "/logo-sanpablo.jpg"
     }
-  }, [imageError, imageUrl, id])
+  }, [imageError, imageUrl])
 
-  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    // Only allow numbers and limit to 15 digits
     if (/^\d{0,15}$/.test(value)) {
       setDocumentNumber(value)
-      // Clear error when user types a valid character
       if (error && value.length > 0) {
         setError(null)
       }
     }
-  }
+  }, [error])
 
   const validateDocument = useCallback((): boolean => {
-    // Reset previous errors
     setError(null)
     
-    // Check if empty
     if (!documentNumber.trim()) {
       setError('Por favor ingresa un número de documento')
       return false
     }
     
-    // Check minimum length
     if (documentNumber.length < 5) {
       setError('El documento debe tener al menos 5 dígitos')
       return false
     }
     
-    // Check maximum length (should be handled by input but just in case)
     if (documentNumber.length > 15) {
       setError('El documento no puede tener más de 15 dígitos')
       return false
@@ -109,14 +102,12 @@ export const CourseCardV2 = ({
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Prevent multiple rapid submissions (throttle to 2 seconds)
     const now = Date.now()
     if (now - lastSubmitTime < 2000) {
       return
     }
     setLastSubmitTime(now)
     
-    // Local validation
     if (!validateDocument()) {
       return
     }
@@ -133,12 +124,11 @@ export const CourseCardV2 = ({
         },
         body: JSON.stringify({ 
           documentNumber: documentNumber.trim(),
-          documentType: 'CC' // Default to Cédula de Ciudadanía
+          documentType: 'CC'
         }),
         credentials: 'same-origin'
       })
       
-      // Handle different types of responses
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('No autorizado. Por favor inicia sesión.')
@@ -154,13 +144,11 @@ export const CourseCardV2 = ({
       const result = await response.json()
       
       if (result.authorized) {
-        // Show success message before redirect
         toast.success('¡Validación exitosa! Redirigiendo...', {
           duration: 2000,
           position: 'top-center'
         })
         
-        // Small delay for user to see the success message
         setTimeout(() => {
           window.location.href = `/courses/${id}`
         }, 1000)
@@ -183,7 +171,8 @@ export const CourseCardV2 = ({
     }
   }, [documentNumber, id, lastSubmitTime, validateDocument])
 
-  const CourseAccessButton = () => {
+  // Sub-components
+  const CourseAccessButton = useCallback(() => {
     if (isPurchased) {
       return (
         <Link 
@@ -264,11 +253,11 @@ export const CourseCardV2 = ({
         </DialogContent>
       </Dialog>
     )
-  }
+  }, [isPurchased, id, isCompleted, isInProgress, title, isModalOpen, handleModalOpenChange, documentNumber, error, isSubmitting, handleSubmit, handleDocumentChange])
 
+  // Main component render
   return (
     <article className="group relative flex flex-col h-full overflow-hidden rounded-xl bg-slate-800 border border-slate-700 hover:border-slate-600 transition-all duration-300 hover:shadow-lg hover:shadow-slate-900/30 focus-within:ring-2 focus-within:ring-yellow-400 focus-within:ring-offset-2 focus-within:ring-offset-slate-900">
-      {/* Course Image */}
       <div className="relative aspect-video bg-slate-900 flex-shrink-0">
         <Image
           src={getImageSrc}
@@ -281,20 +270,17 @@ export const CourseCardV2 = ({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         
-        {/* Loading State */}
         {!imageLoaded && !imageError && (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
             <div className="animate-pulse h-full w-full bg-slate-700"></div>
           </div>
         )}
 
-        {/* Image Overlay */}
         <div 
           className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           aria-hidden="true"
         />
         
-        {/* Status Badges */}
         <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
           {isCompleted && (
             <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
@@ -320,9 +306,7 @@ export const CourseCardV2 = ({
         </div>
       </div>
 
-      {/* Course Content */}
       <div className="flex flex-col flex-grow p-4 sm:p-5 space-y-3 md:space-y-4">
-        {/* Title & Description */}
         <div className="space-y-2 flex-grow">
           <h3 className="font-bold text-white text-base sm:text-lg leading-tight line-clamp-2">
             {title}
@@ -335,7 +319,6 @@ export const CourseCardV2 = ({
           )}
         </div>
 
-        {/* Course Metadata */}
         <div className="flex items-center gap-3 md:gap-4 text-slate-400 text-xs sm:text-sm">
           <div className="flex items-center gap-1">
             <BookOpen className="h-4 w-4 text-yellow-400 flex-shrink-0" />
@@ -348,7 +331,6 @@ export const CourseCardV2 = ({
           </div>
         </div>
 
-        {/* Progress Bar */}
         {progress !== null && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs sm:text-sm">
@@ -365,7 +347,6 @@ export const CourseCardV2 = ({
           </div>
         )}
 
-        {/* Action Button */}
         <div className="pt-1 sm:pt-2">
           <CourseAccessButton />
         </div>
