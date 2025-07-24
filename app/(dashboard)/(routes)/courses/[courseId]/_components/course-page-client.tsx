@@ -356,23 +356,46 @@ export const CoursePageClient = ({
                           <div className="text-slate-400 py-2">No hay capítulos en este tema.</div>
                         )}
                         {(Array.isArray(topic.chapters) && topic.chapters.length > 0) && topic.chapters.map((chapter: any, chapterIndex: number) => {
+                          const isLocked = isChapterLocked(chapter);
+                          const isCompleted = chapter.userProgress?.[0]?.isCompleted;
+                          
                           return (
                             <div key={chapter.id}>
-                              <div className="p-3 sm:p-4 bg-slate-800/40 border border-slate-700/50 rounded-lg sm:rounded-xl">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-7 h-7 sm:w-10 sm:h-10 bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <BookOpen className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <h4 className="text-slate-300 font-medium text-sm sm:text-base line-clamp-2 leading-tight">
-                                      {chapter.title}
-                                    </h4>
-                                    <p className="text-slate-500 text-xs mt-1 flex items-center gap-1">
-                                      ID: {chapter.id}
-                                    </p>
+                              <Link 
+                                href={isLocked ? '#' : `/courses/${courseId}/chapters/${chapter.id}`}
+                                onClick={(e) => {
+                                  if (isLocked) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                              >
+                                <div className={`p-3 sm:p-4 ${isLocked ? 'bg-slate-800/20' : 'bg-slate-800/40 hover:bg-slate-700/60 cursor-pointer'} border ${isCompleted ? 'border-green-500/30' : 'border-slate-700/50'} rounded-lg sm:rounded-xl transition-colors`}>
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${isCompleted ? 'bg-green-500/20' : 'bg-slate-700'}`}>
+                                      {isCompleted ? (
+                                        <CheckCircle className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
+                                      ) : (
+                                        <BookOpen className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <h4 className={`font-medium text-sm sm:text-base line-clamp-2 leading-tight ${isLocked ? 'text-slate-500' : 'text-slate-300'}`}>
+                                          {chapter.title}
+                                        </h4>
+                                        {isLocked && (
+                                          <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500 flex-shrink-0" />
+                                        )}
+                                      </div>
+                                      {!isLocked && chapter.description && (
+                                        <p className="text-slate-400 text-xs mt-1 line-clamp-1">
+                                          {chapter.description}
+                                        </p>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
+                              </Link>
                             </div>
                           );
                         })}

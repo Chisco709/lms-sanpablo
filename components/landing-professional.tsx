@@ -493,9 +493,9 @@ export default function LandingProfessionalEnhanced() {
           <div className="flex flex-col items-center gap-3 bg-black/70 rounded-2xl p-6 sm:p-8 shadow-lg border border-yellow-400/20 w-full lg:w-1/3 glass-effect-dark hover:scale-105 transition-all duration-500" data-animate="fade-up">
             <Phone size={32} className="text-yellow-400 mb-2 animate-pulse-glow" />
             <span className="text-white/90 text-base sm:text-lg font-semibold text-center">
-              Cel:  3104723644 / 3148885007<br />WhatsApp: +57 33043496941
+              Cel:  3104723644 / 3148885007<br />WhatsApp: +57 3043496841
             </span>
-            <a href="https://wa.me/573043496941" target="_blank" rel="noopener noreferrer" className="mt-2 w-full text-center">
+            <a href="https://wa.me/573043496841" target="_blank" rel="noopener noreferrer" className="mt-2 w-full text-center">
               <span className="inline-block w-full px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold text-base sm:text-lg shadow-lg border-2 border-green-400/40 hover:scale-110 hover:shadow-2xl transition-all duration-300 glow-green">
                 Chatear por WhatsApp
               </span>
