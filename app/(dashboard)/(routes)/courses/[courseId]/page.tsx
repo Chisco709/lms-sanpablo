@@ -4,45 +4,26 @@ import { redirect } from "next/navigation";
 import { getProgress } from "@/actions/get-progress";
 import { CoursePageClient } from "./_components/course-page-client";
 
-const CourseIdPage = async ({
-  params
-}: {
-  params: Promise<{ courseId: string }>
-}) => {
+interface CourseIdPageProps {
+  params: { courseId: string }
+}
+
+const CourseIdPage = async ({ params }: CourseIdPageProps) => {
   const user = await currentUser();
-  const { courseId } = await params;
+  const { courseId } = params;
 
   if (!user) {
     return redirect("/");
   }
   
+  // Fetch the course with all necessary relations
   const course = await db.course.findUnique({
     where: {
       id: courseId,
-      isPublished: true // Ensure only published courses are accessible
+      isPublished: true
     },
     include: {
       category: true,
-      chapters: {
-        where: {
-          isPublished: true,
-        },
-        include: {
-          userProgress: {
-            where: { userId: user.id }
-          },
-          pensumTopic: {
-            select: {
-              id: true,
-              title: true,
-              isPublished: true
-            }
-          }
-        },
-        orderBy: {
-          position: "asc"
-        }
-      },
       pensumTopics: {
         where: {
           isPublished: true,
@@ -57,18 +38,38 @@ const CourseIdPage = async ({
             where: { 
               isPublished: true 
             },
-            orderBy: { 
-              position: "asc" 
-            },
             include: {
               userProgress: {
                 where: { userId: user.id }
               }
+            },
+            orderBy: { 
+              position: 'asc' 
             }
           }
         },
         orderBy: {
-          position: "asc"
+          position: 'asc'
+        }
+      },
+      chapters: {
+        where: { 
+          isPublished: true 
+        },
+        include: {
+          userProgress: {
+            where: { userId: user.id }
+          },
+          pensumTopic: {
+            select: { 
+              id: true,
+              title: true,
+              isPublished: true
+            }
+          }
+        },
+        orderBy: { 
+          position: 'asc' 
         }
       }
     }
@@ -78,27 +79,39 @@ const CourseIdPage = async ({
     return redirect("/");
   }
 
+  // Check if user has purchased the course
   const purchase = await db.purchase.findUnique({
     where: {
-      userId_courseId: { userId: user.id,
-        courseId: course.id,
+      userId_courseId: { 
+        userId: user.id,
+        courseId: course.id
       }
     }
   });
 
   const progressCount = await getProgress(user.id, course.id);
-  const isFreeCoure = !course.price || course.price === 0;
-  const hasAccess = !!purchase || isFreeCoure;
+  const isFreeCourse = !course.price || course.price === 0;
+  const hasAccess = !!purchase || isFreeCourse;
 
-  // ✅ SOPORTE PARA CURSOS CON Y SIN TEMAS DEL PENSUM
+  // Process Pensum Topics and chapters
   let allChapters = [];
-  // Filtra solo temas con capítulos publicados
-  if (course.pensumTopics && course.pensumTopics.length > 0) {
-    course.pensumTopics = course.pensumTopics.filter((topic: any) => topic.chapters && topic.chapters.length > 0);
+  
+  // If there are published Pensum Topics with chapters
+  if (course.pensumTopics?.length > 0) {
+    // Filter out topics without chapters and ensure we have published chapters
+    course.pensumTopics = course.pensumTopics.filter(
+      (topic: any) => topic.chapters?.length > 0
+    );
+
     if (course.pensumTopics.length > 0) {
+      // Use the published Pensum Topics
       allChapters = course.pensumTopics.flatMap((topic: any) => topic.chapters);
     } else {
-      allChapters = course.chapters;
+      // No valid Pensum Topics, fallback to chapters directly
+      allChapters = course.chapters || [];
+      
+      // Create a virtual topic with all chapters
+      const now = new Date();
       course.pensumTopics = [{
         id: 'virtual-topic',
         title: 'Contenido del Curso',
@@ -106,23 +119,27 @@ const CourseIdPage = async ({
         position: 1,
         isPublished: true,
         courseId: course.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        chapters: course.chapters
+        createdAt: now,
+        updatedAt: now,
+        chapters: allChapters
       }];
     }
   } else {
-    allChapters = course.chapters;
+    // No Pensum Topics, use chapters directly
+    allChapters = course.chapters || [];
+    
+    // Create a virtual topic with all chapters
+    const now = new Date();
     course.pensumTopics = [{
       id: 'virtual-topic',
       title: 'Contenido del Curso',
       description: 'Todas las clases del curso',
       position: 1,
       isPublished: true,
-      courseId: course.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      chapters: course.chapters
+courseId: course.id,
+      createdAt: now,
+      updatedAt: now,
+      chapters: allChapters
     }];
   }
 
@@ -138,7 +155,7 @@ const CourseIdPage = async ({
       progressCount={progressCount}
       completedChapters={completedChapters}
       hasAccess={hasAccess}
-      isFreeCoure={isFreeCoure}
+      isFreeCoure={isFreeCourse}
       courseId={courseId}
     />
   );
