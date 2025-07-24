@@ -62,14 +62,15 @@ export const CoursePageClient = ({
     // Fetch todos los temas y capítulos (modo profesor)
     (async () => {
       try {
-        const res = await fetch(`/api/courses/${courseId}/pensum-topics?all=true`); // <-- Cambia el endpoint para traer todos los temas
+        const res = await fetch(`/api/courses/${courseId}/pensum-topics?all=true`);
         const data = await res.json();
-        setPensumTopics(data);
-        if (data.length > 0) {
+        console.log('DEBUG pensumTopics:', data); // Debug: Verifica los datos que llegan
+        setPensumTopics(Array.isArray(data) ? data : []);
+        if (Array.isArray(data) && data.length > 0) {
           setExpandedTopics({ [data[0].id]: true });
         }
       } catch (err) {
-        // Puedes mostrar un error si lo deseas
+        console.error('Error al cargar pensumTopics:', err);
       }
     })();
     // Track course view solo en el cliente
@@ -285,12 +286,19 @@ export const CoursePageClient = ({
             </div>
             {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
             <div className="space-y-3 sm:space-y-6">
-              {pensumTopics?.length === 0 && (
+              {/* DEBUG: Mostrar datos en consola para verificar */}
+              {process.env.NODE_ENV !== 'production' && (
+                <pre className="bg-black/80 text-green-400 text-xs p-2 rounded mb-2 overflow-x-auto">
+                  {JSON.stringify(pensumTopics, null, 2)}
+                </pre>
+              )}
+              {/* CORREGIDO: Solo muestra mensaje si realmente está vacío o no es array */}
+              {(Array.isArray(pensumTopics) && pensumTopics.length === 0) && (
                 <div className="text-center text-slate-400 py-8">
                   No hay temas ni capítulos creados en el pensum.
                 </div>
               )}
-              {pensumTopics?.map((topic: any, topicIndex: number) => {
+              {(Array.isArray(pensumTopics) && pensumTopics.length > 0) && pensumTopics.map((topic: any, topicIndex: number) => {
                 const isExpanded = expandedTopics[topic.id];
                 const topicProgress = getTopicProgress(topic);
                 const isTopicCompleted = topicProgress.completed === topicProgress.total && topicProgress.total > 0;
@@ -338,11 +346,10 @@ export const CoursePageClient = ({
                     {/* CAPÍTULOS DEL TEMA - SOLO SI HAY */}
                     {isExpanded && (
                       <div className="space-y-2 ml-1 sm:ml-4 pl-3 sm:pl-8 border-l-2 border-yellow-400/30">
-                        {topic.chapters?.length === 0 && (
+                        {(Array.isArray(topic.chapters) && topic.chapters.length === 0) && (
                           <div className="text-slate-400 py-2">No hay capítulos en este tema.</div>
                         )}
-                        {topic.chapters?.map((chapter: any, chapterIndex: number) => {
-                          // En modo profesor, no hay bloqueo de capítulos
+                        {(Array.isArray(topic.chapters) && topic.chapters.length > 0) && topic.chapters.map((chapter: any, chapterIndex: number) => {
                           return (
                             <div key={chapter.id}>
                               <div className="p-3 sm:p-4 bg-slate-800/40 border border-slate-700/50 rounded-lg sm:rounded-xl">
