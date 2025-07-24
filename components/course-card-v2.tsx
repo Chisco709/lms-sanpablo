@@ -32,14 +32,14 @@ export const CourseCardV2 = ({
   // State management
   const [imageError, setImageError] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [fullName, setFullName] = useState("")
+  const [passcode, setPasscode] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastSubmitTime, setLastSubmitTime] = useState(0)
   
-  // Expected name for validation (case insensitive)
-  const expectedName = "Juan Jose Chisco Montoya"
+  // Expected passcode
+  const EXPECTED_PASSCODE = "4089"
   
   // Memoized values
   const courseState = useMemo(() => ({
@@ -55,7 +55,7 @@ export const CourseCardV2 = ({
     setIsModalOpen(open)
     if (!open) {
       setError(null)
-      setFullName("")
+      setPasscode("")
     }
   }, [])
 
@@ -71,42 +71,51 @@ export const CourseCardV2 = ({
     }
   }, [imageError, imageUrl])
 
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFullName(value)
+  const handlePasscodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '') // Remove non-digit characters
     
-    if (error && value.trim().length > 0) {
-      setError(null)
+    // Limit to 4 digits
+    if (value.length <= 4) {
+      setPasscode(value)
+      
+      // Clear error when user starts typing
+      if (error && value.length > 0) {
+        setError(null)
+      }
     }
   }, [error])
 
-  const validateName = useCallback((): boolean => {
+  const validatePasscode = useCallback((): boolean => {
     setError(null)
     
-    if (!fullName.trim()) {
-      setError('Por favor ingresa tu nombre completo')
+    if (!passcode) {
+      setError('Por favor ingresa el código de acceso')
       return false
     }
     
-    // Case-insensitive comparison with the expected name
-    if (fullName.trim().toLowerCase() !== expectedName.toLowerCase()) {
-      setError('El nombre ingresado no coincide con los registros')
+    if (passcode.length !== 4) {
+      setError('El código debe tener 4 dígitos')
+      return false
+    }
+    
+    if (passcode !== EXPECTED_PASSCODE) {
+      setError('Código incorrecto. Por favor inténtalo de nuevo.')
       return false
     }
     
     return true
-  }, [fullName])
+  }, [passcode])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
     const now = Date.now()
-    if (now - lastSubmitTime < 2000) {
+    if (now - lastSubmitTime < 1000) {
       return
     }
     setLastSubmitTime(now)
     
-    if (!validateName()) {
+    if (!validatePasscode()) {
       return
     }
     
@@ -114,12 +123,12 @@ export const CourseCardV2 = ({
     setError(null)
     
     try {
-      // Simulate API call with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Simulate API call with a short delay
+      await new Promise(resolve => setTimeout(resolve, 500))
       
-      // Directly authorize since we've already validated the name
-      toast.success('¡Validación exitosa! Redirigiendo...', {
-        duration: 2000,
+      // Directly authorize since we've already validated the passcode
+      toast.success('¡Código correcto! Redirigiendo...', {
+        duration: 1500,
         position: 'top-center'
       })
       
@@ -133,14 +142,14 @@ export const CourseCardV2 = ({
         : 'Ocurrió un error inesperado. Por favor inténtalo de nuevo.'
       
       setError(errorMessage)
-      toast.error('Error al validar el nombre', {
+      toast.error('Error al validar el código', {
         duration: 4000,
         position: 'top-center'
       })
     } finally {
       setIsSubmitting(false)
     }
-  }, [fullName, id, lastSubmitTime, validateName])
+  }, [passcode, id, lastSubmitTime, validatePasscode])
 
   // Sub-components
   const CourseAccessButton = useCallback(() => {
@@ -178,27 +187,30 @@ export const CourseCardV2 = ({
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="name" className="block text-sm font-medium text-slate-300">
-                Nombre completo
+              <label htmlFor="passcode" className="block text-sm font-medium text-slate-300">
+                Código de Acceso
               </label>
               <input
-                id="name"
+                id="passcode"
                 type="text"
-                placeholder="Ingresa tu nombre completo"
-                value={fullName}
-                onChange={handleNameChange}
-                className={`flex h-10 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="Ingresa el código de 4 dígitos"
+                value={passcode}
+                onChange={handlePasscodeChange}
+                className={`text-center text-xl font-mono tracking-widest flex h-12 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
                   error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
                 }`}
                 disabled={isSubmitting}
                 aria-invalid={!!error}
-                aria-describedby={error ? 'name-error' : undefined}
-                autoComplete="name"
-                title="Por favor ingresa tu nombre completo"
+                aria-describedby={error ? 'passcode-error' : undefined}
+                maxLength={4}
+                autoComplete="one-time-code"
+                title="Ingresa el código de 4 dígitos"
               />
               {error && (
                 <p 
-                  id="name-error" 
+                  id="passcode-error" 
                   className="text-red-400 text-sm text-center"
                   role="alert"
                   aria-live="assertive"
@@ -221,7 +233,7 @@ export const CourseCardV2 = ({
         </DialogContent>
       </Dialog>
     )
-  }, [isPurchased, id, isCompleted, isInProgress, title, isModalOpen, handleModalOpenChange, fullName, error, isSubmitting, handleSubmit, handleNameChange])
+  }, [isPurchased, id, isCompleted, isInProgress, title, isModalOpen, handleModalOpenChange, passcode, error, isSubmitting, handleSubmit, handlePasscodeChange])
 
   // Main component render
   return (
