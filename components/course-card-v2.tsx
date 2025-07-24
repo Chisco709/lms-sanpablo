@@ -58,20 +58,33 @@ export const CourseCardV2 = ({
 
   const handleDocumentValidation = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!documentId.trim()) return
+    const trimmedDocId = documentId.trim()
+    
+    if (!trimmedDocId) {
+      toast.error('Por favor ingresa un número de documento')
+      return
+    }
+    
+    if (trimmedDocId.length < 5) {
+      toast.error('El documento debe tener al menos 5 dígitos')
+      return
+    }
     
     setIsLoading(true)
+    
     try {
       const response = await fetch('/api/verify-document', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          documentNumber: documentId.trim(),
+          documentNumber: trimmedDocId,
           documentType: 'CC' // Default to Cédula de Ciudadanía
         })
       })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       
       const result = await response.json()
       
@@ -79,19 +92,11 @@ export const CourseCardV2 = ({
         // If valid, redirect to course
         window.location.href = `/courses/${id}`
       } else {
-        toast({
-          title: "Acceso denegado",
-          description: result.message || "El documento ingresado no está autorizado para acceder a este curso.",
-          variant: "destructive"
-        })
+        toast.error(result.message || 'Documento no autorizado para acceder a este curso')
       }
     } catch (error) {
       console.error('Error verifying document:', error)
-      toast({
-        title: "Error",
-        description: "Ocurrió un error al validar el documento. Por favor, inténtalo de nuevo.",
-        variant: "destructive"
-      })
+      toast.error('Error al validar el documento. Por favor, inténtalo de nuevo.')
     } finally {
       setIsLoading(false)
     }
@@ -134,11 +139,16 @@ export const CourseCardV2 = ({
               <Input
                 id="document"
                 type="text"
+                inputMode="numeric"
                 placeholder="Ingresa tu número de documento (C.C o T.I)"
                 value={documentId}
-                onChange={(e) => setDocumentId(e.target.value.replace(/\D/g, ''))}
-                className="bg-slate-800 border-slate-700 text-white placeholder-slate-500"
-                required
+                onChange={(e) => {
+                  // Only allow numbers and update the state
+                  const value = e.target.value.replace(/\D/g, '')
+                  setDocumentId(value)
+                }}
+                className="bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400"
+                disabled={isLoading}
                 minLength={5}
                 maxLength={15}
                 pattern="\d+"
