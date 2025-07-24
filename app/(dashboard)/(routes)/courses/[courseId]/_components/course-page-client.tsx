@@ -199,30 +199,19 @@ export const CoursePageClient = ({
             >
               <Menu className="h-5 w-5 text-white" />
             </button>
-            {/* Course Content Dropdown */}
-            <div className="space-y-6">
-              <CourseContentDropdown 
-                topics={pensumTopics.map(topic => ({
-                  ...topic,
-                  chapters: topic.chapters || []
-                }))} 
-                courseId={courseId} 
-              />
-              
-              {/* Course Stats Section */}
-              <div className="hidden lg:flex items-center gap-6 bg-black/50 p-4 rounded-xl">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{totalTopics}</div>
-                  <div className="text-green-400 text-sm">Temas</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{allChapters.length}</div>
-                  <div className="text-green-400 text-sm">Clases</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-400">{completedChapters}</div>
-                  <div className="text-yellow-400 text-sm">Completadas</div>
-                </div>
+            {/* Course Stats Section - Moved to top right */}
+            <div className="hidden lg:flex items-center gap-6 bg-black/50 p-4 rounded-xl">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{totalTopics}</div>
+                <div className="text-green-400 text-sm">Temas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{allChapters.length}</div>
+                <div className="text-green-400 text-sm">Clases</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-400">{completedChapters}</div>
+                <div className="text-yellow-400 text-sm">Completadas</div>
               </div>
             </div>
           </div>
@@ -291,6 +280,19 @@ export const CoursePageClient = ({
       {/* Contenido principal - OPTIMIZADO PARA MÓVIL */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <div className="grid lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          {/* Sidebar with Course Content Dropdown - Added to left */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <CourseContentDropdown 
+                topics={pensumTopics.map(topic => ({
+                  ...topic,
+                  chapters: topic.chapters || []
+                }))} 
+                courseId={courseId} 
+              />
+            </div>
+          </div>
+          
           {/* CONTENIDO ORGANIZADO POR TEMAS DEL PENSUM - MÓVIL FIRST */}
           <div className="lg:col-span-3 space-y-3 sm:space-y-6">
             {/* Título responsive */}
