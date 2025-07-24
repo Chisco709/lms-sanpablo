@@ -215,14 +215,13 @@ export const CourseCardV2 = ({
               <label htmlFor="document" className="block text-sm font-medium text-slate-300">
                 Documento de identidad (TI o C.C)
               </label>
-              <Input
+              <input
                 id="document"
                 type="text"
-                inputMode="numeric"
                 placeholder="Ingresa tu número de documento (C.C o T.I)"
                 value={documentNumber}
                 onChange={handleDocumentChange}
-                className={`bg-slate-800 border-2 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
+                className={`flex h-10 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
                   error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
                 }`}
                 disabled={isSubmitting}
@@ -230,7 +229,7 @@ export const CourseCardV2 = ({
                 aria-describedby={error ? 'document-error' : undefined}
                 minLength={5}
                 maxLength={15}
-                pattern="\d+"
+                inputMode="tel"
                 title="Por favor ingresa solo números"
               />
               {error && (
