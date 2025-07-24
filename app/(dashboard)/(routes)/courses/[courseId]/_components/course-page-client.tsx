@@ -42,32 +42,41 @@ export const CoursePageClient = ({
   const [canGoBack, setCanGoBack] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [pensumTopics, setPensumTopics] = useState<any[]>(course.pensumTopics || []);
   const router = useRouter();
+  
+  // Variables globales para el render
+  const totalTopics = pensumTopics?.length || 0;
+  const allChapters = pensumTopics?.flatMap((topic: any) => topic.chapters) || [];
   
   // Analytics hooks
   const { trackLMSEvent, trackCourseInteraction } = useAnalytics();
   usePageTracking();
   useTimeTracking(`Curso: ${course.title}`);
   
-  // Obtener todos los capítulos de todos los temas
-  const allChapters = course.pensumTopics?.flatMap((topic: any) => topic.chapters) || [];
-  const totalTopics = course.pensumTopics?.length || 0;
-
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined') {
       setCanGoBack(window.history.length > 1);
     }
-    // Expandir el primer tema por defecto
-    if (course.pensumTopics?.length > 0) {
-      setExpandedTopics({ [course.pensumTopics[0].id]: true });
-    }
-    
+    // Fetch temas publicados desde el backend
+    (async () => {
+      try {
+        const res = await fetch(`/api/courses/${courseId}/pensum-topics`);
+        const data = await res.json();
+        setPensumTopics(data);
+        if (data.length > 0) {
+          setExpandedTopics({ [data[0].id]: true });
+        }
+      } catch (err) {
+        // Puedes mostrar un error si lo deseas
+      }
+    })();
     // Track course view solo en el cliente
     if (mounted && typeof window !== 'undefined') {
       trackLMSEvent.courseView(courseId, course.title);
     }
-  }, [course.pensumTopics, courseId, course.title, trackLMSEvent, mounted]);
+  }, [courseId, trackLMSEvent, mounted]);
 
   const handleBackNavigation = () => {
     if (canGoBack) {
@@ -276,7 +285,7 @@ export const CoursePageClient = ({
             </div>
             {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
             <div className="space-y-3 sm:space-y-6">
-              {course.pensumTopics?.map((topic: any, topicIndex: number) => {
+              {pensumTopics?.map((topic: any, topicIndex: number) => {
                 const isExpanded = expandedTopics[topic.id];
                 const topicProgress = getTopicProgress(topic);
                 const isTopicCompleted = topicProgress.completed === topicProgress.total && topicProgress.total > 0;
@@ -458,4 +467,4 @@ export const CoursePageClient = ({
       </div>
     </div>
   );
-}; 
+};
