@@ -34,6 +34,7 @@ export const CourseCardV2 = ({
   const [documentId, setDocumentId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [inputValue, setInputValue] = useState("")
 
 
   const courseState = useMemo(() => ({
@@ -141,11 +142,19 @@ export const CourseCardV2 = ({
                 type="text"
                 inputMode="numeric"
                 placeholder="Ingresa tu número de documento (C.C o T.I)"
-                value={documentId}
+                value={inputValue}
                 onChange={(e) => {
-                  // Only allow numbers and update the state
-                  const value = e.target.value.replace(/\D/g, '')
-                  setDocumentId(value)
+                  const value = e.target.value
+                  // Only allow numbers
+                  const numericValue = value.replace(/\D/g, '')
+                  setInputValue(numericValue)
+                  setDocumentId(numericValue)
+                }}
+                onBlur={() => {
+                  // Ensure we have a clean value when input loses focus
+                  const cleanValue = inputValue.replace(/\D/g, '')
+                  setInputValue(cleanValue)
+                  setDocumentId(cleanValue)
                 }}
                 className="bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400"
                 disabled={isLoading}
