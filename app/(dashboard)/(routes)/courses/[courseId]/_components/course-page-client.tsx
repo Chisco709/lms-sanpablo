@@ -69,8 +69,10 @@ export const CoursePageClient = ({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
   
-  // Use the course.pensumTopics with proper typing
+  // Use the course.pensumTopics with proper typing and state management
   const [pensumTopics, setPensumTopics] = useState<PensumTopic[]>(course.pensumTopics || []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Variables globales para el render
   const totalTopics = pensumTopics.length;
@@ -99,31 +101,53 @@ export const CoursePageClient = ({
       setCanGoBack(window.history.length > 1);
     }
     
-    // Fetch all topics and chapters (teacher mode)
+    // Fetch all topics and chapters
     const fetchPensumTopics = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const res = await fetch(`/api/courses/${courseId}/pensum-topics?all=true`);
+        const res = await fetch(`/api/courses/${courseId}/pensum-topics`);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
         const data = await res.json();
         console.log('DEBUG pensumTopics:', data);
         
-        if (Array.isArray(data)) {
-          setPensumTopics(data);
-          if (data.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
+          const validTopics = data.filter(topic => 
+            topic.isPublished && 
+            Array.isArray(topic.chapters) && 
+            topic.chapters.some((ch: any) => ch.isPublished)
+          );
+          
+          setPensumTopics(validTopics);
+          
+          if (validTopics.length > 0) {
+            // Auto-expand the first topic by default
             setExpandedTopics(prev => ({
               ...prev,
-              [data[0].id]: true
+              [validTopics[0].id]: true
             }));
           }
         } else {
+          console.warn('No published topics with published chapters found');
           setPensumTopics([]);
         }
       } catch (err) {
-        console.error('Error al cargar pensumTopics:', err);
+        console.error('Error loading pensumTopics:', err);
+        setError('Error al cargar los temas del curso. Por favor, intente de nuevo.');
         setPensumTopics([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     
-    fetchPensumTopics();
+    // Only refetch if we don't have initial data
+    if (!course.pensumTopics || course.pensumTopics.length === 0) {
+      fetchPensumTopics();
+    }
   }, [courseId]);
 
   const handleBackNavigation = () => {
@@ -319,17 +343,49 @@ export const CoursePageClient = ({
       )}
       {/* Main Content - Centered and Simplified */}
       <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8 w-full">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-400 mx-auto mb-4"></div>
+            <p className="text-slate-400">Cargando contenido del curso...</p>
+          </div>
+        )}
+        
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+        
         {/* Main Content Dropdown - Centered and Prominent */}
         <div className="w-full">
           <CourseContentDropdown 
             topics={pensumTopics.map((topic: PensumTopic) => ({
               ...topic,
-              chapters: topic.chapters || []
+              chapters: (topic.chapters || []).filter((ch: any) => ch.isPublished)
             }))} 
             courseId={courseId}
             hasAccess={hasAccess}
           />
         </div>
+        
+        {/* Empty State */}
+        {!isLoading && !error && pensumTopics.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="h-12 w-12 text-slate-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-300 mb-2">No hay contenido disponible</h3>
+            <p className="text-slate-500 max-w-md mx-auto">
+              Este curso no tiene temas publicados en este momento. Por favor, inténtalo más tarde o contacta al profesor.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
