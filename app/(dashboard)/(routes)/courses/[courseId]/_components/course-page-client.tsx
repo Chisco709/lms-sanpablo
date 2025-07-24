@@ -59,10 +59,10 @@ export const CoursePageClient = ({
     if (typeof window !== 'undefined') {
       setCanGoBack(window.history.length > 1);
     }
-    // Fetch temas publicados desde el backend
+    // Fetch todos los temas y capítulos (modo profesor)
     (async () => {
       try {
-        const res = await fetch(`/api/courses/${courseId}/pensum-topics`);
+        const res = await fetch(`/api/courses/${courseId}/pensum-topics?all=true`); // <-- Cambia el endpoint para traer todos los temas
         const data = await res.json();
         setPensumTopics(data);
         if (data.length > 0) {
@@ -285,6 +285,11 @@ export const CoursePageClient = ({
             </div>
             {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
             <div className="space-y-3 sm:space-y-6">
+              {pensumTopics?.length === 0 && (
+                <div className="text-center text-slate-400 py-8">
+                  No hay temas ni capítulos creados en el pensum.
+                </div>
+              )}
               {pensumTopics?.map((topic: any, topicIndex: number) => {
                 const isExpanded = expandedTopics[topic.id];
                 const topicProgress = getTopicProgress(topic);
@@ -292,10 +297,12 @@ export const CoursePageClient = ({
 
                 return (
                   <div key={topic.id} className="space-y-2 sm:space-y-4">
-                    {/* HEADER DEL TEMA - MÓVIL OPTIMIZADO */}
-                    <div 
+                    {/* HEADER DEL TEMA - MODO PROFESOR */}
+                    <button
+                      type="button"
                       onClick={() => toggleTopic(topic.id)}
-                      className="group cursor-pointer bg-gradient-to-r from-yellow-500/10 via-yellow-400/5 to-yellow-500/10 hover:from-yellow-500/20 hover:via-yellow-400/10 hover:to-yellow-500/20 border border-yellow-500/30 hover:border-yellow-400/50 rounded-lg sm:rounded-2xl p-3 sm:p-6 transition-all duration-300 active:scale-[0.98] touch-manipulation"
+                      className="w-full group cursor-pointer bg-gradient-to-r from-yellow-500/10 via-yellow-400/5 to-yellow-500/10 hover:from-yellow-500/20 hover:via-yellow-400/10 hover:to-yellow-500/20 border border-yellow-500/30 hover:border-yellow-400/50 rounded-lg sm:rounded-2xl p-3 sm:p-6 transition-all duration-300 active:scale-[0.98] touch-manipulation text-left"
+                      aria-expanded={isExpanded}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
@@ -326,89 +333,33 @@ export const CoursePageClient = ({
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </button>
 
-                    {/* CAPÍTULOS DEL TEMA - MÓVIL OPTIMIZADO */}
+                    {/* CAPÍTULOS DEL TEMA - SOLO SI HAY */}
                     {isExpanded && (
                       <div className="space-y-2 ml-1 sm:ml-4 pl-3 sm:pl-8 border-l-2 border-yellow-400/30">
-                        {topic.chapters.map((chapter: any, chapterIndex: number) => {
-                          const isCompleted = !!chapter.userProgress?.[0]?.isCompleted;
-                          const isLocked = isChapterLocked(chapter);
-                          const unlockDate = formatUnlockDate(chapter.unlockDate);
-
+                        {topic.chapters?.length === 0 && (
+                          <div className="text-slate-400 py-2">No hay capítulos en este tema.</div>
+                        )}
+                        {topic.chapters?.map((chapter: any, chapterIndex: number) => {
+                          // En modo profesor, no hay bloqueo de capítulos
                           return (
                             <div key={chapter.id}>
-                              {isLocked ? (
-                                <div className="p-3 sm:p-4 bg-slate-800/40 border border-slate-700/50 rounded-lg sm:rounded-xl">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-7 h-7 sm:w-10 sm:h-10 bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                                      <Lock className="h-3 w-3 sm:h-5 sm:w-5 text-slate-400" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="text-slate-300 font-medium text-sm sm:text-base line-clamp-2 leading-tight">
-                                        {chapter.title}
-                                      </h4>
-                                      {unlockDate && (
-                                        <p className="text-slate-500 text-xs mt-1 flex items-center gap-1">
-                                          <Calendar className="h-3 w-3 flex-shrink-0" />
-                                          <span className="truncate">Disponible: {unlockDate}</span>
-                                        </p>
-                                      )}
-                                    </div>
+                              <div className="p-3 sm:p-4 bg-slate-800/40 border border-slate-700/50 rounded-lg sm:rounded-xl">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-7 h-7 sm:w-10 sm:h-10 bg-slate-700 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <BookOpen className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-slate-300 font-medium text-sm sm:text-base line-clamp-2 leading-tight">
+                                      {chapter.title}
+                                    </h4>
+                                    <p className="text-slate-500 text-xs mt-1 flex items-center gap-1">
+                                      ID: {chapter.id}
+                                    </p>
                                   </div>
                                 </div>
-                              ) : (
-                                <Link
-                                  href={`/courses/${courseId}/chapters/${chapter.id}`}
-                                  className={`block p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all duration-200 border active:scale-[0.98] touch-manipulation ${
-                                    isCompleted
-                                      ? 'bg-gradient-to-r from-green-500/20 to-green-600/20 border-green-500/30 hover:border-green-400/50'
-                                      : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 hover:border-slate-600/50'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0 ${
-                                      isCompleted
-                                        ? 'bg-green-500 text-white'
-                                        : 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
-                                    }`}>
-                                      {isCompleted ? (
-                                        <CheckCircle className="h-3 w-3 sm:h-5 sm:w-5" />
-                                      ) : (
-                                        <Play className="h-3 w-3 sm:h-5 sm:w-5" />
-                                      )}
-                                    </div>
-                                    
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className={`font-semibold text-sm sm:text-base line-clamp-2 leading-tight ${
-                                        isCompleted ? 'text-green-400' : 'text-white'
-                                      }`}>
-                                        Clase {chapterIndex + 1}: {chapter.title}
-                                      </h4>
-                                      
-                                      <div className="flex items-center gap-2 mt-1">
-                                        {chapter.isFree && (
-                                          <span className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
-                                            GRATIS
-                                          </span>
-                                        )}
-                                        {isCompleted && (
-                                          <span className="text-green-400 text-xs font-medium flex items-center gap-1">
-                                            <CheckCircle className="h-3 w-3" />
-                                            <span className="hidden sm:inline">Completada</span>
-                                          </span>
-                                        )}
-                                        <div className="text-slate-400 text-xs flex items-center gap-1">
-                                          <Clock className="h-3 w-3 flex-shrink-0" />
-                                          <span>~10 min</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 group-hover:text-white transition-colors flex-shrink-0" />
-                                  </div>
-                                </Link>
-                              )}
+                              </div>
                             </div>
                           );
                         })}
