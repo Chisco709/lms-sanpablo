@@ -28,9 +28,9 @@ const CourseIdPage = async ({
         },
         include: {
           userProgress: {
-            where: { userId: user.id,
-            }
-          }
+            where: { userId: user.id }
+          },
+          pensumTopic: true // Incluye el tema de pensum en cada capítulo
         },
         orderBy: {
           position: "asc"
@@ -42,18 +42,8 @@ const CourseIdPage = async ({
         },
         include: {
           chapters: {
-            where: {
-              isPublished: true,
-            },
-            include: {
-              userProgress: {
-                where: { userId: user.id,
-                }
-              }
-            },
-            orderBy: {
-              position: "asc"
-            }
+            where: { isPublished: true },
+            orderBy: { position: "asc" }
           }
         },
         orderBy: {
@@ -81,16 +71,27 @@ const CourseIdPage = async ({
 
   // ✅ SOPORTE PARA CURSOS CON Y SIN TEMAS DEL PENSUM
   let allChapters = [];
-  
+  // Filtra solo temas con capítulos publicados
   if (course.pensumTopics && course.pensumTopics.length > 0) {
-    // Filtrar solo temas con capítulos
     course.pensumTopics = course.pensumTopics.filter((topic: any) => topic.chapters && topic.chapters.length > 0);
-    allChapters = course.pensumTopics.flatMap((topic: any) => topic.chapters);
+    if (course.pensumTopics.length > 0) {
+      allChapters = course.pensumTopics.flatMap((topic: any) => topic.chapters);
+    } else {
+      allChapters = course.chapters;
+      course.pensumTopics = [{
+        id: 'virtual-topic',
+        title: 'Contenido del Curso',
+        description: 'Todas las clases del curso',
+        position: 1,
+        isPublished: true,
+        courseId: course.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        chapters: course.chapters
+      }];
+    }
   } else {
-    // Si NO tiene temas del pensum, usar capítulos directos
     allChapters = course.chapters;
-    
-    // Crear un tema virtual para mantener la UI consistente
     course.pensumTopics = [{
       id: 'virtual-topic',
       title: 'Contenido del Curso',
