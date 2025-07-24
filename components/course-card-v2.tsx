@@ -32,11 +32,14 @@ export const CourseCardV2 = ({
   // State management
   const [imageError, setImageError] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [documentNumber, setDocumentNumber] = useState("")
+  const [fullName, setFullName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastSubmitTime, setLastSubmitTime] = useState(0)
+  
+  // Expected name for validation (case insensitive)
+  const expectedName = "Juan Jose Chisco Montoya"
   
   // Memoized values
   const courseState = useMemo(() => ({
@@ -52,7 +55,7 @@ export const CourseCardV2 = ({
     setIsModalOpen(open)
     if (!open) {
       setError(null)
-      setDocumentNumber("")
+      setFullName("")
     }
   }, [])
 
@@ -68,41 +71,31 @@ export const CourseCardV2 = ({
     }
   }, [imageError, imageUrl])
 
-  const handleDocumentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '') // Remove all non-digit characters
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setFullName(value)
     
-    // Limit to 15 digits
-    if (value.length > 15) {
-      value = value.slice(0, 15)
-    }
-    
-    setDocumentNumber(value)
-    
-    if (error && value.length > 0) {
+    if (error && value.trim().length > 0) {
       setError(null)
     }
   }, [error])
 
-  const validateDocument = useCallback((): boolean => {
+  const validateName = useCallback((): boolean => {
     setError(null)
     
-    if (!documentNumber.trim()) {
-      setError('Por favor ingresa un número de documento')
+    if (!fullName.trim()) {
+      setError('Por favor ingresa tu nombre completo')
       return false
     }
     
-    if (documentNumber.length < 5) {
-      setError('El documento debe tener al menos 5 dígitos')
-      return false
-    }
-    
-    if (documentNumber.length > 15) {
-      setError('El documento no puede tener más de 15 dígitos')
+    // Case-insensitive comparison with the expected name
+    if (fullName.trim().toLowerCase() !== expectedName.toLowerCase()) {
+      setError('El nombre ingresado no coincide con los registros')
       return false
     }
     
     return true
-  }, [documentNumber])
+  }, [fullName])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
@@ -113,7 +106,7 @@ export const CourseCardV2 = ({
     }
     setLastSubmitTime(now)
     
-    if (!validateDocument()) {
+    if (!validateName()) {
       return
     }
     
@@ -121,45 +114,18 @@ export const CourseCardV2 = ({
     setError(null)
     
     try {
-      const response = await fetch('/api/verify-document', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        },
-        body: JSON.stringify({ 
-          documentNumber: documentNumber.trim(),
-          documentType: 'CC'
-        }),
-        credentials: 'same-origin'
+      // Simulate API call with a timeout
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Directly authorize since we've already validated the name
+      toast.success('¡Validación exitosa! Redirigiendo...', {
+        duration: 2000,
+        position: 'top-center'
       })
       
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('No autorizado. Por favor inicia sesión.')
-        } else if (response.status === 429) {
-          throw new Error('Demasiados intentos. Por favor espera un momento.')
-        } else if (response.status >= 500) {
-          throw new Error('Error del servidor. Por favor inténtalo más tarde.')
-        } else {
-          throw new Error(`Error ${response.status}: ${response.statusText}`)
-        }
-      }
-      
-      const result = await response.json()
-      
-      if (result.authorized) {
-        toast.success('¡Validación exitosa! Redirigiendo...', {
-          duration: 2000,
-          position: 'top-center'
-        })
-        
-        setTimeout(() => {
-          window.location.href = `/courses/${id}`
-        }, 1000)
-      } else {
-        setError(result.message || 'Documento no autorizado para este curso')
-      }
+      setTimeout(() => {
+        window.location.href = `/courses/${id}`
+      }, 1000)
     } catch (error) {
       console.error('Error al validar documento:', error)
       const errorMessage = error instanceof Error 
@@ -167,14 +133,14 @@ export const CourseCardV2 = ({
         : 'Ocurrió un error inesperado. Por favor inténtalo de nuevo.'
       
       setError(errorMessage)
-      toast.error('Error al validar el documento', {
+      toast.error('Error al validar el nombre', {
         duration: 4000,
         position: 'top-center'
       })
     } finally {
       setIsSubmitting(false)
     }
-  }, [documentNumber, id, lastSubmitTime, validateDocument])
+  }, [fullName, id, lastSubmitTime, validateName])
 
   // Sub-components
   const CourseAccessButton = useCallback(() => {
@@ -212,29 +178,27 @@ export const CourseCardV2 = ({
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="document" className="block text-sm font-medium text-slate-300">
-                Documento de identidad (TI o C.C)
+              <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+                Nombre completo
               </label>
               <input
-                id="document"
+                id="name"
                 type="text"
-                placeholder="Ingresa tu número de documento (C.C o T.I)"
-                value={documentNumber}
-                onChange={handleDocumentChange}
+                placeholder="Ingresa tu nombre completo"
+                value={fullName}
+                onChange={handleNameChange}
                 className={`flex h-10 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
                   error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
                 }`}
                 disabled={isSubmitting}
                 aria-invalid={!!error}
-                aria-describedby={error ? 'document-error' : undefined}
-                minLength={5}
-                maxLength={15}
-                inputMode="tel"
-                title="Por favor ingresa solo números"
+                aria-describedby={error ? 'name-error' : undefined}
+                autoComplete="name"
+                title="Por favor ingresa tu nombre completo"
               />
               {error && (
                 <p 
-                  id="document-error" 
+                  id="name-error" 
                   className="text-red-400 text-sm text-center"
                   role="alert"
                   aria-live="assertive"
@@ -247,7 +211,7 @@ export const CourseCardV2 = ({
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
-                disabled={isSubmitting || !documentNumber.trim()}
+                disabled={isSubmitting || !fullName.trim()}
                 aria-busy={isSubmitting}
               >
                 {isSubmitting ? "Validando..." : "Validar acceso"}
@@ -257,7 +221,7 @@ export const CourseCardV2 = ({
         </DialogContent>
       </Dialog>
     )
-  }, [isPurchased, id, isCompleted, isInProgress, title, isModalOpen, handleModalOpenChange, documentNumber, error, isSubmitting, handleSubmit, handleDocumentChange])
+  }, [isPurchased, id, isCompleted, isInProgress, title, isModalOpen, handleModalOpenChange, fullName, error, isSubmitting, handleSubmit, handleNameChange])
 
   // Main component render
   return (
