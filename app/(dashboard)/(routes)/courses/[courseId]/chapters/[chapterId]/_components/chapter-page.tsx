@@ -209,7 +209,7 @@ const ChapterPage = ({
 
                 <div className="space-y-3 md:space-y-4">
                   <a
-                    href={chapter.pdfUrl}
+                    href={`/api/view-pdf?url=${encodeURIComponent(chapter.pdfUrl)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full px-5 md:px-6 py-3 md:py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
@@ -219,7 +219,9 @@ const ChapterPage = ({
                   
                   <a
                     href={chapter.pdfUrl}
-                    download
+                    download={`${chapter.title.replace(/\s+/g, '_')}.pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
                   >
                     📥 Descargar

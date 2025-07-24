@@ -118,7 +118,7 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
       const now = new Date();
       course.pensumTopics = [{
         id: 'virtual-topic',
-        title: 'Contenido del Curso',
+        title: 'Neurobiología',
         description: 'Todas las clases del curso',
         position: 1,
         isPublished: true,
