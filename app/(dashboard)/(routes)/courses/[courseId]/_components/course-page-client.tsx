@@ -22,6 +22,30 @@ import {
 import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 import { CourseContentDropdown } from "@/components/course-content-dropdown";
 
+interface PensumTopic {
+  id: string;
+  title: string;
+  position: number;
+  isPublished: boolean;
+  chapters: Chapter[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Chapter {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl: string | null;
+  position: number;
+  isPublished: boolean;
+  isFree: boolean;
+  courseId: string;
+  createdAt: string;
+  updatedAt: string;
+  userProgress: Array<{ isCompleted: boolean }>;
+}
+
 interface CoursePageClientProps {
   course: any;
   progressCount: number;
@@ -45,46 +69,62 @@ export const CoursePageClient = ({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
   
-  // Use the course.pensumTopics directly from props
-  const pensumTopics = course.pensumTopics || [];
+  // Use the course.pensumTopics with proper typing
+  const [pensumTopics, setPensumTopics] = useState<PensumTopic[]>(course.pensumTopics || []);
   
   // Variables globales para el render
   const totalTopics = pensumTopics.length;
-  const allChapters = pensumTopics.flatMap((topic: any) => topic.chapters || []) || [];
+  const allChapters = pensumTopics.flatMap((topic: PensumTopic) => topic.chapters || []) || [];
   
   // Log for debugging
   console.log('Course in client component:', course);
   console.log('Pensum Topics in client component:', pensumTopics);
   
   // Analytics hooks
-  const { trackLMSEvent, trackCourseInteraction } = useAnalytics();
+  const { trackLMSEvent } = useAnalytics();
   usePageTracking();
   useTimeTracking(`Curso: ${course.title}`);
   
+  // Track course view when component mounts
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      trackLMSEvent.courseView(courseId, course.title);
+    }
+  }, [courseId, course.title, mounted, trackLMSEvent]);
+  
+  // Initialize component state
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined') {
       setCanGoBack(window.history.length > 1);
     }
-    // Fetch todos los temas y capítulos (modo profesor)
-    (async () => {
+    
+    // Fetch all topics and chapters (teacher mode)
+    const fetchPensumTopics = async () => {
       try {
         const res = await fetch(`/api/courses/${courseId}/pensum-topics?all=true`);
         const data = await res.json();
-        console.log('DEBUG pensumTopics:', data); // Debug: Verifica los datos que llegan
-        setPensumTopics(Array.isArray(data) ? data : []);
-        if (Array.isArray(data) && data.length > 0) {
-          setExpandedTopics({ [data[0].id]: true });
+        console.log('DEBUG pensumTopics:', data);
+        
+        if (Array.isArray(data)) {
+          setPensumTopics(data);
+          if (data.length > 0) {
+            setExpandedTopics(prev => ({
+              ...prev,
+              [data[0].id]: true
+            }));
+          }
+        } else {
+          setPensumTopics([]);
         }
       } catch (err) {
         console.error('Error al cargar pensumTopics:', err);
+        setPensumTopics([]);
       }
-    })();
-    // Track course view solo en el cliente
-    if (mounted && typeof window !== 'undefined') {
-      trackLMSEvent.courseView(courseId, course.title);
-    }
-  }, [courseId, trackLMSEvent, mounted]);
+    };
+    
+    fetchPensumTopics();
+  }, [courseId]);
 
   const handleBackNavigation = () => {
     if (canGoBack) {
@@ -277,193 +317,18 @@ export const CoursePageClient = ({
           </div>
         </div>
       )}
-      {/* Contenido principal - OPTIMIZADO PARA MÓVIL */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
-        <div className="grid lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          {/* Sidebar with Course Content Dropdown - Added to left */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <CourseContentDropdown 
-                topics={pensumTopics.map(topic => ({
-                  ...topic,
-                  chapters: topic.chapters || []
-                }))} 
-                courseId={courseId} 
-              />
-            </div>
-          </div>
-          
-          {/* CONTENIDO ORGANIZADO POR TEMAS DEL PENSUM - MÓVIL FIRST */}
-          <div className="lg:col-span-3 space-y-3 sm:space-y-6">
-            {/* Título responsive */}
-            <div className="text-center px-2 sm:px-0">
-              <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-white bg-clip-text text-transparent mb-2 sm:mb-4 leading-tight">
-                CONTENIDO DEL CURSO
-              </h2>
-              <p className="text-green-400 text-sm sm:text-lg">
-                {totalTopics} {totalTopics === 1 ? 'tema' : 'temas'} • {allChapters.length} {allChapters.length === 1 ? 'clase' : 'clases'}
-              </p>
-            </div>
-            {/* TEMAS DEL PENSUM ORGANIZADOS - MÓVIL OPTIMIZADO */}
-            <div className="space-y-3 sm:space-y-6">
-              {/* DEBUG: Mostrar datos en consola para verificar */}
-              {process.env.NODE_ENV !== 'production' && (
-                <pre className="bg-black/80 text-green-400 text-xs p-2 rounded mb-2 overflow-x-auto">
-                  {JSON.stringify(pensumTopics, null, 2)}
-                </pre>
-              )}
-              {/* CORREGIDO: Solo muestra mensaje si realmente está vacío o no es array */}
-              {(Array.isArray(pensumTopics) && pensumTopics.length === 0) && (
-                <div className="text-center text-slate-400 py-8">
-                  No hay temas ni capítulos creados en el pensum.
-                </div>
-              )}
-              {(Array.isArray(pensumTopics) && pensumTopics.length > 0) && pensumTopics.map((topic: any, topicIndex: number) => {
-                const isExpanded = expandedTopics[topic.id];
-                const topicProgress = getTopicProgress(topic);
-                const isTopicCompleted = topicProgress.completed === topicProgress.total && topicProgress.total > 0;
-
-                return (
-                  <div key={topic.id} className="space-y-2 sm:space-y-4">
-                    {/* HEADER DEL TEMA - MODO PROFESOR */}
-                    <button
-                      type="button"
-                      onClick={() => toggleTopic(topic.id)}
-                      className="w-full group cursor-pointer bg-gradient-to-r from-yellow-500/10 via-yellow-400/5 to-yellow-500/10 hover:from-yellow-500/20 hover:via-yellow-400/10 hover:to-yellow-500/20 border border-yellow-500/30 hover:border-yellow-400/50 rounded-lg sm:rounded-2xl p-3 sm:p-6 transition-all duration-300 active:scale-[0.98] touch-manipulation text-left"
-                      aria-expanded={isExpanded}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-                          <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-sm sm:text-lg flex-shrink-0 ${
-                            isTopicCompleted
-                              ? 'bg-gradient-to-br from-green-500 to-green-600 text-white'
-                              : 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-black'
-                          }`}>
-                            {isTopicCompleted ? <CheckCircle size={16} className="sm:w-6 sm:h-6" /> : (topicIndex + 1)}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-base sm:text-xl lg:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors line-clamp-2 leading-tight">
-                              📚 {topic.title}
-                            </h3>
-                            <p className="text-slate-400 mt-0.5 sm:mt-1 text-xs sm:text-base">
-                              {topicProgress.completed}/{topicProgress.total} clases
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                          {isTopicCompleted && (
-                            <span className="px-1.5 sm:px-3 py-0.5 sm:py-1 bg-green-500/20 text-green-400 font-bold rounded-full text-xs">
-                              ✅
-                            </span>
-                          )}
-                          <div className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''} p-1`}>
-                            <ChevronDown className="h-4 w-4 sm:h-6 sm:w-6 text-slate-400 group-hover:text-yellow-400" />
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-
-                    {/* CAPÍTULOS DEL TEMA - SOLO SI HAY */}
-                    {isExpanded && (
-                      <div className="space-y-2 ml-1 sm:ml-4 pl-3 sm:pl-8 border-l-2 border-yellow-400/30">
-                        {(Array.isArray(topic.chapters) && topic.chapters.length === 0) && (
-                          <div className="text-slate-400 py-2">No hay capítulos en este tema.</div>
-                        )}
-                        {(Array.isArray(topic.chapters) && topic.chapters.length > 0) && topic.chapters.map((chapter: any, chapterIndex: number) => {
-                          const isLocked = isChapterLocked(chapter);
-                          const isCompleted = chapter.userProgress?.[0]?.isCompleted;
-                          
-                          return (
-                            <div key={chapter.id}>
-                              <Link 
-                                href={isLocked ? '#' : `/courses/${courseId}/chapters/${chapter.id}`}
-                                onClick={(e) => {
-                                  if (isLocked) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              >
-                                <div className={`p-3 sm:p-4 ${isLocked ? 'bg-slate-800/20' : 'bg-slate-800/40 hover:bg-slate-700/60 cursor-pointer'} border ${isCompleted ? 'border-green-500/30' : 'border-slate-700/50'} rounded-lg sm:rounded-xl transition-colors`}>
-                                  <div className="flex items-center gap-3">
-                                    <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${isCompleted ? 'bg-green-500/20' : 'bg-slate-700'}`}>
-                                      {isCompleted ? (
-                                        <CheckCircle className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
-                                      ) : (
-                                        <BookOpen className="h-3 w-3 sm:h-5 sm:w-5 text-green-400" />
-                                      )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <h4 className={`font-medium text-sm sm:text-base line-clamp-2 leading-tight ${isLocked ? 'text-slate-500' : 'text-slate-300'}`}>
-                                          {chapter.title}
-                                        </h4>
-                                        {isLocked && (
-                                          <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500 flex-shrink-0" />
-                                        )}
-                                      </div>
-                                      {!isLocked && chapter.description && (
-                                        <p className="text-slate-400 text-xs mt-1 line-clamp-1">
-                                          {chapter.description}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </Link>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* SIDEBAR - OCULTO EN MÓVIL, MOSTRADO EN DESKTOP */}
-          <div className="hidden lg:block">
-            <div className="sticky top-28 space-y-6">
-              {/* Información del curso */}
-              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/30">
-                <h3 className="text-white font-bold text-xl mb-4">Información del Curso</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Progreso:</span>
-                    <span className="text-white font-semibold">{Math.round((completedChapters / allChapters.length) * 100) || 0}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Completadas:</span>
-                    <span className="text-green-400 font-semibold">{completedChapters}/{allChapters.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Acceso:</span>
-                    <span className={hasAccess ? "text-green-400" : "text-yellow-400"}>
-                      {hasAccess ? "✅ Total" : "⭐ Limitado"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progreso visual */}
-              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/30">
-                <h3 className="text-white font-bold text-lg mb-4">Tu Progreso</h3>
-                <div className="space-y-4">
-                  <div className="relative">
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${(completedChapters / allChapters.length) * 100 || 0}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-center text-slate-400 text-sm mt-2">
-                      {Math.round((completedChapters / allChapters.length) * 100) || 0}% completado
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Main Content - Centered and Simplified */}
+      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8 w-full">
+        {/* Main Content Dropdown - Centered and Prominent */}
+        <div className="w-full">
+          <CourseContentDropdown 
+            topics={pensumTopics.map((topic: PensumTopic) => ({
+              ...topic,
+              chapters: topic.chapters || []
+            }))} 
+            courseId={courseId}
+            hasAccess={hasAccess}
+          />
         </div>
       </div>
     </div>
