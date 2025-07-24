@@ -42,12 +42,18 @@ export const CoursePageClient = ({
   const [canGoBack, setCanGoBack] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [pensumTopics, setPensumTopics] = useState<any[]>(course.pensumTopics || []);
   const router = useRouter();
   
+  // Use the course.pensumTopics directly from props
+  const pensumTopics = course.pensumTopics || [];
+  
   // Variables globales para el render
-  const totalTopics = pensumTopics?.length || 0;
-  const allChapters = pensumTopics?.flatMap((topic: any) => topic.chapters) || [];
+  const totalTopics = pensumTopics.length;
+  const allChapters = pensumTopics.flatMap((topic: any) => topic.chapters || []) || [];
+  
+  // Log for debugging
+  console.log('Course in client component:', course);
+  console.log('Pensum Topics in client component:', pensumTopics);
   
   // Analytics hooks
   const { trackLMSEvent, trackCourseInteraction } = useAnalytics();

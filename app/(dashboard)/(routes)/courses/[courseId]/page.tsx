@@ -96,8 +96,12 @@ const CourseIdPage = async ({ params }: CourseIdPageProps) => {
   // Process Pensum Topics and chapters
   let allChapters = [];
   
+  console.log('Course PensumTopics:', course.pensumTopics);
+  console.log('Course Chapters:', course.chapters);
+  
   // If there are published Pensum Topics with chapters
   if (course.pensumTopics?.length > 0) {
+    console.log('Found Pensum Topics, count:', course.pensumTopics.length);
     // Filter out topics without chapters and ensure we have published chapters
     course.pensumTopics = course.pensumTopics.filter(
       (topic: any) => topic.chapters?.length > 0
@@ -144,8 +148,12 @@ courseId: course.id,
   }
 
   if (allChapters.length === 0) {
+    console.log('No chapters found, redirecting to /student');
     return redirect("/student");
   }
+  
+  console.log('Final PensumTopics to render:', course.pensumTopics);
+  console.log('All chapters count:', allChapters.length);
 
   const completedChapters = allChapters.filter((ch: any) => ch.userProgress?.[0]?.isCompleted).length;
 

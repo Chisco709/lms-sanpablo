@@ -27,6 +27,10 @@ export const CourseSidebarClient: React.FC<CourseSidebarClientProps> = ({
     setExpandedTopic(expandedTopic === topicId ? null : topicId);
   };
 
+  console.log('Rendering CourseSidebar with course:', course);
+  console.log('Pensum Topics in sidebar:', course.pensumTopics);
+  console.log('Chapters in sidebar:', course.chapters);
+  
   return (
     <div className="h-full bg-slate-950 flex flex-col">
       {/* Header del sidebar - Más espacioso */}
@@ -68,6 +72,7 @@ export const CourseSidebarClient: React.FC<CourseSidebarClientProps> = ({
           </div>
           
           {/* Mostrar temas de pensum si existen */}
+          {console.log('Checking if PensumTopics exist:', course.pensumTopics?.length > 0)}
           {course.pensumTopics && course.pensumTopics.length > 0 ? (
             <div className="space-y-4">
               {course.pensumTopics.map((topic: any) => {
