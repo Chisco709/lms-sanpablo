@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { BookOpen, Play, CheckCircle, Clock, Lock } from "lucide-react"
+import { BookOpen, Play, CheckCircle, Clock } from "lucide-react"
 import { CourseProgress } from "@/components/course-progress"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -31,10 +31,11 @@ export const CourseCardV2 = ({
 }: CourseCardProps) => {
   const [imageError, setImageError] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [documentId, setDocumentId] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  // Document validation state
+  const [documentNumber, setDocumentNumber] = useState("")
+  const [isValidating, setIsValidating] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [inputValue, setInputValue] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
 
   const courseState = useMemo(() => ({
@@ -57,56 +58,78 @@ export const CourseCardV2 = ({
     }
   }, [imageError, imageUrl, id])
 
-  const handleDocumentValidation = async (e: React.FormEvent) => {
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    // Only allow numbers
+    if (/^\d*$/.test(value)) {
+      setDocumentNumber(value)
+      setError(null) // Clear error when user types
+    }
+  }
+
+  const validateDocument = async () => {
+    // Local validation
+    if (!documentNumber) {
+      setError('Por favor ingresa un número de documento')
+      return false
+    }
+    
+    if (documentNumber.length < 5) {
+      setError('El documento debe tener al menos 5 dígitos')
+      return false
+    }
+    
+    return true
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const trimmedDocId = documentId.trim()
     
-    if (!trimmedDocId) {
-      toast.error('Por favor ingresa un número de documento')
+    if (!(await validateDocument())) {
       return
     }
     
-    if (trimmedDocId.length < 5) {
-      toast.error('El documento debe tener al menos 5 dígitos')
-      return
-    }
-    
-    setIsLoading(true)
+    setIsValidating(true)
+    setError(null)
     
     try {
       const response = await fetch('/api/verify-document', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          documentNumber: trimmedDocId,
+          documentNumber: documentNumber.trim(),
           documentType: 'CC' // Default to Cédula de Ciudadanía
         })
       })
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`Error del servidor: ${response.status}`)
       }
       
       const result = await response.json()
       
       if (result.authorized) {
-        // If valid, redirect to course
+        // Redirect to course on successful validation
         window.location.href = `/courses/${id}`
       } else {
-        toast.error(result.message || 'Documento no autorizado para acceder a este curso')
+        setError(result.message || 'Documento no autorizado para este curso')
       }
     } catch (error) {
-      console.error('Error verifying document:', error)
-      toast.error('Error al validar el documento. Por favor, inténtalo de nuevo.')
+      console.error('Error al validar documento:', error)
+      setError('Error de conexión. Por favor, inténtalo de nuevo.')
     } finally {
-      setIsLoading(false)
+      setIsValidating(false)
     }
   }
 
   const CourseAccessButton = () => {
     if (isPurchased) {
       return (
-        <Link href={`/courses/${id}`} className="w-full block" aria-label={`${isCompleted ? 'Ver' : isInProgress ? 'Continuar' : 'Comenzar'} curso ${title}`}>
+        <Link 
+          href={`/courses/${id}`} 
+          className="w-full block" 
+          aria-label={`${isCompleted ? 'Ver' : isInProgress ? 'Continuar' : 'Comenzar'} curso ${title}`}
+        >
           <Button 
             className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-medium transition-colors duration-200 text-sm sm:text-base h-9 sm:h-10"
             size="sm"
@@ -132,7 +155,7 @@ export const CourseCardV2 = ({
           <DialogHeader>
             <DialogTitle className="text-white">Validación de acceso</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleDocumentValidation} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="document" className="block text-sm font-medium text-slate-300">
                 Documento de identidad (TI o C.C)
@@ -142,34 +165,29 @@ export const CourseCardV2 = ({
                 type="text"
                 inputMode="numeric"
                 placeholder="Ingresa tu número de documento (C.C o T.I)"
-                value={inputValue}
-                onChange={(e) => {
-                  const value = e.target.value
-                  // Only allow numbers
-                  const numericValue = value.replace(/\D/g, '')
-                  setInputValue(numericValue)
-                  setDocumentId(numericValue)
-                }}
-                onBlur={() => {
-                  // Ensure we have a clean value when input loses focus
-                  const cleanValue = inputValue.replace(/\D/g, '')
-                  setInputValue(cleanValue)
-                  setDocumentId(cleanValue)
-                }}
-                className="bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400"
-                disabled={isLoading}
+                value={documentNumber}
+                onChange={handleDocumentChange}
+                className={`bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-yellow-400 ${
+                  error ? 'border-red-500' : ''
+                }`}
+                disabled={isValidating}
                 minLength={5}
                 maxLength={15}
                 pattern="\d+"
                 title="Por favor ingresa solo números"
               />
+              {error && (
+                <p className="text-red-500 text-sm mt-1">
+                  {error}
+                </p>
+              )}
             </div>
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-              disabled={isLoading}
+              disabled={isValidating}
             >
-              {isLoading ? "Validando..." : "Validar acceso"}
+              {isValidating ? "Validando..." : "Validar acceso"}
             </Button>
           </form>
         </DialogContent>
