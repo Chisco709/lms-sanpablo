@@ -20,8 +20,7 @@ export const CourseSidebarClient: React.FC<CourseSidebarClientProps> = ({
   completedChapters,
   totalDuration,
 }) => {
-  const [expandedTopic, setExpandedTopic] = useState<string | null>(course.pensumTopics?.[0]?.id || null);
-
+  const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
   const hasAccess = !!purchase;
 
   const handleToggleTopic = (topicId: string) => {
@@ -60,14 +59,18 @@ export const CourseSidebarClient: React.FC<CourseSidebarClientProps> = ({
         </div>
       </div>
 
-      {/* Lista de Temas y Capítulos agrupados */}
+      {/* Contenido del curso y temas de pensum */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="h-4 w-4 text-green-400" />
+            <h4 className="text-sm font-semibold text-white">Contenido del curso</h4>
+          </div>
           {course.pensumTopics && course.pensumTopics.length > 0 ? (
             course.pensumTopics.map((topic: any) => (
               <div key={topic.id} className="mb-4">
                 <button
-                  className="flex items-center gap-2 mb-2 w-full text-left"
+                  className="flex items-center gap-2 mb-2 w-full text-left bg-slate-800/40 hover:bg-slate-800/60 rounded-lg px-3 py-2 transition"
                   onClick={() => handleToggleTopic(topic.id)}
                 >
                   <Target className="h-4 w-4 text-green-400" />
@@ -96,10 +99,7 @@ export const CourseSidebarClient: React.FC<CourseSidebarClientProps> = ({
               </div>
             ))
           ) : (
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="h-4 w-4 text-green-400" />
-              <h4 className="text-sm font-semibold text-white">Contenido del curso</h4>
-            </div>
+            <div className="text-slate-400 text-sm">No hay temas de pensum disponibles.</div>
           )}
         </div>
       </div>
