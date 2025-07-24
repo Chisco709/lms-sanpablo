@@ -19,6 +19,7 @@ const CourseIdPage = async ({
   const course = await db.course.findUnique({
     where: {
       id: courseId,
+      isPublished: true // Ensure only published courses are accessible
     },
     include: {
       category: true,
@@ -30,7 +31,13 @@ const CourseIdPage = async ({
           userProgress: {
             where: { userId: user.id }
           },
-          pensumTopic: true // Incluye el tema de pensum en cada capítulo
+          pensumTopic: {
+            select: {
+              id: true,
+              title: true,
+              isPublished: true
+            }
+          }
         },
         orderBy: {
           position: "asc"
@@ -39,11 +46,25 @@ const CourseIdPage = async ({
       pensumTopics: {
         where: {
           isPublished: true,
+          chapters: {
+            some: {
+              isPublished: true
+            }
+          }
         },
         include: {
           chapters: {
-            where: { isPublished: true },
-            orderBy: { position: "asc" }
+            where: { 
+              isPublished: true 
+            },
+            orderBy: { 
+              position: "asc" 
+            },
+            include: {
+              userProgress: {
+                where: { userId: user.id }
+              }
+            }
           }
         },
         orderBy: {
