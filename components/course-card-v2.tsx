@@ -72,17 +72,9 @@ export const CourseCardV2 = ({
   }, [imageError, imageUrl])
 
   const handlePasscodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '') // Remove non-digit characters
-    
-    // Limit to 4 digits
-    if (value.length <= 4) {
-      setPasscode(value)
-      
-      // Clear error when user starts typing
-      if (error && value.length > 0) {
-        setError(null)
-      }
-    }
+    const value = e.target.value.replace(/\D/g, '') // Solo números
+    setPasscode(value.slice(0, 4)) // Limitar a 4 dígitos
+    if (error) setError(null)
   }, [error])
 
   const validatePasscode = useCallback((): boolean => {
@@ -151,7 +143,7 @@ export const CourseCardV2 = ({
     }
   }, [passcode, id, lastSubmitTime, validatePasscode])
 
-  // Sub-components
+  // Componente de botón de acceso al curso
   const CourseAccessButton = useCallback(() => {
     if (isPurchased) {
       return (
@@ -181,61 +173,78 @@ export const CourseCardV2 = ({
             Acceder al curso
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700">
+        
+        <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 p-6">
           <DialogHeader>
-            <DialogTitle className="text-white">Validación de acceso</DialogTitle>
+            <DialogTitle className="text-white text-center text-xl font-bold mb-2">
+              Acceso al Curso
+            </DialogTitle>
+            <p className="text-slate-400 text-sm text-center mb-6">
+              Ingresa el código de acceso de 4 dígitos
+            </p>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="passcode" className="block text-sm font-medium text-slate-300">
-                Código de Acceso
-              </label>
-              <input
-                id="passcode"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder="Ingresa el código de 4 dígitos"
-                value={passcode}
-                onChange={handlePasscodeChange}
-                onFocus={(e) => {
-                  // Prevent auto-selection of text on focus
-                  e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
-                }}
-                className={`text-center text-xl font-mono tracking-widest flex h-12 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
-                  error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
-                }`}
-                disabled={isSubmitting}
-                aria-invalid={!!error}
-                aria-describedby={error ? 'passcode-error' : undefined}
-                maxLength={4}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck="false"
-                title="Ingresa el código de 4 dígitos"
-              />
+          
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="relative">
+                <input
+                  id="passcode"
+                  type="text"
+                  inputMode="numeric"
+                  value={passcode}
+                  onChange={handlePasscodeChange}
+                  className={`w-full h-14 text-2xl font-mono text-center tracking-widest bg-slate-800 border-2 rounded-lg focus:outline-none transition-colors ${
+                    error 
+                      ? 'border-red-500 text-red-500' 
+                      : 'border-slate-700 hover:border-slate-600 focus:border-blue-500 text-white'
+                  }`}
+                  maxLength={4}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  disabled={isSubmitting}
+                />
+                
+                {/* Placeholder digits */}
+                {!passcode && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="flex space-x-2">
+                      {[1,2,3,4].map((_, i) => (
+                        <div key={i} className="w-3 h-3 rounded-full bg-slate-700"></div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               {error && (
-                <p 
-                  id="passcode-error" 
-                  className="text-red-400 text-sm text-center"
-                  role="alert"
-                  aria-live="assertive"
-                >
+                <p className="mt-2 text-sm text-red-400 text-center" role="alert">
                   {error}
                 </p>
               )}
             </div>
-            <div className="space-y-2">
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
-                disabled={isSubmitting || !passcode.trim()}
-                aria-busy={isSubmitting}
-              >
-                {isSubmitting ? "Validando..." : "Validar acceso"}
-              </Button>
-            </div>
-          </form>
+            
+            <Button 
+              type="button"
+              onClick={handleSubmit}
+              className="w-full h-11 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-lg transition-colors"
+              disabled={isSubmitting || passcode.length !== 4}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Validando...
+                </span>
+              ) : 'Validar Acceso'}
+            </Button>
+            
+            <p className="text-xs text-slate-500 text-center">
+              Ingresa el código de 4 dígitos proporcionado
+            </p>
+          </div>
         </DialogContent>
       </Dialog>
     )
