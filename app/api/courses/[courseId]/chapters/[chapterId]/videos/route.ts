@@ -5,9 +5,19 @@ import { z } from "zod";
 
 const videoSchema = z.object({
   title: z.string().min(1, "El título es requerido"),
-  url: z.string().url("URL inválida").startsWith("https://www.youtube.com/", {
-    message: "Solo se permiten videos de YouTube"
-  }),
+  url: z.string().url("URL inválida").refine(
+    (url) => {
+      // Acepta tanto youtu.be como youtube.com
+      return (
+        url.includes('youtube.com/watch') || 
+        url.includes('youtu.be/') ||
+        url.includes('youtube.com/embed/')
+      );
+    },
+    {
+      message: "Solo se permiten enlaces de YouTube (formato: youtube.com/watch?v=ID o youtu.be/ID)"
+    }
+  ),
   position: z.number().int().min(0),
   isPrimary: z.boolean().optional().default(false)
 });

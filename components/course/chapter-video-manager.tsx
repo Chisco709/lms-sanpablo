@@ -36,6 +36,30 @@ export function ChapterVideoManager({
     isPrimary: false
   });
 
+  // Extrae el ID de un video de YouTube desde una URL
+  const extractVideoId = (url: string): string | null => {
+    // Patrón para URLs de YouTube (soporta varios formatos)
+    const patterns = [
+      // Formato estándar: https://www.youtube.com/watch?v=ID
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^"&?\/\s]{11})/,
+      // Formato con parámetros adicionales: https://www.youtube.com/watch?feature=player_embedded&v=ID
+      /[?&]v=([^"&?\/\s]{11})/,
+      // Formato corto: https://youtu.be/ID
+      /youtu\.be\/([^"&?\/\s]{11})/,
+      // Formato embed: https://www.youtube.com/embed/ID
+      /youtube\.com\/embed\/([^"&?\/\s]{11})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  };
+
   // Cargar videos existentes
   useEffect(() => {
     const fetchVideos = async () => {

@@ -6,9 +6,20 @@ import { z } from "zod";
 const updateVideoSchema = z.object({
   title: z.string().min(1, "El título es requerido").optional(),
   url: z.string().url("URL inválida")
-    .startsWith("https://www.youtube.com/", {
-      message: "Solo se permiten videos de YouTube"
-    })
+    .refine(
+      (url) => {
+        if (!url) return true; // Permitir undefined/opcional
+        // Acepta tanto youtu.be como youtube.com
+        return (
+          url.includes('youtube.com/watch') || 
+          url.includes('youtu.be/') ||
+          url.includes('youtube.com/embed/')
+        );
+      },
+      {
+        message: "Solo se permiten enlaces de YouTube (formato: youtube.com/watch?v=ID o youtu.be/ID)"
+      }
+    )
     .optional(),
   position: z.number().int().min(0).optional(),
   isPrimary: z.boolean().optional()
