@@ -141,12 +141,11 @@ model Attachment {
   @@index([courseId])
 }
 
-
 model Chapter {
   id String @id @default(uuid())
   title String
   description String? @db.Text
-  videoUrl String? @db.Text
+  videoUrl String? @db.Text // Mantenido para compatibilidad
   pdfUrl String? @db.Text
   googleFormUrl String? @db.Text // URL del Google Form
   position Int
@@ -161,6 +160,9 @@ model Chapter {
   pensumTopicId String?
   pensumTopic PensumTopic? @relation(fields: [pensumTopicId], references: [id], onDelete: SetNull)
 
+  // Relación con videos
+  videos ChapterVideo[]
+
   userProgress UserProgress[]
   assignments Assignment[]
 
@@ -169,6 +171,21 @@ model Chapter {
 
   @@index([courseId])
   @@index([pensumTopicId])
+}
+
+model ChapterVideo {
+  id        String   @id @default(uuid())
+  title     String
+  url       String   @db.Text
+  position  Int
+  isPrimary Boolean  @default(false)
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
 }
 
 // Nuevo modelo para Temas del Pensum
