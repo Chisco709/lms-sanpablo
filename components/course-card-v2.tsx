@@ -198,6 +198,10 @@ export const CourseCardV2 = ({
                 placeholder="Ingresa el código de 4 dígitos"
                 value={passcode}
                 onChange={handlePasscodeChange}
+                onFocus={(e) => {
+                  // Prevent auto-selection of text on focus
+                  e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
+                }}
                 className={`text-center text-xl font-mono tracking-widest flex h-12 w-full rounded-md bg-slate-800 border-2 border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors ${
                   error ? 'border-red-500 focus:border-red-500' : 'hover:border-slate-600 focus:border-blue-500'
                 }`}
@@ -205,7 +209,9 @@ export const CourseCardV2 = ({
                 aria-invalid={!!error}
                 aria-describedby={error ? 'passcode-error' : undefined}
                 maxLength={4}
-                autoComplete="one-time-code"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
                 title="Ingresa el código de 4 dígitos"
               />
               {error && (
