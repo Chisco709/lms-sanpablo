@@ -72,10 +72,25 @@ export const CourseCardV2 = ({
   }, [imageError, imageUrl])
 
   const handlePasscodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '') // Solo números
-    setPasscode(value.slice(0, 4)) // Limitar a 4 dígitos
-    if (error) setError(null)
-  }, [error])
+    // Solo permite un dígito a la vez (para forzar escritura manual)
+    const newChar = e.target.value.slice(-1);
+    if (/\d/.test(newChar)) {
+      setPasscode(prev => {
+        const newPasscode = (prev + newChar).slice(0, 4);
+        if (error) setError(null);
+        return newPasscode;
+      });
+    }
+  }, [error]);
+  
+  // Prevenir pegado
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    toast.error('Por favor escribe el código manualmente', {
+      duration: 2000,
+      position: 'top-center'
+    });
+  }, []);
 
   const validatePasscode = useCallback((): boolean => {
     setError(null)
@@ -193,6 +208,14 @@ export const CourseCardV2 = ({
                   inputMode="numeric"
                   value={passcode}
                   onChange={handlePasscodeChange}
+                  onPaste={handlePaste}
+                  onKeyDown={(e) => {
+                    // Solo permitir teclas numéricas y teclas de control
+                    if (!/^[0-9\b]$/.test(e.key) && 
+                        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                   className={`w-full h-14 text-2xl font-mono text-center tracking-widest bg-slate-800 border-2 rounded-lg focus:outline-none transition-colors ${
                     error 
                       ? 'border-red-500 text-red-500' 
@@ -201,6 +224,7 @@ export const CourseCardV2 = ({
                   maxLength={4}
                   autoComplete="off"
                   autoCorrect="off"
+                  autoCapitalize="off"
                   spellCheck="false"
                   disabled={isSubmitting}
                 />
