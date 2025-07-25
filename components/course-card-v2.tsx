@@ -223,7 +223,7 @@ export const CourseCardV2 = ({
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-colors"
-                disabled={isSubmitting || !fullName.trim()}
+                disabled={isSubmitting || !passcode.trim()}
                 aria-busy={isSubmitting}
               >
                 {isSubmitting ? "Validando..." : "Validar acceso"}
