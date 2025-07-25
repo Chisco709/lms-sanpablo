@@ -34,12 +34,6 @@ const CourseIdPage = async ({
     include: {
       category: true,
       chapters: {
-        where: {
-          isPublished: true,
-          pdfUrl: {
-            not: null
-          }
-        },
         orderBy: {
           position: "asc",
         },
@@ -68,6 +62,17 @@ const CourseIdPage = async ({
       },
     },
   });
+
+  // Check if there are any published chapters with PDFs for the publish button
+  const hasPublishedChapters = await db.chapter.count({
+    where: {
+      courseId: courseId,
+      isPublished: true,
+      pdfUrl: {
+        not: null
+      }
+    }
+  }) > 0;
 
   if (!course) {
     return redirect("/teacher/courses");
@@ -131,7 +136,7 @@ const CourseIdPage = async ({
             disabled={!isComplete}
             courseId={courseId}
             isPublished={course.isPublished}
-            hasPublishedChapters={course.chapters.length > 0}
+            hasPublishedChapters={hasPublishedChapters}
           />
         </div>
       </div>
