@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
-import { ChapterVideoForm } from "./_components/chapter-video-form";
+import { ChapterVideoManager } from "@/components/course/chapter-video-manager";
 import { ChapterPdfUploadClient } from "./ChapterPdfUploadClient";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterActions } from "./_components/chapter-actions";
@@ -157,10 +157,9 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
                   Contenido multimedia
                 </h2>
               </div>
-              <ChapterVideoForm
-                initialData={chapter}
-                courseId={courseId}
+              <ChapterVideoManager
                 chapterId={chapterId}
+                courseId={courseId}
               />
               <div>
                 <div className="flex items-center gap-x-2 mb-6">

@@ -82,7 +82,19 @@ export function ChapterVideoManager({
 
       const createdVideo = await response.json();
       setVideos([...videos, createdVideo]);
-      setNewVideo({ title: "", url: "", isPrimary: false });
+      
+      // Mantener el formulario abierto pero limpiar los campos
+      setNewVideo({ 
+        title: "", 
+        url: "", 
+        isPrimary: false 
+      });
+      
+      // Enfocar el campo de título después de agregar
+      setTimeout(() => {
+        document.getElementById('video-title')?.focus();
+      }, 100);
+      
       toast.success("Video agregado correctamente");
     } catch (error: any) {
       console.error("Error:", error);
@@ -293,76 +305,122 @@ export function ChapterVideoManager({
           )}
         </div>
 
-        {/* Formulario para agregar nuevo video */}
-        <div className="mt-6 border border-dashed rounded-lg p-6">
-          <h4 className="font-medium mb-4 flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Agregar Nuevo Video
-          </h4>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Título del Video <span className="text-destructive">*</span>
-              </label>
-              <Input
-                placeholder="Ej: Introducción al módulo"
-                value={newVideo.title}
-                onChange={(e) =>
-                  setNewVideo({ ...newVideo, title: e.target.value })
-                }
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                URL de YouTube <span className="text-destructive">*</span>
-              </label>
-              <Input
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={newVideo.url}
-                onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Solo se admiten enlaces de YouTube (ejemplo: https://www.youtube.com/watch?v=...)
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isPrimary"
-                checked={newVideo.isPrimary}
-                onChange={(e) =>
-                  setNewVideo({ ...newVideo, isPrimary: e.target.checked })
-                }
-                disabled={isSubmitting}
-                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <label htmlFor="isPrimary" className="text-sm">
-                Marcar como video principal
-              </label>
-            </div>
-
-            <Button
-              onClick={addVideo}
-              disabled={!newVideo.title.trim() || !newVideo.url.trim() || isSubmitting}
-              className="mt-2"
+        {/* Sección de agregar video */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-medium">Agregar Videos</h4>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                // Desplazarse al formulario
+                document.getElementById('add-video-form')?.scrollIntoView({ behavior: 'smooth' });
+                // Enfocar el primer campo
+                setTimeout(() => {
+                  document.getElementById('video-title')?.focus();
+                }, 300);
+              }}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Agregar Video
-                </>
-              )}
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Otro Video
             </Button>
+          </div>
+
+          {/* Formulario para agregar nuevo video */}
+          <div id="add-video-form" className="border border-dashed rounded-lg p-6 bg-card/50">
+            <h4 className="font-medium mb-4 flex items-center gap-2">
+              <Video className="h-5 w-5 text-primary" />
+              Nuevo Video
+            </h4>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Título del Video <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  id="video-title"
+                  placeholder="Ej: Introducción al módulo"
+                  value={newVideo.title}
+                  onChange={(e) =>
+                    setNewVideo({ ...newVideo, title: e.target.value })
+                  }
+                  disabled={isSubmitting}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && newVideo.title.trim() && newVideo.url.trim()) {
+                      addVideo();
+                    }
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  URL de YouTube <span className="text-destructive">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={newVideo.url}
+                    onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
+                    disabled={isSubmitting}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newVideo.title.trim() && newVideo.url.trim()) {
+                        addVideo();
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Solo se admiten enlaces de YouTube (ejemplo: https://www.youtube.com/watch?v=...)
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isPrimary"
+                    checked={newVideo.isPrimary}
+                    onChange={(e) =>
+                      setNewVideo({ ...newVideo, isPrimary: e.target.checked })
+                    }
+                    disabled={isSubmitting}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor="isPrimary" className="text-sm">
+                    Marcar como video principal
+                  </label>
+                </div>
+
+                <Button
+                  onClick={addVideo}
+                  disabled={!newVideo.title.trim() || !newVideo.url.trim() || isSubmitting}
+                  className="ml-auto"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Agregando...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Agregar Video
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {videos.length > 0 && (
+                <div className="pt-2">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium">{videos.length}</span> {videos.length === 1 ? 'video agregado' : 'videos agregados'} a este capítulo.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
