@@ -33,16 +33,28 @@ const getYouTubeEmbedUrl = (url: string) => {
   return url;
 };
 
+interface ChapterVideo {
+  id: string;
+  title: string;
+  url: string;
+  position: number;
+  isPrimary: boolean;
+  chapterId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface ChapterPageProps {
   chapter: {
     id: string;
     title: string;
     description?: string;
-    videoUrl?: string;
+    videoUrl?: string; // Mantener por compatibilidad
     position?: number;
     pdfUrl?: string;
     googleFormUrl?: string;
     isFree?: boolean;
+    videos?: ChapterVideo[]; // Lista de videos del capítulo
   };
   course: {
     id: string;

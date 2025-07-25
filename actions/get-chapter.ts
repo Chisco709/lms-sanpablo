@@ -38,6 +38,13 @@ export const getChapter = async ({
       where: {
         id: chapterId,
         isPublished: true,
+      },
+      include: {
+        videos: {
+          orderBy: {
+            position: 'asc'
+          }
+        }
       }
     });
 

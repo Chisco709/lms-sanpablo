@@ -32,16 +32,17 @@ const ChapterIdPage = async ({
     return redirect("/");
   }
 
-  // Simplificar los tipos para evitar conflictos
+  // Incluir los datos del capítulo y sus videos
   const chapterData = {
     id: chapter.id,
     title: chapter.title,
     description: chapter.description || "",
-    videoUrl: chapter.videoUrl || "",
+    videoUrl: chapter.videoUrl || "", // Mantener por compatibilidad
     position: chapter.position || 1,
     pdfUrl: chapter.pdfUrl || "",
     googleFormUrl: chapter.googleFormUrl || "",
     isFree: chapter.isFree || false,
+    videos: chapter.videos || [], // Incluir la lista de videos
   };
 
   return (
