@@ -29,30 +29,58 @@ export async function GET(
 ) {
   try {
     const user = await currentUser();
-    if (!user) return new NextResponse("No autorizado", { status: 401 });
+    if (!user) {
+      console.log("[VIDEOS_GET] Usuario no autenticado");
+      return new NextResponse("No autorizado", { status: 401 });
+    }
 
     const { courseId, chapterId } = params;
+    console.log(`[VIDEOS_GET] Obteniendo videos para curso ${courseId}, capítulo ${chapterId}`);
 
-    // Verificar que el usuario es propietario del curso
-    const course = await db.course.findUnique({
-      where: { id: courseId, userId: user.id }
-    });
-    if (!course) return new NextResponse("No autorizado", { status: 401 });
+    try {
+      // Verificar que el usuario es propietario del curso
+      const course = await db.course.findUnique({
+        where: { id: courseId, userId: user.id },
+        select: { id: true }
+      });
+      
+      if (!course) {
+        console.log(`[VIDEOS_GET] Curso no encontrado o usuario no autorizado`);
+        return new NextResponse("No autorizado", { status: 401 });
+      }
 
-    const videos = await db.chapterVideo.findMany({
-      where: { 
-        chapter: {
-          id: chapterId,
-          courseId: courseId
+      const videos = await db.chapterVideo.findMany({
+        where: { 
+          chapterId: chapterId,
+          chapter: {
+            courseId: courseId
+          }
+        },
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          url: true,
+          position: true,
+          isPrimary: true,
+          chapterId: true,
+          createdAt: true,
+          updatedAt: true
         }
-      },
-      orderBy: { position: 'asc' }
-    });
+      });
 
-    return NextResponse.json(videos);
+      console.log(`[VIDEOS_GET] ${videos.length} videos encontrados`);
+      return NextResponse.json(videos);
+    } catch (dbError) {
+      console.error("[VIDEOS_GET_DB_ERROR]", dbError);
+      return new NextResponse("Error al obtener los videos", { status: 500 });
+    }
   } catch (error) {
-    console.error("[VIDEOS_GET]", error);
-    return new NextResponse("Error interno", { status: 500 });
+    console.error("[VIDEOS_GET_ERROR]", error);
+    return new NextResponse("Error interno del servidor", { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
@@ -63,79 +91,141 @@ export async function POST(
 ) {
   try {
     const user = await currentUser();
-    if (!user) return new NextResponse("No autorizado", { status: 401 });
+    if (!user) {
+      console.log("[VIDEO_CREATE] Usuario no autenticado");
+      return new NextResponse("No autorizado", { status: 401 });
+    }
 
     const { courseId, chapterId } = params;
-    const json = await req.json();
-    const body = videoSchema.parse(json);
-
-    // Verificar que el usuario es propietario del curso
-    const course = await db.course.findUnique({
-      where: { id: courseId, userId: user.id }
-    });
-    if (!course) return new NextResponse("No autorizado", { status: 401 });
-
-    // Verificar que el capítulo existe y pertenece al curso
-    const chapter = await db.chapter.findFirst({
-      where: { 
-        id: chapterId, 
-        courseId: courseId 
-      }
-    });
-    if (!chapter) {
-      return new NextResponse("Capítulo no encontrado", { status: 404 });
-    }
-
-    // Si se marca como primario, quitar la marca a los demás
-    if (body.isPrimary) {
-      await db.chapterVideo.updateMany({
-        where: { 
-          chapterId,
-          isPrimary: true 
-        },
-        data: { isPrimary: false }
-      });
-    }
-
-    // Obtener el número actual de videos para establecer la posición
-    const videoCount = await db.chapterVideo.count({ where: { chapterId } });
+    console.log(`[VIDEO_CREATE] Intentando agregar video al capítulo ${chapterId} del curso ${courseId}`);
     
+    let json;
     try {
+      json = await req.json();
+      console.log("[VIDEO_CREATE] Datos recibidos:", json);
+    } catch (parseError) {
+      console.error("[VIDEO_CREATE] Error al analizar JSON:", parseError);
+      return new NextResponse(
+        JSON.stringify({ message: "Formato de solicitud inválido" }), 
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validar los datos de entrada
+    let body;
+    try {
+      body = videoSchema.parse(json);
+      console.log("[VIDEO_CREATE] Datos validados:", body);
+    } catch (validationError) {
+      console.error("[VIDEO_CREATE] Error de validación:", validationError);
+      if (validationError instanceof z.ZodError) {
+        return new NextResponse(
+          JSON.stringify({ 
+            message: "Datos de entrada inválidos",
+            errors: validationError.errors 
+          }), 
+          { 
+            status: 422,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      throw validationError;
+    }
+
+    try {
+      // Verificar que el usuario es propietario del curso
+      const course = await db.course.findUnique({
+        where: { id: courseId, userId: user.id },
+        select: { id: true }
+      });
+      
+      if (!course) {
+        console.log(`[VIDEO_CREATE] Curso no encontrado o usuario no autorizado`);
+        return new NextResponse("No autorizado", { status: 401 });
+      }
+
+      // Verificar que el capítulo existe y pertenece al curso
+      const chapter = await db.chapter.findFirst({
+        where: { 
+          id: chapterId, 
+          courseId: courseId 
+        },
+        select: { id: true }
+      });
+      
+      if (!chapter) {
+        console.log(`[VIDEO_CREATE] Capítulo ${chapterId} no encontrado en el curso ${courseId}`);
+        return new NextResponse("Capítulo no encontrado", { status: 404 });
+      }
+
+      // Si se marca como primario, quitar la marca a los demás
+      if (body.isPrimary) {
+        console.log("[VIDEO_CREATE] Actualizando videos existentes para quitar marca de primario");
+        await db.chapterVideo.updateMany({
+          where: { 
+            chapterId,
+            isPrimary: true 
+          },
+          data: { isPrimary: false }
+        });
+      }
+
+      // Obtener el número actual de videos para establecer la posición
+      const videoCount = await db.chapterVideo.count({ 
+        where: { chapterId } 
+      });
+      
+      console.log(`[VIDEO_CREATE] Creando nuevo video en posición ${body.position ?? videoCount}`);
+      
       const video = await db.chapterVideo.create({
         data: {
-          title: body.title,
-          url: body.url,
+          title: body.title.trim(),
+          url: body.url.trim(),
           position: body.position ?? videoCount,
           isPrimary: body.isPrimary || false,
-          chapterId
+          chapterId: chapterId
+        },
+        select: {
+          id: true,
+          title: true,
+          url: true,
+          position: true,
+          isPrimary: true,
+          chapterId: true,
+          createdAt: true,
+          updatedAt: true
         }
       });
 
-      return NextResponse.json(video, { status: 201 });
-    } catch (dbError) {
-      console.error("[VIDEO_CREATE_DB_ERROR]", dbError);
-      return new NextResponse("Error al guardar el video en la base de datos", { 
-        status: 500,
+      console.log("[VIDEO_CREATE] Video creado exitosamente:", video);
+      return NextResponse.json(video, { 
+        status: 201,
         headers: { 'Content-Type': 'application/json' }
       });
-    }
-  } catch (error) {
-    console.error("[VIDEO_CREATE]", error);
-    if (error instanceof z.ZodError) {
+      
+    } catch (dbError) {
+      console.error("[VIDEO_CREATE_DB_ERROR]", dbError);
       return new NextResponse(
         JSON.stringify({ 
-          message: "Datos de entrada inválidos",
-          errors: error.errors 
+          message: "Error al guardar el video en la base de datos",
+          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
         }), 
         { 
-          status: 422,
+          status: 500,
           headers: { 'Content-Type': 'application/json' }
         }
       );
     }
+  } catch (error) {
+    console.error("[VIDEO_CREATE_ERROR]", error);
     return new NextResponse(
       JSON.stringify({ 
-        message: "Error interno del servidor al procesar la solicitud" 
+        message: "Error interno del servidor al procesar la solicitud",
+        ...(process.env.NODE_ENV === 'development' && { 
+          error: error.message,
+          stack: error.stack 
+        })
       }), 
       { 
         status: 500,
