@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
-import { PlayCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { PlayCircle, Lock } from "lucide-react";
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -128,9 +128,15 @@ const ChapterPage = ({
     );
   }
 
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const hasAccess = purchase || chapter.isFree;
   const isLocked = !hasAccess;
-  const videos = chapter.videos || [];
+  const videos = Array.isArray(chapter.videos) ? chapter.videos : [];
   const hasVideos = videos.length > 0;
   const primaryVideo = hasVideos ? videos.find(v => v.isPrimary) || videos[0] : null;
   const embedUrl = primaryVideo ? getYouTubeEmbedUrl(primaryVideo.url) : 
@@ -182,21 +188,25 @@ const ChapterPage = ({
             {chapter.title}
           </h1>
         </div>
-        {/* VIDEO - MOBILE OPTIMIZADO */}
+        {/* VIDEO - SIMPLIFIED */}
         <div className="mb-10 md:mb-16">
           <div className="bg-black/80 rounded-2xl md:rounded-3xl overflow-hidden border-4 border-green-400/20" style={{ aspectRatio: '16/9' }}>
-            {isLocked ? (
+            {!isClient ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="animate-pulse text-gray-400">Cargando...</div>
+              </div>
+            ) : isLocked ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12 bg-yellow-400/10">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-8">🔒</div>
+                <Lock className="h-12 w-12 md:h-16 md:w-16 text-yellow-400 mb-4" />
                 <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Clase Bloqueada</h3>
                 <p className="text-white text-base md:text-lg max-w-2xl px-4">
-                  Primero debes completar las clases anteriores para desbloquear esta
+                  {purchase ? 'Completa las clases anteriores para desbloquear esta' : 'Adquiere el curso para acceder a esta clase'}
                 </p>
               </div>
-            ) : embedUrl ? (
+            ) : hasVideos ? (
               <iframe
-                src={embedUrl}
-                title={chapter.title}
+                src={embedUrl || ''}
+                title={primaryVideo?.title || chapter.title}
                 className="w-full h-full"
                 allowFullScreen
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -204,9 +214,13 @@ const ChapterPage = ({
               />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-8">📹</div>
-                <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Video Próximamente</h3>
-                <p className="text-white text-base md:text-lg">El video estará disponible muy pronto</p>
+                <PlayCircle className="h-16 w-16 md:h-20 md:w-20 text-gray-400 mb-4" />
+                <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">
+                  {chapter.title || 'Video de la Clase'}
+                </h3>
+                <p className="text-gray-300 text-base md:text-lg">
+                  {chapter.description || 'El video estará disponible pronto'}
+                </p>
               </div>
             )}
           </div>
