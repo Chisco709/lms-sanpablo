@@ -100,20 +100,47 @@ export async function POST(
     // Obtener el número actual de videos para establecer la posición
     const videoCount = await db.chapterVideo.count({ where: { chapterId } });
     
-    const video = await db.chapterVideo.create({
-      data: {
-        ...body,
-        position: body.position ?? videoCount, // Usar la posición proporcionada o agregar al final
-        chapterId
-      }
-    });
+    try {
+      const video = await db.chapterVideo.create({
+        data: {
+          title: body.title,
+          url: body.url,
+          position: body.position ?? videoCount,
+          isPrimary: body.isPrimary || false,
+          chapterId
+        }
+      });
 
-    return NextResponse.json(video, { status: 201 });
+      return NextResponse.json(video, { status: 201 });
+    } catch (dbError) {
+      console.error("[VIDEO_CREATE_DB_ERROR]", dbError);
+      return new NextResponse("Error al guardar el video en la base de datos", { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
   } catch (error) {
     console.error("[VIDEO_CREATE]", error);
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify(error.errors), { status: 422 });
+      return new NextResponse(
+        JSON.stringify({ 
+          message: "Datos de entrada inválidos",
+          errors: error.errors 
+        }), 
+        { 
+          status: 422,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
-    return new NextResponse("Error al crear el video", { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ 
+        message: "Error interno del servidor al procesar la solicitud" 
+      }), 
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   }
 }

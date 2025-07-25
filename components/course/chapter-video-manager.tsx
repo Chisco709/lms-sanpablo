@@ -66,18 +66,28 @@ export function ChapterVideoManager({
       try {
         setIsLoading(true);
         const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/videos`);
-        if (!response.ok) throw new Error("Error al cargar los videos");
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Error al cargar los videos");
+        }
+        
         const data = await response.json();
         setVideos(data);
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("No se pudieron cargar los videos");
+      } catch (error: any) {
+        console.error("Error al cargar videos:", error);
+        toast.error(error.message || "No se pudieron cargar los videos. Intenta recargar la página.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchVideos();
+    
+    // Limpiar notificaciones al desmontar
+    return () => {
+      toast.dismiss();
+    };
   }, [chapterId, courseId]);
 
   const addVideo = async () => {
@@ -88,26 +98,48 @@ export function ChapterVideoManager({
 
     try {
       setIsSubmitting(true);
+      
+      // Mostrar notificación de carga
+      const toastId = toast.loading("Agregando video...");
+      
       const response = await fetch(`/api/courses/${courseId}/chapters/${chapterId}/videos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...newVideo,
+          title: newVideo.title.trim(),
+          url: newVideo.url.trim(),
+          isPrimary: newVideo.isPrimary,
           position: videos.length
         }),
       });
 
+      const responseData = await response.json().catch(() => ({}));
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Error al agregar el video");
+        let errorMessage = "Error al agregar el video";
+        
+        if (response.status === 422 && responseData.errors) {
+          // Mostrar errores de validación de Zod
+          errorMessage = responseData.errors
+            .map((err: any) => `${err.path.join('.')}: ${err.message}`)
+            .join('\n');
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (response.status === 401) {
+          errorMessage = "No tienes permiso para realizar esta acción";
+        } else if (response.status === 500) {
+          errorMessage = "Error en el servidor. Por favor, inténtalo de nuevo más tarde.";
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const createdVideo = await response.json();
-      setVideos([...videos, createdVideo]);
+      // Actualizar la lista de videos
+      setVideos(prevVideos => [...prevVideos, responseData]);
       
-      // Mantener el formulario abierto pero limpiar los campos
+      // Limpiar el formulario
       setNewVideo({ 
         title: "", 
         url: "", 
@@ -116,13 +148,17 @@ export function ChapterVideoManager({
       
       // Enfocar el campo de título después de agregar
       setTimeout(() => {
-        document.getElementById('video-title')?.focus();
+        const titleInput = document.getElementById('video-title') as HTMLInputElement;
+        if (titleInput) {
+          titleInput.focus();
+        }
       }, 100);
       
-      toast.success("Video agregado correctamente");
+      // Mostrar notificación de éxito
+      toast.success("✅ Video agregado correctamente", { id: toastId });
     } catch (error: any) {
-      console.error("Error:", error);
-      toast.error(error.message || "Error al agregar el video");
+      console.error("Error al agregar video:", error);
+      toast.error(error.message || "Error desconocido al agregar el video");
     } finally {
       setIsSubmitting(false);
     }

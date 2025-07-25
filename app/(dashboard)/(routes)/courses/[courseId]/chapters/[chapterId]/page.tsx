@@ -6,17 +6,29 @@ import { Chapter, Course, Purchase } from "@prisma/client";
 
 export const dynamic = 'force-dynamic';
 
-interface ChapterWithVideos extends Chapter {
-  videos: Array<{
-    id: string;
-    title: string;
-    url: string;
-    position: number;
-    isPrimary: boolean;
-    chapterId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }>;
+// Interfaz para el tipo de video que espera el componente ChapterPage
+interface ChapterVideo {
+  id: string;
+  title: string;
+  url: string;
+  position: number;
+  isPrimary: boolean;
+  chapterId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Interfaz para los datos del capítulo que espera el componente ChapterPage
+interface ChapterData {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  position: number;
+  pdfUrl: string;
+  googleFormUrl: string;
+  isFree: boolean;
+  videos?: ChapterVideo[];
 }
 
 const ChapterIdPage = async ({
@@ -45,7 +57,14 @@ const ChapterIdPage = async ({
 
     const { chapter, course, attachments, nextChapter, userProgress, purchase } = result;
 
-    const chapterData = {
+    // Función para convertir fechas a string
+    const formatDate = (date: Date | string | undefined): string => {
+      if (!date) return new Date().toISOString();
+      return date instanceof Date ? date.toISOString() : date;
+    };
+
+    // Crear el objeto de datos del capítulo asegurando que las fechas sean strings
+    const chapterData: ChapterData = {
       id: chapter.id,
       title: chapter.title,
       description: chapter.description || "",
@@ -54,8 +73,17 @@ const ChapterIdPage = async ({
       pdfUrl: chapter.pdfUrl || "",
       googleFormUrl: chapter.googleFormUrl || "",
       isFree: chapter.isFree || false,
-      videos: Array.isArray((chapter as ChapterWithVideos).videos) 
-        ? (chapter as ChapterWithVideos).videos 
+      videos: Array.isArray((chapter as any).videos) 
+        ? (chapter as any).videos.map((video: any) => ({
+            id: video.id,
+            title: video.title,
+            url: video.url,
+            position: video.position,
+            isPrimary: video.isPrimary,
+            chapterId: video.chapterId,
+            createdAt: formatDate(video.createdAt),
+            updatedAt: formatDate(video.updatedAt)
+          }))
         : []
     };
 

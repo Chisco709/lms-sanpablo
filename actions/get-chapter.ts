@@ -43,6 +43,16 @@ export const getChapter = async ({
         videos: {
           orderBy: {
             position: 'asc'
+          },
+          select: {
+            id: true,
+            title: true,
+            url: true,
+            position: true,
+            isPrimary: true,
+            chapterId: true,
+            createdAt: true,
+            updatedAt: true
           }
         }
       }
