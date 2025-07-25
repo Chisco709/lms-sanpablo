@@ -13,12 +13,14 @@ interface CourseActionsProps {
   disabled: boolean;
   courseId: string;
   isPublished: boolean;
+  hasPublishedChapters: boolean;
 }
 
 export const CourseActions = ({
   disabled,
   courseId,
-  isPublished
+  isPublished,
+  hasPublishedChapters
 }: CourseActionsProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,13 +47,19 @@ export const CourseActions = ({
         await axios.patch(`/api/courses/${courseId}/unpublish`);
         toast.success("Curso despublicado");
       } else {
+        if (!hasPublishedChapters) {
+          toast.error("Debes publicar al menos un capítulo con PDF antes de publicar el curso");
+          return;
+        }
+        
         await axios.patch(`/api/courses/${courseId}/publish`);
-        toast.success("Curso publicado");
+        toast.success("¡Curso publicado exitosamente!");
       }
       
       router.refresh();
-    } catch {
-      toast.error("Error al cambiar el estado del curso");
+    } catch (error: any) {
+      const errorMessage = error.response?.data || "Error al cambiar el estado del curso";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

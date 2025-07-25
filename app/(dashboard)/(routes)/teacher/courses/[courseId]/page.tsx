@@ -34,6 +34,12 @@ const CourseIdPage = async ({
     include: {
       category: true,
       chapters: {
+        where: {
+          isPublished: true,
+          pdfUrl: {
+            not: null
+          }
+        },
         orderBy: {
           position: "asc",
         },
@@ -125,6 +131,7 @@ const CourseIdPage = async ({
             disabled={!isComplete}
             courseId={courseId}
             isPublished={course.isPublished}
+            hasPublishedChapters={course.chapters.length > 0}
           />
         </div>
       </div>
