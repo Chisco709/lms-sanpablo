@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { PlayCircle } from "lucide-react";
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -129,7 +130,11 @@ const ChapterPage = ({
 
   const hasAccess = purchase || chapter.isFree;
   const isLocked = !hasAccess;
-  const embedUrl = chapter.videoUrl ? getYouTubeEmbedUrl(chapter.videoUrl) : null;
+  const videos = chapter.videos || [];
+  const hasVideos = videos.length > 0;
+  const primaryVideo = hasVideos ? videos.find(v => v.isPrimary) || videos[0] : null;
+  const embedUrl = primaryVideo ? getYouTubeEmbedUrl(primaryVideo.url) : 
+                  (chapter.videoUrl ? getYouTubeEmbedUrl(chapter.videoUrl) : null);
   const isCompleted = !!userProgress?.isCompleted;
 
   return (
@@ -206,6 +211,65 @@ const ChapterPage = ({
             )}
           </div>
         </div>
+        
+        {/* LISTA DE VIDEOS - MOBILE OPTIMIZADO */}
+        {hasVideos && hasAccess && (
+          <div className="mb-10 md:mb-16">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">Videos de la Clase</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {chapter.videos?.map((video) => {
+                const isCurrentVideo = primaryVideo?.id === video.id;
+                return (
+                  <div 
+                    key={video.id} 
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                      isCurrentVideo 
+                        ? 'border-green-400 bg-green-400/10' 
+                        : 'border-gray-700 hover:border-green-400/50 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer'
+                    }`}
+                    onClick={() => {
+                      if (!isCurrentVideo) {
+                        window.location.href = `?videoId=${video.id}#video`;
+                      }
+                    }}
+                  >
+                    <div className="aspect-video bg-black rounded-lg mb-3 overflow-hidden relative">
+                      <img 
+                        src={`https://img.youtube.com/vi/${(() => {
+                          try {
+                            const embedUrl = getYouTubeEmbedUrl(video.url);
+                            if (!embedUrl) return '';
+                            const videoIdMatch = embedUrl.match(/embed\/([^?]+)/) || video.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+                            return videoIdMatch ? videoIdMatch[1] : '';
+                          } catch (e) {
+                            return '';
+                          }
+                        })()}/hqdefault.jpg`} 
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <PlayCircle className="h-12 w-12 text-white opacity-80" />
+                      </div>
+                      {isCurrentVideo && (
+                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                          Reproduciendo
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="font-medium text-white line-clamp-2">
+                      {video.title}
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      {video.position === 1 ? 'Video principal' : `Video ${video.position}`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        
         {/* SECCIONES - MOBILE STACK, DESKTOP GRID */}
         <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
           
