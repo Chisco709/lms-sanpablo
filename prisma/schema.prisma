@@ -146,8 +146,10 @@ model Chapter {
   id String @id @default(uuid())
   title String
   description String? @db.Text
-  videoUrl String? @db.Text
-  pdfUrl String? @db.Text
+  videoUrl String? @db.Text @map("video_url")
+  videoUrls String[] @default([]) // Nuevo campo para múltiples videos
+  pdfUrl String? @db.Text @map("pdf_url")
+  pdfUrls String[] @default([]) // Nuevo campo para múltiples PDFs
   googleFormUrl String? @db.Text // URL del Google Form
   position Int
   isPublished Boolean @default(false)

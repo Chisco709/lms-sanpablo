@@ -6,11 +6,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChapterTitleForm } from "./_components/chapter-title-form";
 import { ChapterDescriptionForm } from "./_components/chapter-description-form";
-import { ChapterVideoForm } from "./_components/chapter-video-form";
-import { ChapterPdfUploadClient } from "./ChapterPdfUploadClient";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterActions } from "./_components/chapter-actions";
 import { Banner } from "@/components/banner";
+import { ChapterResources } from "@/components/chapter-resources";
 
 const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId: string } }) => {
   const user = await currentUser();
@@ -44,8 +43,12 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
   const requiredFields = [
     chapter.title,
     chapter.description,
-    chapter.videoUrl || chapter.pdfUrl,
+    chapter.videoUrl || chapter.videoUrls?.length || chapter.pdfUrl || chapter.pdfUrls?.length,
   ];
+  
+  // Convertir URLs antiguas a arrays para compatibilidad
+  const pdfUrls = chapter.pdfUrls || (chapter.pdfUrl ? [chapter.pdfUrl] : []);
+  const videoUrls = chapter.videoUrls || (chapter.videoUrl ? [chapter.videoUrl] : []);
 
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
@@ -157,24 +160,12 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
                   Contenido multimedia
                 </h2>
               </div>
-              <ChapterVideoForm
-                initialData={chapter}
+              <ChapterResources
                 courseId={courseId}
                 chapterId={chapterId}
+                initialPdfUrls={pdfUrls}
+                initialVideoUrls={videoUrls}
               />
-              <div>
-                <div className="flex items-center gap-x-2 mb-6">
-                  <Video className="h-4 w-4 text-purple-400" />
-                  <h2 className="text-xl text-white">
-                    Subir PDF
-                  </h2>
-                </div>
-                <ChapterPdfUploadClient
-                  courseId={courseId}
-                  chapterId={chapterId}
-                  initialPdfUrl={chapter.pdfUrl || ""}
-                />
-              </div>
             </div>
             {/* Información adicional */}
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
