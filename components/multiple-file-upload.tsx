@@ -18,7 +18,8 @@ export const MultipleFileUpload = ({
   endpoint,
   multiple = true,
   maxFiles = 10,
-  className = ""
+  className = "",
+  onUploadBegin
 }: MultipleFileUploadProps) => {
   return (
     <div className={className}>
