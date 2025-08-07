@@ -73,22 +73,38 @@ export async function PATCH(
 
     if (!course) return new NextResponse("No autorizado", { status: 401 });
 
+    // Preparar datos para actualización
+    const updateData: any = {
+      title: values.title,
+      description: values.description,
+      isFree: values.isFree,
+      googleFormUrl: values.googleFormUrl,
+    };
+
+    // Actualizar solo los campos que se envían
+    if (values.videoUrl !== undefined) {
+      updateData.videoUrl = values.videoUrl;
+    }
+    
+    if (values.videoUrls !== undefined) {
+      updateData.videoUrls = values.videoUrls;
+    }
+    
+    if (values.pdfUrl !== undefined) {
+      updateData.pdfUrl = values.pdfUrl;
+    }
+    
+    if (values.pdfUrls !== undefined) {
+      updateData.pdfUrls = values.pdfUrls;
+    }
+
     // Actualizar capítulo
     const updatedChapter = await db.chapter.update({
       where: {
         id: chapterId,
         courseId: courseId
       },
-      data: {
-        // Solo actualiza pdfUrl si se envía
-        pdfUrl: typeof values.pdfUrl === "string" && values.pdfUrl.trim() !== "" ? values.pdfUrl : undefined,
-        // Mantener los demás campos si se envían
-        title: values.title,
-        description: values.description,
-        videoUrl: values.videoUrl,
-        googleFormUrl: values.googleFormUrl,
-        isFree: values.isFree,
-      }
+      data: updateData
     });
 
     return NextResponse.json(updatedChapter);

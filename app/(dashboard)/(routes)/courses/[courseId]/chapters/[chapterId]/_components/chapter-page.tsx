@@ -1,14 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { 
   ChevronLeft, 
   ChevronRight,
   CheckCircle,
   Download,
-  Home
+  Home,
+  Play
 } from "lucide-react";
+
+type VideoUrl = {
+  url: string | null;
+  originalUrl: string;
+};
 
 import { Preview } from "@/components/preview";
 import { CourseProgressButton } from "./course-progress-button";
@@ -39,8 +45,10 @@ interface ChapterPageProps {
     title: string;
     description?: string;
     videoUrl?: string;
+    videoUrls?: string[];
     position?: number;
     pdfUrl?: string;
+    pdfUrls?: string[];
     googleFormUrl?: string;
     isFree?: boolean;
   };
@@ -117,8 +125,30 @@ const ChapterPage = ({
 
   const hasAccess = purchase || chapter.isFree;
   const isLocked = !hasAccess;
-  const embedUrl = chapter.videoUrl ? getYouTubeEmbedUrl(chapter.videoUrl) : null;
   const isCompleted = !!userProgress?.isCompleted;
+  
+  // Handle both single videoUrl and videoUrls array
+  const videoUrls: string[] = Array.isArray(chapter.videoUrls) ? [...chapter.videoUrls] : [];
+  if (chapter.videoUrl && typeof chapter.videoUrl === 'string' && !videoUrls.includes(chapter.videoUrl)) {
+    videoUrls.unshift(chapter.videoUrl); // Add legacy videoUrl to the beginning
+  }
+  
+  // Get embed URLs for all videos
+  const embedUrls: VideoUrl[] = videoUrls.map(url => ({
+    url: getYouTubeEmbedUrl(url),
+    originalUrl: url
+  }));
+  
+  const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(0);
+  const currentVideo: VideoUrl = embedUrls[currentVideoIndex];
+  
+  const handleNextVideo = (): void => {
+    setCurrentVideoIndex((prev) => (prev + 1) % embedUrls.length);
+  };
+  
+  const handlePrevVideo = (): void => {
+    setCurrentVideoIndex((prev) => (prev - 1 + embedUrls.length) % embedUrls.length);
+  };
 
   return (
     <div className="min-h-screen bg-black relative">
@@ -176,15 +206,58 @@ const ChapterPage = ({
                   Primero debes completar las clases anteriores para desbloquear esta
                 </p>
               </div>
-            ) : embedUrl ? (
-              <iframe
-                src={embedUrl}
-                title={chapter.title}
-                className="w-full h-full"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                style={{ border: 'none' }}
-              />
+            ) : embedUrls.length > 0 ? (
+              <div className="relative h-full">
+                {/* Main Video */}
+                <iframe
+                  key={currentVideoIndex}
+                  src={currentVideo.url || ''}
+                  title={`${chapter.title} - Video ${currentVideoIndex + 1}`}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  style={{ border: 'none' }}
+                />
+                
+                {/* Video Navigation (only show if multiple videos) */}
+                {embedUrls.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePrevVideo}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 z-10 transition-all duration-300 hover:scale-110"
+                      aria-label="Video anterior"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
+                      onClick={handleNextVideo}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 z-10 transition-all duration-300 hover:scale-110"
+                      aria-label="Siguiente video"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                    
+                    {/* Video Pager */}
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+                      {embedUrls.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentVideoIndex(index)}
+                          className={`h-2 w-2 rounded-full transition-all ${
+                            index === currentVideoIndex ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                          aria-label={`Ir al video ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Video Counter */}
+                    <div className="absolute top-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded-md z-10">
+                      {currentVideoIndex + 1} / {embedUrls.length}
+                    </div>
+                  </>
+                )}
+              </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12">
                 <div className="text-4xl md:text-6xl mb-4 md:mb-8">📹</div>
@@ -193,6 +266,47 @@ const ChapterPage = ({
               </div>
             )}
           </div>
+          
+          {/* Video List (for multiple videos) */}
+          {embedUrls.length > 1 && (
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {embedUrls.map((video, index) => {
+                const videoId = video.originalUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
+                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentVideoIndex(index)}
+                    className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                      index === currentVideoIndex 
+                        ? 'border-green-400 ring-2 ring-green-400 ring-offset-2 ring-offset-black/80' 
+                        : 'border-transparent hover:border-white/50'
+                    }`}
+                    aria-label={`Ver video ${index + 1}`}
+                  >
+                    {thumbnailUrl && (
+                      <>
+                        <img 
+                          src={thumbnailUrl} 
+                          alt={`Miniatura del video ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                            <Play className="h-4 w-4 text-white ml-0.5" />
+                          </div>
+                        </div>
+                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                          {Math.floor(Math.random() * 5) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                        </div>
+                      </>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
         {/* SECCIONES - MOBILE STACK, DESKTOP GRID */}
         <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
