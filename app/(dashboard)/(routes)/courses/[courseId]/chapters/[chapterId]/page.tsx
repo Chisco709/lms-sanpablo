@@ -38,8 +38,10 @@ const ChapterIdPage = async ({
     title: chapter.title,
     description: chapter.description || "",
     videoUrl: chapter.videoUrl || "",
+    videoUrls: Array.isArray(chapter.videoUrls) ? chapter.videoUrls : (chapter.videoUrl ? [chapter.videoUrl] : []),
     position: chapter.position || 1,
     pdfUrl: chapter.pdfUrl || "",
+    pdfUrls: Array.isArray(chapter.pdfUrls) ? chapter.pdfUrls : (chapter.pdfUrl ? [chapter.pdfUrl] : []),
     googleFormUrl: chapter.googleFormUrl || "",
     isFree: chapter.isFree || false,
   };
