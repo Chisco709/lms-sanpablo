@@ -34,18 +34,28 @@ export async function PATCH(
       );
     }
 
-    // Verificar que el curso tenga al menos un capítulo con PDF
+    // Verificar que el curso tenga al menos un capítulo con PDF (en pdfUrl o pdfUrls)
     const chapters = await db.chapter.findMany({
       where: {
         courseId: courseId,
         isPublished: true,
-        pdfUrl: {
-          not: null
-        }
+        OR: [
+          {
+            pdfUrl: {
+              not: null
+            }
+          },
+          {
+            pdfUrls: {
+              isEmpty: false
+            }
+          }
+        ]
       },
       select: {
         id: true,
-        pdfUrl: true
+        pdfUrl: true,
+        pdfUrls: true
       }
     });
 
