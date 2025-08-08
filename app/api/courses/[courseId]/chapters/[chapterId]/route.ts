@@ -144,47 +144,65 @@ export async function PATCH(
     }
 
     // Handle PDFs
-    if (values.pdfUrls !== undefined) {
-      // If we're receiving pdfUrls in the request
-      if (Array.isArray(values.pdfUrls)) {
-        // Process each PDF item to ensure it has the correct structure
-        updateData.pdfUrls = values.pdfUrls.map((item: string | { url: string; name?: string }, index: number) => {
-          // If it's a string, convert to object with default name
-          if (typeof item === 'string') {
+    try {
+      console.log('Processing PDFs with values:', JSON.stringify(values, null, 2));
+      
+      if (values.pdfUrls !== undefined) {
+        // If we're receiving pdfUrls in the request
+        if (Array.isArray(values.pdfUrls)) {
+          console.log('Processing PDF URLs array:', values.pdfUrls);
+          
+          // Process each PDF item to ensure it has the correct structure
+          updateData.pdfUrls = values.pdfUrls.map((item: string | { url: string; name?: string }, index: number) => {
+            // If it's a string, convert to object with default name
+            if (typeof item === 'string') {
+              return {
+                url: item,
+                name: `Documento ${index + 1}`
+              };
+            }
+            // If it's an object, ensure it has required fields
             return {
-              url: item,
-              name: `Documento ${index + 1}`
+              url: item.url,
+              name: item.name?.trim() || `Documento ${index + 1}`
             };
+          });
+          
+          // Update the legacy pdfUrl field with the first PDF URL for backward compatibility
+          if (updateData.pdfUrls.length > 0) {
+            updateData.pdfUrl = updateData.pdfUrls[0].url;
+          } else {
+            updateData.pdfUrl = null;
           }
-          // If it's an object, ensure it has required fields
-          return {
-            url: item.url,
-            name: item.name || `Documento ${index + 1}`
-          };
-        });
-        
-        // Update the legacy pdfUrl field with the first PDF URL for backward compatibility
-        if (updateData.pdfUrls.length > 0) {
-          updateData.pdfUrl = updateData.pdfUrls[0].url;
-        } else {
-          updateData.pdfUrl = null;
+          
+          console.log('Processed PDFs:', JSON.stringify(updateData.pdfUrls, null, 2));
         }
+      } else if (values.pdfUrl !== undefined) {
+        // Handle legacy single PDF URL
+        console.log('Processing legacy single PDF URL:', values.pdfUrl);
+        updateData.pdfUrl = values.pdfUrl;
+        updateData.pdfUrls = [{
+          url: values.pdfUrl,
+          name: 'Documento 1'
+        }];
+      } else if (currentChapter.pdfUrl || currentChapter.pdfUrls) {
+        // If no PDF data in request, keep existing data
+        console.log('No PDF data in request, keeping existing data');
+        updateData.pdfUrl = currentChapter.pdfUrl;
+        updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) && currentChapter.pdfUrls.length > 0
+          ? currentChapter.pdfUrls
+          : currentChapter.pdfUrl 
+            ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] 
+            : [];
+      } else {
+        console.log('No PDF data to process');
+        updateData.pdfUrls = [];
+        updateData.pdfUrl = null;
       }
-    } else if (values.pdfUrl !== undefined) {
-      // Handle legacy single PDF URL
-      updateData.pdfUrl = values.pdfUrl;
-      updateData.pdfUrls = [{
-        url: values.pdfUrl,
-        name: 'Documento 1'
-      }];
-    } else if (currentChapter.pdfUrl || currentChapter.pdfUrls) {
-      // If no PDF data in request, keep existing data
-      updateData.pdfUrl = currentChapter.pdfUrl;
-      updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) && currentChapter.pdfUrls.length > 0
-        ? currentChapter.pdfUrls
-        : currentChapter.pdfUrl 
-          ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] 
-          : [];
+    } catch (error: unknown) {
+      console.error('Error processing PDF data:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      return new NextResponse(`Error processing PDF data: ${errorMessage}`, { status: 400 });
     }
 
     // Actualizar capítulo

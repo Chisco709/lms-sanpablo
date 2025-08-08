@@ -124,27 +124,52 @@ export const MultiplePdfUpload = ({
     
     try {
       setIsSaving(true);
+      console.log('Updating PDF name with data:', {
+        pdfUrls: updatedPdfs,
+        pdfIndex: index,
+        newName
+      });
       
       // Update the PDF name in the database
       const response = await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
-        pdfUrls: updatedPdfs
+        pdfUrls: updatedPdfs.map(pdf => ({
+          url: pdf.url,
+          name: pdf.name
+        }))
       });
+      
+      console.log('Server response:', response.data);
       
       // Update local state with the response from the server
       if (response.data?.pdfUrls) {
         setPdfs(response.data.pdfUrls);
-      } else {
+      } else if (response.data) {
+        // If the response doesn't have pdfUrls but has data, use it
         setPdfs(updatedPdfs);
+      } else {
+        throw new Error('Invalid response from server');
       }
       
       setEditingIndex(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating PDF name:", error);
+      
+      // Show detailed error message
+      const errorMessage = error.response?.data?.message || 
+                         error.message || 
+                         'Error al actualizar el nombre del PDF';
+      
+      console.error('Detailed error:', {
+        message: errorMessage,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      
       // Revert to the original name in case of error
       setPdfs([...pdfs]);
       
-      // Show error message to user (you might want to use a toast or alert)
-      alert("No se pudo actualizar el nombre del PDF. Por favor, inténtalo de nuevo.");
+      // Show error message to user
+      alert(`Error: ${errorMessage}\n\nPor favor, inténtalo de nuevo.`);
     } finally {
       setIsSaving(false);
     }
