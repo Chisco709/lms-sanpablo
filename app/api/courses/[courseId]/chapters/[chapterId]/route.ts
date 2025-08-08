@@ -127,6 +127,12 @@ export async function PATCH(
       updateData.description = values.description;
       console.log('Setting description:', updateData.description);
     }
+    
+    // Handle isFree if provided
+    if (values.isFree !== undefined) {
+      updateData.isFree = Boolean(values.isFree);
+      console.log('Setting isFree:', updateData.isFree);
+    }
 
     // Handle videos
     if (values.videoUrls !== undefined) {
