@@ -21,22 +21,35 @@ import { CourseProgressButton } from "./course-progress-button";
 import { useAnalytics, usePageTracking, useTimeTracking } from "@/hooks/use-analytics";
 
 // Función para convertir URL de YouTube a formato embed
-const getYouTubeEmbedUrl = (url: string) => {
+const getYouTubeEmbedUrl = (url: string): string | null => {
   if (!url) return null;
   
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /youtube\.com\/watch\?.*v=([^&\n?#]+)/
-  ];
+  console.log('Processing YouTube URL:', url);
   
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1&showinfo=0&autoplay=0`;
+  // Extraer el ID del video de diferentes formatos de URL de YouTube
+  const regExp = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/|watch(?:\?v=|\/))|\?v=|\&v=)([^#\&\?]{11}).*/;
+  const match = url.match(regExp);
+  
+  if (match && match[1]) {
+    const videoId = match[1];
+    console.log('Extracted video ID:', videoId);
+    
+    // Verificar si el videoId es válido (solo caracteres alfanuméricos, guiones bajos y guiones)
+    if (/^[\w-]{11}$/.test(videoId)) {
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0&autoplay=0&enablejsapi=1`;
+      console.log('Generated embed URL:', embedUrl);
+      return embedUrl;
     }
   }
   
-  return url;
+  // Si la URL ya está en formato embed, verificar y devolver
+  const embedMatch = url.match(/youtube\.com\/embed\/([\w-]{11})/);
+  if (embedMatch && embedMatch[1]) {
+    return `https://www.youtube.com/embed/${embedMatch[1]}?rel=0&modestbranding=1&showinfo=0&autoplay=0&enablejsapi=1`;
+  }
+  
+  console.warn('No se pudo extraer un ID de video válido de la URL:', url);
+  return null;
 };
 
 interface ChapterPageProps {
@@ -130,8 +143,16 @@ const ChapterPage = ({
   // Handle both single videoUrl and videoUrls array
   const videoUrls: string[] = [];
   
+  // Debug: Log the chapter data
+  console.log('Chapter data:', {
+    videoUrl: chapter.videoUrl,
+    videoUrls: chapter.videoUrls,
+    hasAccess
+  });
+  
   // Add videoUrl if it exists and is a string
   if (chapter.videoUrl && typeof chapter.videoUrl === 'string') {
+    console.log('Found videoUrl:', chapter.videoUrl);
     videoUrls.push(chapter.videoUrl);
   }
   
@@ -139,19 +160,35 @@ const ChapterPage = ({
   if (Array.isArray(chapter.videoUrls)) {
     chapter.videoUrls.forEach(url => {
       if (url && typeof url === 'string' && !videoUrls.includes(url)) {
+        console.log('Adding video from videoUrls array:', url);
         videoUrls.push(url);
       }
     });
   }
   
   // Get embed URLs for all videos
-  const embedUrls: VideoUrl[] = videoUrls.map(url => ({
-    url: getYouTubeEmbedUrl(url),
-    originalUrl: url
-  }));
+  const embedUrls: VideoUrl[] = videoUrls
+    .filter(url => {
+      const embedUrl = getYouTubeEmbedUrl(url);
+      if (!embedUrl) {
+        console.warn('Could not generate embed URL for:', url);
+        return false;
+      }
+      return true;
+    })
+    .map(url => ({
+      url: getYouTubeEmbedUrl(url)!,
+      originalUrl: url
+    }));
+  
+  console.log('Processed video URLs:', {
+    videoUrls,
+    embedUrls,
+    hasVideos: embedUrls.length > 0
+  });
   
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(0);
-  const currentVideo: VideoUrl = embedUrls[currentVideoIndex];
+  const currentVideo: VideoUrl | null = embedUrls.length > 0 ? embedUrls[Math.min(currentVideoIndex, embedUrls.length - 1)] : null;
   
   const handleNextVideo = (): void => {
     setCurrentVideoIndex((prev) => (prev + 1) % embedUrls.length);
@@ -217,18 +254,29 @@ const ChapterPage = ({
                   Primero debes completar las clases anteriores para desbloquear esta
                 </p>
               </div>
-            ) : embedUrls.length > 0 ? (
+            ) : embedUrls.length > 0 && currentVideo?.url ? (
               <div className="relative h-full">
                 {/* Main Video */}
-                <iframe
-                  key={currentVideoIndex}
-                  src={currentVideo.url || ''}
-                  title={`${chapter.title} - Video ${currentVideoIndex + 1}`}
-                  className="w-full h-full"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  style={{ border: 'none' }}
-                />
+                <div className="relative w-full h-full bg-black">
+                  {currentVideo && currentVideo.url ? (
+                    <iframe
+                      key={currentVideoIndex}
+                      src={currentVideo.url}
+                      title={`${chapter.title} - Video ${currentVideoIndex + 1}`}
+                      className="absolute top-0 left-0 w-full h-full"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      style={{ border: 'none' }}
+                    />
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12">
+                      <div className="text-4xl md:text-6xl mb-4 md:mb-8">❌</div>
+                      <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Error al cargar el video</h3>
+                      <p className="text-white text-base md:text-lg">No se pudo cargar el video. Por favor, verifica la URL.</p>
+                    </div>
+                  )}
+                </div>
                 
                 {/* Video Navigation (only show if multiple videos) */}
                 {embedUrls.length > 1 && (
