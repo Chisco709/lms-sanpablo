@@ -40,7 +40,14 @@ export async function PATCH(
     const missingFields = [];
     if (!chapter?.title) missingFields.push("título");
     if (!chapter?.description) missingFields.push("descripción");
-    if (!chapter?.videoUrl) missingFields.push("URL del video");
+    
+    // Check for video URLs (support both videoUrl and videoUrls)
+    const videoUrls = Array.isArray(chapter.videoUrls) ? chapter.videoUrls : [];
+    const hasVideoUrl = chapter.videoUrl || videoUrls.length > 0;
+    
+    if (!hasVideoUrl) {
+        missingFields.push("al menos un video");
+    }
 
     if (missingFields.length > 0) {
         return new NextResponse(
@@ -50,12 +57,24 @@ export async function PATCH(
     }
 
     // 5. Validar formato de YouTube
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/;
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[\w-]{11}/;
+    
+    // Check single video URL if it exists
     if (chapter.videoUrl && !youtubeRegex.test(chapter.videoUrl)) {
         return new NextResponse(
-            "La URL del video debe ser una URL válida de YouTube (formato: youtube.com/watch?v=ID o youtu.be/ID)",
+            "La URL del video debe ser una URL válida de YouTube (formatos aceptados: youtube.com/watch?v=ID, youtu.be/ID o youtube.com/embed/ID)",
             { status: 400 }
         );
+    }
+    
+    // Check all videos in videoUrls array
+    for (const url of videoUrls) {
+        if (!youtubeRegex.test(url)) {
+            return new NextResponse(
+                `La siguiente URL de video no es válida: ${url}. Formatos aceptados: youtube.com/watch?v=ID, youtu.be/ID o youtube.com/embed/ID`,
+                { status: 400 }
+            );
+        }
     }
 
     const publishedChapter = await db.chapter.update({
