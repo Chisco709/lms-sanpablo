@@ -147,24 +147,25 @@ const ChapterPage = ({
   console.log('Chapter data:', {
     videoUrl: chapter.videoUrl,
     videoUrls: chapter.videoUrls,
-    hasAccess
+    hasAccess,
+    rawChapter: chapter // Log the entire chapter object for debugging
   });
   
-  // Add videoUrl if it exists and is a string
-  if (chapter.videoUrl && typeof chapter.videoUrl === 'string') {
-    console.log('Found videoUrl:', chapter.videoUrl);
-    videoUrls.push(chapter.videoUrl);
-  }
+  // Add all video URLs from both sources
+  const allVideoSources = [
+    ...(chapter.videoUrl ? [chapter.videoUrl] : []),
+    ...(Array.isArray(chapter.videoUrls) ? chapter.videoUrls : [])
+  ];
   
-  // Add all videoUrls from the array if it exists
-  if (Array.isArray(chapter.videoUrls)) {
-    chapter.videoUrls.forEach(url => {
-      if (url && typeof url === 'string' && !videoUrls.includes(url)) {
-        console.log('Adding video from videoUrls array:', url);
-        videoUrls.push(url);
-      }
-    });
-  }
+  // Filter out duplicates and invalid URLs
+  allVideoSources.forEach(url => {
+    if (url && typeof url === 'string' && url.trim() !== '' && !videoUrls.includes(url.trim())) {
+      console.log('Adding video URL:', url.trim());
+      videoUrls.push(url.trim());
+    }
+  });
+  
+  console.log('Collected video URLs:', videoUrls);
   
   // Get embed URLs for all videos
   const embedUrls: VideoUrl[] = videoUrls
@@ -326,44 +327,63 @@ const ChapterPage = ({
             )}
           </div>
           
-          {/* Video List (for multiple videos) */}
-          {embedUrls.length > 1 && (
-            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {embedUrls.map((video, index) => {
-                const videoId = video.originalUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
-                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentVideoIndex(index)}
-                    className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentVideoIndex 
-                        ? 'border-green-400 ring-2 ring-green-400 ring-offset-2 ring-offset-black/80' 
-                        : 'border-transparent hover:border-white/50'
-                    }`}
-                    aria-label={`Ver video ${index + 1}`}
-                  >
-                    {thumbnailUrl && (
-                      <>
-                        <img 
-                          src={thumbnailUrl} 
-                          alt={`Miniatura del video ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                            <Play className="h-4 w-4 text-white ml-0.5" />
+          {/* Video List (for all videos) */}
+          {embedUrls.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-white mb-3">
+                {embedUrls.length > 1 ? 'Videos de la clase' : 'Video de la clase'}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {embedUrls.map((video, index) => {
+                  const videoId = video.originalUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
+                  const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+                  
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentVideoIndex(index)}
+                      className={`relative group rounded-xl overflow-hidden border-2 transition-all ${
+                        index === currentVideoIndex 
+                          ? 'border-green-400 ring-4 ring-green-400/30' 
+                          : 'border-gray-700 hover:border-green-400/50'
+                      }`}
+                      aria-label={`Ver video ${index + 1}`}
+                    >
+                      <div className="aspect-video relative">
+                        {thumbnailUrl ? (
+                          <>
+                            <img 
+                              src={thumbnailUrl} 
+                              alt={`Miniatura del video ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                <Play className="h-5 w-5 text-white ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded-md">
+                              Video {index + 1}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                            <div className="text-gray-400">
+                              <Play className="h-12 w-12 mx-auto mb-2" />
+                              <span>Video {index + 1}</span>
+                            </div>
                           </div>
+                        )}
+                      </div>
+                      {index === currentVideoIndex && (
+                        <div className="absolute -top-2 -right-2 bg-green-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                          ✓
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                          {Math.floor(Math.random() * 5) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                        </div>
-                      </>
-                    )}
-                  </button>
-                );
-              })}
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
