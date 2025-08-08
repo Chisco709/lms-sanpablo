@@ -84,15 +84,26 @@ export const MultiplePdfUpload = ({
   };
 
   const handleRemovePdf = async (urlToRemove: string) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este PDF?")) return;
+    
     try {
       setIsSaving(true);
       const updatedPdfs = pdfs.filter(pdf => pdf.url !== urlToRemove);
-      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
+      
+      const response = await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
         pdfUrls: updatedPdfs
       });
-      setPdfs(updatedPdfs);
+      
+      // Update local state with the response from the server
+      if (response.data?.pdfUrls) {
+        setPdfs(response.data.pdfUrls);
+      } else {
+        setPdfs(updatedPdfs);
+      }
+      
     } catch (error) {
       console.error("Error removing PDF:", error);
+      alert("No se pudo eliminar el PDF. Por favor, inténtalo de nuevo.");
     } finally {
       setIsSaving(false);
     }
@@ -104,21 +115,36 @@ export const MultiplePdfUpload = ({
   };
 
   const saveName = async (index: number) => {
-    const updatedPdfs = [...pdfs];
-    updatedPdfs[index] = {
-      ...updatedPdfs[index],
-      name: editName.trim() || `Documento ${index + 1}`
-    };
+    if (index < 0 || index >= pdfs.length) return;
+    
+    const newName = editName.trim() || `Documento ${index + 1}`;
+    const updatedPdfs = pdfs.map((pdf, i) => 
+      i === index ? { ...pdf, name: newName } : pdf
+    );
     
     try {
       setIsSaving(true);
-      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
+      
+      // Update the PDF name in the database
+      const response = await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
         pdfUrls: updatedPdfs
       });
-      setPdfs(updatedPdfs);
+      
+      // Update local state with the response from the server
+      if (response.data?.pdfUrls) {
+        setPdfs(response.data.pdfUrls);
+      } else {
+        setPdfs(updatedPdfs);
+      }
+      
       setEditingIndex(null);
     } catch (error) {
       console.error("Error updating PDF name:", error);
+      // Revert to the original name in case of error
+      setPdfs([...pdfs]);
+      
+      // Show error message to user (you might want to use a toast or alert)
+      alert("No se pudo actualizar el nombre del PDF. Por favor, inténtalo de nuevo.");
     } finally {
       setIsSaving(false);
     }

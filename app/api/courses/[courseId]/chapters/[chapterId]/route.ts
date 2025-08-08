@@ -143,42 +143,48 @@ export async function PATCH(
         currentChapter.videoUrl ? [currentChapter.videoUrl] : [];
     }
 
-    // Manejar PDFs
-    if (values.pdfUrl !== undefined) {
-      // Si se envía un pdfUrl individual, lo convertimos al formato de objeto con nombre
+    // Handle PDFs
+    if (values.pdfUrls !== undefined) {
+      // If we're receiving pdfUrls in the request
+      if (Array.isArray(values.pdfUrls)) {
+        // Process each PDF item to ensure it has the correct structure
+        updateData.pdfUrls = values.pdfUrls.map((item: string | { url: string; name?: string }, index: number) => {
+          // If it's a string, convert to object with default name
+          if (typeof item === 'string') {
+            return {
+              url: item,
+              name: `Documento ${index + 1}`
+            };
+          }
+          // If it's an object, ensure it has required fields
+          return {
+            url: item.url,
+            name: item.name || `Documento ${index + 1}`
+          };
+        });
+        
+        // Update the legacy pdfUrl field with the first PDF URL for backward compatibility
+        if (updateData.pdfUrls.length > 0) {
+          updateData.pdfUrl = updateData.pdfUrls[0].url;
+        } else {
+          updateData.pdfUrl = null;
+        }
+      }
+    } else if (values.pdfUrl !== undefined) {
+      // Handle legacy single PDF URL
       updateData.pdfUrl = values.pdfUrl;
-      const pdfName = typeof values.pdfUrl === 'string' ? 'Documento 1' : (values.pdfUrl.name || 'Documento 1');
       updateData.pdfUrls = [{
         url: values.pdfUrl,
-        name: pdfName
+        name: 'Documento 1'
       }];
-    } else if (values.pdfUrls !== undefined) {
-      // Si se envían múltiples PDFs
-      const existingPdfs = Array.isArray(currentChapter.pdfUrls) ? 
-        currentChapter.pdfUrls : 
-        (currentChapter.pdfUrl ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] : []);
-      
-      // Asegurarse de que cada PDF tenga un nombre
-      updateData.pdfUrls = (Array.isArray(values.pdfUrls) ? values.pdfUrls : []).map((pdf: string | { url: string; name?: string }, index: number) => {
-        if (typeof pdf === 'string') {
-          return { url: pdf, name: `Documento ${index + 1}` };
-        }
-        return {
-          url: pdf.url,
-          name: pdf.name || `Documento ${index + 1}`
-        };
-      });
-      
-      // Si no hay PDFs nuevos, mantener los existentes
-      if (updateData.pdfUrls.length === 0) {
-        updateData.pdfUrls = existingPdfs;
-      }
-    } else if (currentChapter.pdfUrl) {
-      // Si no se envían PDFs, mantener los existentes
+    } else if (currentChapter.pdfUrl || currentChapter.pdfUrls) {
+      // If no PDF data in request, keep existing data
       updateData.pdfUrl = currentChapter.pdfUrl;
-      updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) ? 
-        currentChapter.pdfUrls : 
-        currentChapter.pdfUrl ? [currentChapter.pdfUrl] : [];
+      updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) && currentChapter.pdfUrls.length > 0
+        ? currentChapter.pdfUrls
+        : currentChapter.pdfUrl 
+          ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] 
+          : [];
     }
 
     // Actualizar capítulo
