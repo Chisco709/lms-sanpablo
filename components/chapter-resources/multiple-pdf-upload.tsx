@@ -115,63 +115,109 @@ export const MultiplePdfUpload = ({
   };
 
   const saveName = async (index: number) => {
-    if (index < 0 || index >= pdfs.length) return;
+    if (index < 0 || index >= pdfs.length) {
+      console.error('Invalid PDF index:', index);
+      return;
+    }
     
     const newName = editName.trim() || `Documento ${index + 1}`;
     const updatedPdfs = pdfs.map((pdf, i) => 
       i === index ? { ...pdf, name: newName } : pdf
     );
     
+    console.group('=== PDF Name Update ===');
+    console.log('Course ID:', courseId);
+    console.log('Chapter ID:', chapterId);
+    console.log('Updating PDF at index:', index);
+    console.log('New name:', newName);
+    
     try {
       setIsSaving(true);
-      console.log('Updating PDF name with data:', {
-        pdfUrls: updatedPdfs,
-        pdfIndex: index,
-        newName
-      });
       
-      // Update the PDF name in the database
-      const response = await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, { 
+      // Prepare the data to send
+      const requestData = {
         pdfUrls: updatedPdfs.map(pdf => ({
           url: pdf.url,
           name: pdf.name
         }))
-      });
+      };
       
-      console.log('Server response:', response.data);
+      console.log('Sending PATCH request with data:', JSON.stringify(requestData, null, 2));
       
-      // Update local state with the response from the server
-      if (response.data?.pdfUrls) {
-        setPdfs(response.data.pdfUrls);
-      } else if (response.data) {
-        // If the response doesn't have pdfUrls but has data, use it
-        setPdfs(updatedPdfs);
+      // Make the API request
+      const response = await axios.patch(
+        `/api/courses/${courseId}/chapters/${chapterId}`,
+        requestData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          validateStatus: (status) => status < 500, // Don't throw for 4xx errors
+        }
+      );
+      
+      console.log('Server response status:', response.status);
+      console.log('Server response data:', response.data);
+      
+      if (response.status >= 200 && response.status < 300) {
+        // Success case
+        if (response.data?.pdfUrls) {
+          console.log('Successfully updated PDF names:', response.data.pdfUrls);
+          setPdfs(response.data.pdfUrls);
+        } else if (response.data) {
+          console.log('Received response without pdfUrls, using local update');
+          setPdfs(updatedPdfs);
+        } else {
+          console.warn('Empty response from server, using local update');
+          setPdfs(updatedPdfs);
+        }
+        setEditingIndex(null);
       } else {
-        throw new Error('Invalid response from server');
+        // Handle API error responses
+        const errorMessage = response.data?.error || 
+                           response.data?.message || 
+                           `Error del servidor (${response.status})`;
+        
+        console.error('API Error:', {
+          status: response.status,
+          message: errorMessage,
+          data: response.data
+        });
+        
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Error updating PDF name:', error);
+      
+      // Extract error message
+      let errorMessage = 'Error al actualizar el nombre del PDF';
+      let errorDetails = '';
+      
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.error || 
+                      error.response.data?.message || 
+                      `Error del servidor (${error.response.status})`;
+        errorDetails = error.response.data?.details || '';
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = 'No se recibió respuesta del servidor';
+        errorDetails = 'El servidor no respondió a la solicitud';
+      } else if (error.message) {
+        // Other errors
+        errorMessage = error.message;
       }
       
-      setEditingIndex(null);
-    } catch (error: any) {
-      console.error("Error updating PDF name:", error);
-      
-      // Show detailed error message
-      const errorMessage = error.response?.data?.message || 
-                         error.message || 
-                         'Error al actualizar el nombre del PDF';
-      
-      console.error('Detailed error:', {
-        message: errorMessage,
-        status: error.response?.status,
-        data: error.response?.data
-      });
+      console.error('Error details:', { errorMessage, errorDetails });
       
       // Revert to the original name in case of error
       setPdfs([...pdfs]);
       
-      // Show error message to user
-      alert(`Error: ${errorMessage}\n\nPor favor, inténtalo de nuevo.`);
+      // Show detailed error message to user
+      alert(`Error: ${errorMessage}${errorDetails ? `\n\nDetalles: ${errorDetails}` : ''}\n\nPor favor, inténtalo de nuevo.`);
     } finally {
       setIsSaving(false);
+      console.groupEnd();
     }
   };
 

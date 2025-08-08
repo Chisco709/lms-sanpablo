@@ -205,19 +205,63 @@ export async function PATCH(
       return new NextResponse(`Error processing PDF data: ${errorMessage}`, { status: 400 });
     }
 
-    // Actualizar capítulo
-    const updatedChapter = await db.chapter.update({
-      where: {
-        id: chapterId,
-        courseId: courseId
-      },
-      data: updateData
-    });
-
-    return NextResponse.json(updatedChapter);
-  } catch (error) {
-    console.error("[CHAPTER_UPDATE]", error);
-    return new NextResponse("Error interno", { status: 500 });
+    console.log('Updating chapter with data:', JSON.stringify(updateData, null, 2));
+      
+    try {
+      // Actualizar capítulo
+      const updatedChapter = await db.chapter.update({
+        where: {
+          id: chapterId,
+          courseId: courseId
+        },
+        data: updateData,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          videoUrl: true,
+          videoUrls: true,
+          pdfUrl: true,
+          pdfUrls: true,
+          isFree: true,
+          isPublished: true,
+          position: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
+      
+      console.log('Chapter updated successfully:', JSON.stringify(updatedChapter, null, 2));
+      return NextResponse.json(updatedChapter);
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      throw dbError;
+    }
+  } catch (error: unknown) {
+    console.error("=== CHAPTER_UPDATE ERROR ===");
+    console.error('Error details:', error);
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Error interno del servidor',
+        details: error instanceof Error ? error.message : 'Error desconocido',
+        timestamp: new Date().toISOString()
+      }), 
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+  } finally {
+    console.log('=== PATCH REQUEST END ===\n');
   }
 }
 
