@@ -50,76 +50,18 @@ export async function PATCH(
 
     console.log('Todos los capítulos publicados:', JSON.stringify(allPublishedChapters, null, 2));
 
-    // Verificar que el curso tenga al menos un capítulo con PDF (en pdfUrl o pdfUrls)
-    const chapters = await db.chapter.findMany({
+    // Verificar que el curso tenga al menos un capítulo publicado
+    const publishedChapters = await db.chapter.count({
       where: {
         courseId: courseId,
-        isPublished: true,
-        OR: [
-          {
-            pdfUrl: {
-              not: null
-            }
-          },
-          {
-            pdfUrls: {
-              isEmpty: false
-            }
-          },
-          {
-            pdfUrls: {
-              hasSome: [""] // This will match any non-empty array or non-null value
-            }
-          }
-        ]
-      },
-      select: {
-        id: true,
-        title: true,
-        pdfUrl: true,
-        pdfUrls: true
+        isPublished: true
       }
     });
 
-    console.log('Capítulos con PDF encontrados:', JSON.stringify(chapters, null, 2));
-
-    // Verificar si hay al menos un capítulo con PDF
-    const hasPdfChapter = chapters.some(chapter => {
-      return (
-        chapter.pdfUrl || 
-        (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)
-      );
-    });
-
-    if (!hasPdfChapter) {
-      // Agregar más detalles sobre el error para depuración
-      const errorDetails = {
-        message: "No se encontraron capítulos con PDF",
-        courseId,
-        publishedChaptersCount: allPublishedChapters.length,
-        publishedChapters: allPublishedChapters.map(c => ({
-          id: c.id,
-          title: c.title,
-          hasPdfUrl: !!c.pdfUrl,
-          hasPdfUrls: Array.isArray(c.pdfUrls) ? c.pdfUrls.length > 0 : false,
-          pdfUrl: c.pdfUrl,
-          pdfUrls: c.pdfUrls
-        }))
-      };
-      
-      console.error('Error de validación de PDF:', JSON.stringify(errorDetails, null, 2));
-      
+    if (publishedChapters === 0) {
       return new NextResponse(
-        JSON.stringify({
-          error: "Se requiere al menos un capítulo publicado con PDF para publicar el curso",
-          details: errorDetails
-        }),
-        { 
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        "Debes publicar al menos un capítulo antes de publicar el curso",
+        { status: 400 }
       );
     }
 
