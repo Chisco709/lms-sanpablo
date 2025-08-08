@@ -412,22 +412,36 @@ const ChapterPage = ({
                   {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && (
                     <div className="space-y-3">
                       {[
-                        ...(chapter.pdfUrl ? [{ url: chapter.pdfUrl, name: 'Guía de Trabajo' }] : []),
-                        ...(Array.isArray(chapter.pdfUrls) ? chapter.pdfUrls : [])
+                        // Handle legacy single pdfUrl
+                        ...(chapter.pdfUrl ? [{
+                          url: chapter.pdfUrl, 
+                          name: 'Guía de Trabajo',
+                          isLegacy: true
+                        }] : []),
+                        // Handle pdfUrls array which can contain strings or objects
+                        ...(Array.isArray(chapter.pdfUrls) 
+                          ? chapter.pdfUrls.map(item => ({
+                              url: typeof item === 'string' ? item : item.url,
+                              name: typeof item === 'string' 
+                                ? `Documento ${chapter.pdfUrls!.indexOf(item) + 1}` 
+                                : (item.name || `Documento ${chapter.pdfUrls!.indexOf(item) + 1}`),
+                              isLegacy: false
+                            }))
+                          : [])
                       ]
-                        .filter((pdf): pdf is { url: string; name: string } => {
-                        if (!pdf) return false;
-                        const pdfUrl = typeof pdf === 'string' ? pdf : pdf.url;
-                        return !!pdfUrl;
+                      .filter((pdf): pdf is { url: string; name: string; isLegacy: boolean } => {
+                        return !!pdf && !!pdf.url;
                       })
-                        .map((pdf, index) => (
+                      .map((pdf, index) => {
+                        const displayName = pdf.name || `Documento ${index + 1}`;
+                        return (
                           <div key={index} className="space-y-2">
                             <h4 className="text-white text-sm font-medium">
-                              {pdf.name || `Documento ${index + 1}`}
+                              {displayName}
                             </h4>
                             <div className="flex flex-col sm:flex-row gap-2">
                               <a
-                                href={`/api/view-pdf?url=${encodeURIComponent(typeof pdf === 'string' ? pdf : pdf.url)}`}
+                                href={`/api/view-pdf?url=${encodeURIComponent(pdf.url)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
@@ -436,8 +450,8 @@ const ChapterPage = ({
                               </a>
                               
                               <a
-                                href={`/api/download-pdf?url=${encodeURIComponent(typeof pdf === 'string' ? pdf : pdf.url)}&filename=${encodeURIComponent(
-                                  (pdf.name || `Guia_${index + 1}`).replace(/[^\w\s]/gi, '').replace(/\s+/g, '_') + '.pdf'
+                                href={`/api/download-pdf?url=${encodeURIComponent(pdf.url)}&filename=${encodeURIComponent(
+                                  displayName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_') + '.pdf'
                                 )}`}
                                 className="flex-1 px-4 py-3 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
                               >
@@ -445,7 +459,8 @@ const ChapterPage = ({
                               </a>
                             </div>
                           </div>
-                        ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
