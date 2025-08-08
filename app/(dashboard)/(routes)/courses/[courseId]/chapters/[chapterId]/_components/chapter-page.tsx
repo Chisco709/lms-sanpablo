@@ -203,58 +203,69 @@ const ChapterPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-black relative">
-      {/* Luces de fondo globales */}
+    <div className="min-h-screen bg-black relative overflow-x-hidden">
+      {/* Luces de fondo globales - Optimizadas para móvil */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute left-[-15%] top-[-15%] w-[400px] h-[400px] bg-green-500/30 rounded-full blur-[120px] opacity-70" />
-        <div className="absolute right-[-10%] bottom-[-10%] w-[300px] h-[300px] bg-yellow-400/20 rounded-full blur-[100px] opacity-60" />
-        <div className="absolute right-[10%] top-[10%] w-[180px] h-[180px] bg-white/10 rounded-full blur-[60px] opacity-20" />
+        <div className="absolute left-[-30%] top-[-20%] w-[300px] h-[300px] sm:left-[-15%] sm:top-[-15%] sm:w-[400px] sm:h-[400px] bg-green-500/30 rounded-full blur-[80px] sm:blur-[120px] opacity-70" />
+        <div className="absolute right-[-20%] bottom-[-15%] w-[250px] h-[250px] sm:right-[-10%] sm:bottom-[-10%] sm:w-[300px] sm:h-[300px] bg-yellow-400/20 rounded-full blur-[70px] sm:blur-[100px] opacity-60" />
+        <div className="absolute right-[5%] top-[5%] w-[120px] h-[120px] sm:right-[10%] sm:top-[10%] sm:w-[180px] sm:h-[180px] bg-white/10 rounded-full blur-[40px] sm:blur-[60px] opacity-20" />
       </div>
       {/* HEADER - MOBILE OPTIMIZADO */}
-      <div className="bg-black/80 border-b-4 border-green-400/20 p-3 md:p-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-            <Link 
-              href="/student"
-              className="flex items-center gap-2 md:gap-4 text-green-400 hover:text-yellow-400 transition-all duration-300 group w-full sm:w-auto"
-            >
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-black/60 group-hover:bg-green-400/10 rounded-2xl md:rounded-3xl flex items-center justify-center transition-all duration-300 flex-shrink-0 border border-green-400/30">
-                <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="text-green-400 text-sm md:text-lg block">← Volver</span>
-                <span className="font-bold text-lg md:text-2xl text-white line-clamp-1">Mis Cursos</span>
-              </div>
-            </Link>
-            {isCompleted && (
-              <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 bg-green-500/20 rounded-2xl md:rounded-3xl border border-green-500/30 w-full sm:w-auto justify-center sm:justify-start">
-                <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-green-400 flex-shrink-0" />
-                <span className="text-green-400 font-bold text-lg md:text-xl">¡Completada!</span>
-              </div>
-            )}
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-12">
-        {/* TÍTULO - MOBILE OPTIMIZADO */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-3 md:gap-4 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-green-400/10 via-yellow-400/10 to-white/5 rounded-2xl md:rounded-3xl mb-6 md:mb-8 border border-green-400/20">
-            <div className="text-3xl md:text-4xl">📚</div>
-            <div>
-              <span className="text-green-400 font-bold text-base md:text-lg block">Clase {chapter.position || '1'}</span>
-              {isCompleted && <span className="text-green-400 font-bold text-xs md:text-sm">✅ Ya la terminé</span>}
+      <div className="bg-black/90 backdrop-blur-sm border-b-4 border-green-400/20 p-3 md:p-4 sticky top-0 z-30">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <Link 
+            href="/student"
+            className="flex items-center gap-2 text-green-400 hover:text-yellow-400 transition-all duration-300 group flex-shrink-0"
+          >
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/60 group-hover:bg-green-400/10 rounded-2xl flex items-center justify-center transition-all duration-300 border border-green-400/30">
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            </div>
+            <div className="hidden sm:block min-w-0">
+              <span className="text-green-400 text-sm block">← Volver</span>
+              <span className="font-bold text-lg text-white line-clamp-1">Mis Cursos</span>
+            </div>
+          </Link>
+          
+          <div className="flex-1 min-w-0 px-2">
+            <h1 className="text-white font-bold text-base sm:text-lg md:text-xl truncate text-center">
+              {chapter.title}
+            </h1>
+            <div className="text-xs text-gray-400 text-center">
+              Clase {chapter.position || '1'}
+              {isCompleted && ' • Completada'}
             </div>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 md:mb-8 leading-tight px-2">
-            {chapter.title}
-          </h1>
+          
+          {isCompleted && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 rounded-2xl border border-green-500/30">
+              <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <span className="text-green-400 font-bold text-sm sm:text-base hidden xs:inline">¡Listo!</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+        {/* Progress Indicator - Mobile Optimized */}
+        <div className="mb-6 sm:mb-8">
+          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-green-400 to-yellow-400 transition-all duration-500"
+              style={{ width: isCompleted ? '100%' : '0%' }}
+            />
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-gray-400">
+            <span>Progreso</span>
+            <span>{isCompleted ? '100% Completado' : '0% Completado'}</span>
+          </div>
         </div>
         {/* VIDEO - MOBILE OPTIMIZADO */}
-        <div className="mb-10 md:mb-16">
-          <div className="bg-black/80 rounded-2xl md:rounded-3xl overflow-hidden border-4 border-green-400/20" style={{ aspectRatio: '16/9' }}>
+        <div className="mb-8 sm:mb-12 bg-black/50 rounded-2xl overflow-hidden border border-green-400/20">
+          <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             {isLocked ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12 bg-yellow-400/10">
                 <div className="text-4xl md:text-6xl mb-4 md:mb-8">🔒</div>
                 <h3 className="text-lg md:text-2xl font-bold text-white mb-4 md:mb-6">Clase Bloqueada</h3>
-                <p className="text-white text-base md:text-lg max-w-2xl px-4">
+                <p className="text-white text-sm md:text-base mb-6 md:mb-8">
                   Primero debes completar las clases anteriores para desbloquear esta
                 </p>
               </div>
@@ -391,7 +402,7 @@ const ChapterPage = ({
           )}
         </div>
         {/* SECCIONES - MOBILE STACK, DESKTOP GRID */}
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
           
           {/* GUÍA PDF - MOBILE OPTIMIZADO */}
         {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && hasAccess && (
@@ -506,7 +517,7 @@ const ChapterPage = ({
         {chapter.googleFormUrl && hasAccess && (
             <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
               <div className="text-center">
-                <div className="text-4xl md:text-6xl mb-4 md:mb-6">📝</div>
+                <div className="text-5xl mb-4 text-center">📝</div>
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Entrega tu Trabajo</h2>
                 <p className="text-white text-sm md:text-base mb-6 md:mb-8">
                   Completa este formulario cuando termines
@@ -533,34 +544,38 @@ const ChapterPage = ({
 
         {/* BOTÓN DE COMPLETAR - MOBILE OPTIMIZADO */}
         {hasAccess && (
-          <div className="mt-8 md:mt-12 text-center">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-3xl md:text-4xl mb-3 md:mb-4">🎯</div>
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
-                ¿Ya terminaste de ver la clase?
+          <div className="mt-6 sm:mt-8 text-center">
+            <div className="bg-black/70 rounded-2xl p-4 sm:p-6 border border-green-400/20">
+              <div className="text-4xl mb-3">🎯</div>
+              <h3 className="text-lg font-bold text-white mb-2">
+                {isCompleted ? '¡Buen trabajo!' : '¿Ya terminaste la clase?'}
               </h3>
-              <p className="text-white text-sm md:text-base mb-5 md:mb-6">
-                Marca como completada para continuar con el siguiente tema
+              <p className="text-white/80 text-sm mb-4">
+                {isCompleted 
+                  ? '¡Sigue así y continúa aprendiendo!' 
+                  : 'Marca como completada para desbloquear el siguiente tema'}
               </p>
-              <CourseProgressButton
-                chapterId={chapter.id}
-                courseId={course.id}
-                nextChapterId={nextChapter?.id}
-                isCompleted={isCompleted}
-              />
+              <div className="max-w-xs mx-auto">
+                <CourseProgressButton
+                  chapterId={chapter.id}
+                  courseId={course.id}
+                  nextChapterId={nextChapter?.id}
+                  isCompleted={isCompleted}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* DESCRIPCIÓN - MOBILE OPTIMIZADO */}
         {chapter.description && (
-          <div className="mt-8 md:mt-12">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center mb-6 md:mb-8">
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4">📖</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white">¿Qué aprenderás?</h2>
+          <div className="mt-6 sm:mt-8">
+            <div className="bg-black/70 rounded-2xl p-4 sm:p-6 border border-green-400/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-3xl">📖</div>
+                <h2 className="text-xl font-bold text-white">¿Qué aprenderás?</h2>
               </div>
-              <div className="prose prose-base md:prose-lg max-w-none text-white prose-headings:text-white prose-strong:text-white prose-em:text-white">
+              <div className="prose prose-sm sm:prose-base max-w-none text-white/90 prose-headings:text-white prose-strong:text-white prose-em:text-white">
                 <Preview value={chapter.description} />
               </div>
             </div>
@@ -569,42 +584,42 @@ const ChapterPage = ({
 
         {/* MATERIAL DE APOYO - MOBILE OPTIMIZADO */}
         {!!attachments.length && (
-          <div className="mt-8 md:mt-12">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-center mb-6 md:mb-8">
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4">📎</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white">Material Extra</h2>
+          <div className="mt-6 sm:mt-8">
+            <div className="bg-black/70 rounded-2xl p-4 sm:p-6 border border-green-400/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-3xl">📎</div>
+                <h2 className="text-xl font-bold text-white">Material Extra</h2>
               </div>
-              <div className="space-y-4 md:space-y-6">
-              {attachments.map((attachment) => {
-                const fileExtension = attachment.name.split('.').pop()?.toLowerCase();
-                const isPDF = fileExtension === 'pdf';
-                
-                return (
-                  <a 
-                    href={attachment.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    key={attachment.id}
-                      className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-white/5 hover:bg-white/10 rounded-2xl md:rounded-3xl transition-all duration-300 group border border-white/10"
-                  >
-                      <div className="text-3xl md:text-4xl flex-shrink-0">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                {attachments.map((attachment) => {
+                  const fileExtension = attachment.name.split('.').pop()?.toLowerCase();
+                  const isPDF = fileExtension === 'pdf';
+                  
+                  return (
+                    <a 
+                      href={attachment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      key={attachment.id}
+                      className="flex items-center gap-3 p-3 sm:p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 group border border-white/10"
+                    >
+                      <div className="text-2xl flex-shrink-0">
                         {isPDF ? '📄' : '📁'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-white font-bold text-base md:text-lg mb-1 md:mb-2 truncate">
-                        {attachment.name}
-                      </p>
-                        <p className="text-white/60 text-sm md:text-base">
-                          Haz clic para descargar
-                      </p>
-                    </div>
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-green-400/20 rounded-2xl md:rounded-3xl flex items-center justify-center flex-shrink-0">
-                        <Download className="h-5 w-5 md:h-6 md:w-6 text-green-400" />
                       </div>
-                  </a>
-                );
-              })}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium text-sm sm:text-base truncate">
+                          {attachment.name}
+                        </p>
+                        <p className="text-white/60 text-xs sm:text-sm">
+                          {isPDF ? 'Documento PDF' : 'Archivo'} • {fileExtension?.toUpperCase() || 'DESCARGAR'}
+                        </p>
+                      </div>
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-400/20 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-400/30 transition-colors">
+                        <Download className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
+                      </div>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -612,28 +627,32 @@ const ChapterPage = ({
 
         {/* SIGUIENTE CLASE - MOBILE OPTIMIZADO */}
         {nextChapter && hasAccess && (
-          <div className="mt-8 md:mt-12 text-center">
-            <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
-              <div className="text-3xl md:text-4xl mb-4 md:mb-6">🎯</div>
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
-                ¿Ya terminaste?
-              </h3>
-              <p className="text-white text-sm md:text-base mb-6 md:mb-8">
-                Continúa con la siguiente clase
-              </p>
-              
-              <div className="mb-5 md:mb-6">
-                <p className="text-white/60 text-xs md:text-sm mb-1 md:mb-2">Siguiente:</p>
-                <p className="text-white font-bold text-base md:text-lg line-clamp-2">{nextChapter.title}</p>
+          <div className="mt-6 sm:mt-8">
+            <div className="bg-gradient-to-br from-green-400/10 to-yellow-400/10 rounded-2xl p-4 sm:p-6 border border-green-400/30">
+              <div className="flex items-start gap-3">
+                <div className="text-3xl mt-1">🚀</div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-white mb-1">
+                    Siguiente clase
+                  </h3>
+                  <p className="text-white/80 text-sm mb-4">
+                    Continúa tu aprendizaje con la siguiente lección
+                  </p>
+                  
+                  <div className="bg-black/30 rounded-xl p-3 mb-4 border border-white/10">
+                    <p className="text-white font-medium text-sm">{nextChapter.title}</p>
+                    <p className="text-green-400 text-xs mt-1">Próximo • Clase {nextChapter.position || ''}</p>
+                  </div>
+                  
+                  <Link
+                    href={`/courses/${course.id}/chapters/${nextChapter.id}`}
+                    className="block w-full text-center bg-green-400 hover:bg-green-300 text-black font-bold rounded-xl py-3 px-4 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    <span>Continuar</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
               </div>
-              
-              <Link
-                href={`/courses/${course.id}/chapters/${nextChapter.id}`}
-                className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-              >
-                <span>Siguiente Clase</span>
-                <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-              </Link>
             </div>
           </div>
         )}
