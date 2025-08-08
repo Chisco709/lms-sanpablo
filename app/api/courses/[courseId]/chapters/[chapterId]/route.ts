@@ -122,6 +122,12 @@ export async function PATCH(
     // Preparar datos para actualizar
     const updateData: any = {};
 
+    // Handle description if provided
+    if (values.description !== undefined) {
+      updateData.description = values.description;
+      console.log('Setting description:', updateData.description);
+    }
+
     // Handle videos
     if (values.videoUrls !== undefined) {
       try {
