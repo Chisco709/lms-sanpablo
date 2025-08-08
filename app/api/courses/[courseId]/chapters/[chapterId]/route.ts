@@ -73,6 +73,24 @@ export async function PATCH(
 
     if (!course) return new NextResponse("No autorizado", { status: 401 });
 
+    // Obtener el capítulo actual primero
+    const currentChapter = await db.chapter.findUnique({
+      where: {
+        id: chapterId,
+        courseId: courseId
+      },
+      select: {
+        videoUrl: true,
+        videoUrls: true,
+        pdfUrl: true,
+        pdfUrls: true
+      }
+    });
+
+    if (!currentChapter) {
+      return new NextResponse("Capítulo no encontrado", { status: 404 });
+    }
+
     // Preparar datos para actualización
     const updateData: any = {
       title: values.title,
@@ -81,21 +99,52 @@ export async function PATCH(
       googleFormUrl: values.googleFormUrl,
     };
 
-    // Actualizar solo los campos que se envían
+    // Manejar videos
     if (values.videoUrl !== undefined) {
+      // Si se envía un videoUrl individual, lo convertimos a formato de array
       updateData.videoUrl = values.videoUrl;
+      updateData.videoUrls = [values.videoUrl];
+    } else if (values.videoUrls !== undefined) {
+      // Si se envían múltiples videos
+      const existingVideos = Array.isArray(currentChapter.videoUrls) ? currentChapter.videoUrls : [];
+      updateData.videoUrls = Array.isArray(values.videoUrls) ? values.videoUrls : existingVideos;
+      
+      // Mantener el videoUrl actualizado con el primer video
+      if (updateData.videoUrls.length > 0) {
+        updateData.videoUrl = updateData.videoUrls[0];
+      } else {
+        updateData.videoUrl = null;
+      }
+    } else if (currentChapter.videoUrl) {
+      // Si no se envían videos, mantener los existentes
+      updateData.videoUrl = currentChapter.videoUrl;
+      updateData.videoUrls = Array.isArray(currentChapter.videoUrls) ? 
+        currentChapter.videoUrls : 
+        currentChapter.videoUrl ? [currentChapter.videoUrl] : [];
     }
-    
-    if (values.videoUrls !== undefined) {
-      updateData.videoUrls = values.videoUrls;
-    }
-    
+
+    // Manejar PDFs
     if (values.pdfUrl !== undefined) {
+      // Si se envía un pdfUrl individual, lo convertimos a formato de array
       updateData.pdfUrl = values.pdfUrl;
-    }
-    
-    if (values.pdfUrls !== undefined) {
-      updateData.pdfUrls = values.pdfUrls;
+      updateData.pdfUrls = [values.pdfUrl];
+    } else if (values.pdfUrls !== undefined) {
+      // Si se envían múltiples PDFs
+      const existingPdfs = Array.isArray(currentChapter.pdfUrls) ? currentChapter.pdfUrls : [];
+      updateData.pdfUrls = Array.isArray(values.pdfUrls) ? values.pdfUrls : existingPdfs;
+      
+      // Mantener el pdfUrl actualizado con el primer PDF
+      if (updateData.pdfUrls.length > 0) {
+        updateData.pdfUrl = updateData.pdfUrls[0];
+      } else {
+        updateData.pdfUrl = null;
+      }
+    } else if (currentChapter.pdfUrl) {
+      // Si no se envían PDFs, mantener los existentes
+      updateData.pdfUrl = currentChapter.pdfUrl;
+      updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) ? 
+        currentChapter.pdfUrls : 
+        currentChapter.pdfUrl ? [currentChapter.pdfUrl] : [];
     }
 
     // Actualizar capítulo
