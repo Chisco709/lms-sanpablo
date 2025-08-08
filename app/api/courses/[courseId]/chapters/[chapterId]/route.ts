@@ -76,10 +76,11 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
+  console.log('=== PATCH REQUEST START ===');
+  
   try {
     const user = await currentUser();
-    const { courseId, chapterId  } = await params;
-    const values = await req.json();
+    const { courseId, chapterId } = await params;
 
     if (!user) return new NextResponse("No autorizado", { status: 401 });
 
@@ -93,95 +94,117 @@ export async function PATCH(
 
     if (!course) return new NextResponse("No autorizado", { status: 401 });
 
-    // Obtener el capítulo actual primero
+    // Obtener datos del cuerpo de la petición
+    const values = await req.json();
+    console.log('User ID:', user.id);
+    console.log('Course ID:', courseId);
+    console.log('Chapter ID:', chapterId);
+    console.log('Request body:', JSON.stringify(values, null, 2));
+
+    // Verificar si el capítulo existe
     const currentChapter = await db.chapter.findUnique({
-      where: {
-        id: chapterId,
-        courseId: courseId
-      },
-      select: {
+      where: { id: chapterId, courseId: courseId },
+      select: { 
+        id: true, 
+        courseId: true, 
+        pdfUrl: true, 
+        pdfUrls: true,
         videoUrl: true,
-        videoUrls: true,
-        pdfUrl: true,
-        pdfUrls: true
+        videoUrls: true
       }
     });
 
     if (!currentChapter) {
+      console.error('Chapter not found');
       return new NextResponse("Capítulo no encontrado", { status: 404 });
     }
 
-    // Preparar datos para actualización
-    const updateData: any = {
-      title: values.title,
-      description: values.description,
-      isFree: values.isFree,
-      googleFormUrl: values.googleFormUrl,
-    };
+    // Preparar datos para actualizar
+    const updateData: any = {};
 
-    // Manejar videos
-    if (values.videoUrl !== undefined) {
-      // Si se envía un videoUrl individual, lo convertimos a formato de array
-      updateData.videoUrl = values.videoUrl;
-      updateData.videoUrls = [values.videoUrl];
-    } else if (values.videoUrls !== undefined) {
-      // Si se envían múltiples videos
-      const existingVideos = Array.isArray(currentChapter.videoUrls) ? currentChapter.videoUrls : [];
-      updateData.videoUrls = Array.isArray(values.videoUrls) ? values.videoUrls : existingVideos;
-      
-      // Mantener el videoUrl actualizado con el primer video
-      if (updateData.videoUrls.length > 0) {
-        updateData.videoUrl = updateData.videoUrls[0];
-      } else {
-        updateData.videoUrl = null;
+    // Handle videos
+    if (values.videoUrls !== undefined) {
+      try {
+        console.log('=== PROCESSING VIDEOS ===');
+        console.log('Received video values:', JSON.stringify(values.videoUrls, null, 2));
+        
+        if (Array.isArray(values.videoUrls)) {
+          // Validate and clean each video URL
+          const processedVideos = values.videoUrls
+            .map((url: string) => {
+              if (!url || typeof url !== 'string') return null;
+              const trimmedUrl = url.trim();
+              return trimmedUrl || null;
+            })
+            .filter((url: string | null): url is string => url !== null);
+          
+          console.log('Processed videos:', processedVideos);
+          
+          // Update both the array and legacy single URL for backward compatibility
+          updateData.videoUrls = processedVideos;
+          updateData.videoUrl = processedVideos[0] || null;
+          
+          console.log('Updated video data:', {
+            videoUrl: updateData.videoUrl,
+            videoUrls: updateData.videoUrls
+          });
+        } else if (values.videoUrls === null) {
+          // Handle case where videoUrls is explicitly set to null
+          updateData.videoUrl = null;
+          updateData.videoUrls = [];
+          console.log('Cleared video data');
+        } else {
+          console.warn('videoUrls is not an array:', values.videoUrls);
+          throw new Error('El formato de los videos no es válido');
+        }
+      } catch (error: unknown) {
+        console.error('Error processing video data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        throw new Error(`Error al procesar los videos: ${errorMessage}`);
       }
-    } else if (currentChapter.videoUrl) {
-      // Si no se envían videos, mantener los existentes
-      updateData.videoUrl = currentChapter.videoUrl;
-      updateData.videoUrls = Array.isArray(currentChapter.videoUrls) ? 
-        currentChapter.videoUrls : 
-        currentChapter.videoUrl ? [currentChapter.videoUrl] : [];
     }
 
     // Handle PDFs
-    try {
-      console.log('=== PROCESSING PDFS ===');
-      console.log('Received values:', JSON.stringify(values, null, 2));
-      
-      if (values.pdfUrls !== undefined) {
+    if (values.pdfUrls !== undefined) {
+      try {
+        console.log('=== PROCESSING PDFS ===');
+        console.log('Received values:', JSON.stringify(values, null, 2));
+        
+        type PdfItem = { url: string; name: string; ufsUrl?: string };
+        let processedPdfUrls: PdfItem[] = [];
+        
         if (Array.isArray(values.pdfUrls)) {
           console.log('Processing PDF URLs array with', values.pdfUrls.length, 'items');
           
-          // Validate and process each PDF item
-          updateData.pdfUrls = values.pdfUrls.map((item: string | { url: string; name?: string }, index: number) => {
+          // Process each PDF item
+          processedPdfUrls = values.pdfUrls.map((item: string | { url: string; name?: string }, index: number) => {
             try {
               // If it's a string, convert to object with default name
               if (typeof item === 'string') {
                 if (!item) throw new Error('Empty URL in PDF array');
                 return {
                   url: item,
-                  name: `Documento ${index + 1}`
+                  name: `Documento ${index + 1}`,
+                  ...(item.includes('utfs.io') ? { ufsUrl: item } : {})
                 };
               }
               
               // Validate URL
-              if (!item || typeof item !== 'object' || !item.url) {
-                throw new Error('Invalid PDF item format');
+              if (!item || typeof item !== 'object' || (!item.url && !(item as any).ufsUrl)) {
+                throw new Error('Invalid PDF item format - missing URL');
               }
               
               // Clean and validate the URL - support both url and ufsUrl formats
-              let url = item.url || (item as any).ufsUrl;
+              const url = (item.url || (item as any).ufsUrl).trim();
               if (!url) throw new Error('Empty PDF URL');
-              url = url.trim();
               
               // Clean and validate the name
               const name = (item.name || `Documento ${index + 1}`).trim();
               
-              // Return normalized object with only the fields we need
+              // Return normalized object
               return { 
                 url, 
                 name,
-                // Keep the original URL for backward compatibility
                 ...(url.includes('utfs.io') ? { ufsUrl: url } : {})
               };
               
@@ -192,64 +215,39 @@ export async function PATCH(
             }
           });
           
-          console.log('Processed PDFs:', JSON.stringify(updateData.pdfUrls, null, 2));
+          console.log('Processed PDFs:', JSON.stringify(processedPdfUrls, null, 2));
           
-          // Update the legacy pdfUrl field with the first PDF URL for backward compatibility
-          if (updateData.pdfUrls.length > 0) {
-            updateData.pdfUrl = updateData.pdfUrls[0].url;
-            console.log('Updated legacy pdfUrl:', updateData.pdfUrl);
-          } else {
-            updateData.pdfUrl = null;
-            console.log('No PDFs, setting pdfUrl to null');
-          }
+        } else if (values.pdfUrls === null) {
+          // Handle case where pdfUrls is explicitly set to null
+          processedPdfUrls = [];
+          updateData.pdfUrl = null;
+          console.log('Cleared PDF data');
         } else {
-          console.warn('pdfUrls is not an array:', values.pdfUrls);
+          console.warn('pdfUrls is not an array or null:', values.pdfUrls);
           throw new Error('El formato de los PDFs no es válido');
         }
-      } else if (values.pdfUrl !== undefined) {
-        // Handle legacy single PDF URL
-        console.log('Processing legacy single PDF URL:', values.pdfUrl);
-        if (typeof values.pdfUrl !== 'string' || !values.pdfUrl.trim()) {
-          throw new Error('URL de PDF no válida');
-        }
-        updateData.pdfUrl = values.pdfUrl.trim();
-        updateData.pdfUrls = [{
-          url: updateData.pdfUrl,
-          name: 'Documento 1'
-        }];
-      } else if (currentChapter.pdfUrl || currentChapter.pdfUrls) {
-        // If no PDF data in request, keep existing data
-        console.log('No PDF data in request, keeping existing data');
-        updateData.pdfUrl = currentChapter.pdfUrl;
-        updateData.pdfUrls = Array.isArray(currentChapter.pdfUrls) && currentChapter.pdfUrls.length > 0
-          ? currentChapter.pdfUrls
-          : currentChapter.pdfUrl 
-            ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] 
-            : [];
-      } else {
-        console.log('No PDF data to process');
-        updateData.pdfUrls = [];
-        updateData.pdfUrl = null;
+        
+        // Serialize the PDF URLs array to a JSON string for storage
+        updateData.pdfUrls = JSON.stringify(processedPdfUrls);
+        
+        // Update legacy pdfUrl with the first PDF URL for backward compatibility
+        updateData.pdfUrl = processedPdfUrls[0]?.url || null;
+        
+      } catch (error: unknown) {
+        console.error('Error processing PDF data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        throw new Error(`Error al procesar los PDFs: ${errorMessage}`);
       }
-      
-      console.log('Final PDF data:', JSON.stringify({
-        pdfUrl: updateData.pdfUrl,
-        pdfUrls: updateData.pdfUrls
-      }, null, 2));
-    } catch (error: unknown) {
-      console.error('Error processing PDF data:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      return new NextResponse(`Error processing PDF data: ${errorMessage}`, { status: 400 });
     }
 
     console.log('Updating chapter with data:', JSON.stringify(updateData, null, 2));
-      
+    
     try {
-      // Actualizar capítulo
+      // Update chapter in database
       const updatedChapter = await db.chapter.update({
         where: {
           id: chapterId,
-          courseId: courseId
+          courseId: courseId,
         },
         data: updateData,
         select: {
@@ -263,39 +261,73 @@ export async function PATCH(
           isFree: true,
           isPublished: true,
           position: true,
-          createdAt: true,
-          updatedAt: true
         }
       });
+
+      // Parse the stored pdfUrls if it's a string
+      let pdfUrls: Array<{url: string, name: string, ufsUrl?: string}> = [];
+      try {
+        if (updatedChapter.pdfUrls) {
+          pdfUrls = typeof updatedChapter.pdfUrls === 'string' 
+            ? JSON.parse(updatedChapter.pdfUrls)
+            : Array.isArray(updatedChapter.pdfUrls) 
+              ? updatedChapter.pdfUrls 
+              : [];
+        } else if (updatedChapter.pdfUrl) {
+          // Fallback for legacy format
+          pdfUrls = [{
+            url: updatedChapter.pdfUrl,
+            name: 'Documento 1',
+            ...(updatedChapter.pdfUrl.includes('utfs.io') ? { ufsUrl: updatedChapter.pdfUrl } : {})
+          }];
+        }
+      } catch (error) {
+        console.error('Error parsing pdfUrls:', error);
+        pdfUrls = [];
+      }
       
-      console.log('Chapter updated successfully:', JSON.stringify(updatedChapter, null, 2));
-      return NextResponse.json(updatedChapter);
+      // Return the updated chapter data with properly formatted pdfUrls
+      return NextResponse.json({
+        ...updatedChapter,
+        pdfUrls
+      });
+      
     } catch (dbError) {
       console.error('Database error:', dbError);
-      throw dbError;
+      
+      let errorMessage = 'Error interno del servidor';
+      let errorDetails = dbError instanceof Error ? dbError.message : 'Error desconocido';
+      
+      console.error('Database error details:', {
+        name: dbError instanceof Error ? dbError.name : 'Unknown',
+        message: errorDetails,
+        stack: dbError instanceof Error ? dbError.stack : undefined
+      });
+      
+      return new NextResponse(
+        JSON.stringify({
+          error: errorMessage,
+          details: errorDetails,
+          timestamp: new Date().toISOString()
+        }), 
+        { 
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
     }
   } catch (error: unknown) {
-    console.error("=== CHAPTER_UPDATE ERROR ===");
-    console.error('Error details:', error);
-    
-    if (error instanceof Error) {
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
-    
+    console.error('Unexpected error in PATCH handler:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return new NextResponse(
       JSON.stringify({
         error: 'Error interno del servidor',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        details: errorMessage,
         timestamp: new Date().toISOString()
-      }), 
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   } finally {
     console.log('=== PATCH REQUEST END ===\n');
