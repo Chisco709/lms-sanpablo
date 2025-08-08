@@ -57,12 +57,12 @@ interface ChapterPageProps {
     id: string;
     title: string;
     description?: string;
-    videoUrl?: string;
-    videoUrls?: string[];
+    videoUrl?: string | null;
+    videoUrls?: string[] | null;
     position?: number;
-    pdfUrl?: string;
-    pdfUrls?: string[];
-    googleFormUrl?: string;
+    pdfUrl?: string | null;
+    pdfUrls?: Array<string | { url: string; name?: string }> | null;
+    googleFormUrl?: string | null;
     isFree?: boolean;
   };
   course: {
@@ -409,36 +409,62 @@ const ChapterPage = ({
 
                 <div className="space-y-3 md:space-y-4">
                   {/* Mostrar PDFs con nombres personalizados */}
-                  {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && (
-                    <div className="space-y-3">
-                      {[
-                        // Handle legacy single pdfUrl
-                        ...(chapter.pdfUrl ? [{
-                          url: chapter.pdfUrl, 
-                          name: 'Guía de Trabajo',
-                          isLegacy: true
-                        }] : []),
-                        // Handle pdfUrls array which can contain strings or objects
-                        ...(Array.isArray(chapter.pdfUrls) 
-                          ? chapter.pdfUrls.map(item => ({
-                              url: typeof item === 'string' ? item : item.url,
-                              name: typeof item === 'string' 
-                                ? `Documento ${chapter.pdfUrls!.indexOf(item) + 1}` 
-                                : (item.name || `Documento ${chapter.pdfUrls!.indexOf(item) + 1}`),
-                              isLegacy: false
-                            }))
-                          : [])
-                      ]
-                      .filter((pdf): pdf is { url: string; name: string; isLegacy: boolean } => {
-                        return !!pdf && !!pdf.url;
-                      })
-                      .map((pdf, index) => {
-                        const displayName = pdf.name || `Documento ${index + 1}`;
-                        return (
-                          <div key={index} className="space-y-2">
-                            <h4 className="text-white text-sm font-medium">
-                              {displayName}
-                            </h4>
+                  {(() => {
+                    // Define PDF item type
+                    type PdfItem = {
+                      url: string;
+                      name: string;
+                      isLegacy: boolean;
+                    };
+                    
+                    // Get all PDFs, handling both legacy and new format
+                    const pdfs: PdfItem[] = [];
+                    const processedUrls = new Set<string>();
+                    
+                    // Add PDFs from pdfUrls array (new format)
+                    if (Array.isArray(chapter.pdfUrls)) {
+                      chapter.pdfUrls.forEach((item, index) => {
+                        if (!item) return;
+                        
+                        // Handle both string and object formats
+                        const url = typeof item === 'string' ? item : item.url;
+                        if (!url || processedUrls.has(url)) return;
+                        
+                        const name = typeof item === 'string' 
+                          ? `Documento ${index + 1}`
+                          : (item.name || `Documento ${index + 1}`);
+                        
+                        pdfs.push({ 
+                          url, 
+                          name,
+                          isLegacy: false 
+                        });
+                        processedUrls.add(url);
+                      });
+                    }
+                    
+                    // Add legacy pdfUrl only if it's not already in the list
+                    if (chapter.pdfUrl && !processedUrls.has(chapter.pdfUrl)) {
+                      pdfs.push({
+                        url: chapter.pdfUrl,
+                        name: pdfs.length > 0 ? pdfs[0].name : 'Guía de Trabajo',
+                        isLegacy: true
+                      });
+                    }
+                    
+                    // If no PDFs found, don't render anything
+                    if (pdfs.length === 0) return null;
+                    
+                    return (
+                      <div className="space-y-3">
+                        {pdfs.map((pdf, index) => (
+                          <div key={`${pdf.url}-${index}`} className="space-y-2">
+                            {/* Only show name if there are multiple PDFs or it has a custom name */}
+                            {(pdfs.length > 1 || pdf.name !== 'Documento 1') && (
+                              <h4 className="text-white text-sm font-medium">
+                                {pdf.name}
+                              </h4>
+                            )}
                             <div className="flex flex-col sm:flex-row gap-2">
                               <a
                                 href={`/api/view-pdf?url=${encodeURIComponent(pdf.url)}`}
@@ -446,23 +472,23 @@ const ChapterPage = ({
                                 rel="noopener noreferrer"
                                 className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
                               >
-                                👀 Ver Guía
+                                {pdfs.length > 1 ? '👀 Ver' : '👀 Ver Guía'}
                               </a>
                               
                               <a
                                 href={`/api/download-pdf?url=${encodeURIComponent(pdf.url)}&filename=${encodeURIComponent(
-                                  displayName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_') + '.pdf'
+                                  (pdf.name || 'documento').replace(/[^\w\s]/gi, '').replace(/\s+/g, '_') + '.pdf'
                                 )}`}
                                 className="flex-1 px-4 py-3 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
                               >
-                                📥 Descargar
+                                {pdfs.length > 1 ? '📥 Descargar' : '📥 Descargar Guía'}
                               </a>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
                 
                 <div className="mt-4 md:mt-6 p-3 md:p-4 bg-yellow-400/20 rounded-xl md:rounded-2xl border border-yellow-400/30">
