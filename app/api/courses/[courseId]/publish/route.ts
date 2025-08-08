@@ -65,6 +65,11 @@ export async function PATCH(
             pdfUrls: {
               isEmpty: false
             }
+          },
+          {
+            pdfUrls: {
+              hasSome: [""] // This will match any non-empty array or non-null value
+            }
           }
         ]
       },
@@ -78,7 +83,15 @@ export async function PATCH(
 
     console.log('Capítulos con PDF encontrados:', JSON.stringify(chapters, null, 2));
 
-    if (chapters.length === 0) {
+    // Verificar si hay al menos un capítulo con PDF
+    const hasPdfChapter = chapters.some(chapter => {
+      return (
+        chapter.pdfUrl || 
+        (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)
+      );
+    });
+
+    if (!hasPdfChapter) {
       // Agregar más detalles sobre el error para depuración
       const errorDetails = {
         message: "No se encontraron capítulos con PDF",
@@ -88,11 +101,13 @@ export async function PATCH(
           id: c.id,
           title: c.title,
           hasPdfUrl: !!c.pdfUrl,
-          hasPdfUrls: Array.isArray(c.pdfUrls) ? c.pdfUrls.length > 0 : false
+          hasPdfUrls: Array.isArray(c.pdfUrls) ? c.pdfUrls.length > 0 : false,
+          pdfUrl: c.pdfUrl,
+          pdfUrls: c.pdfUrls
         }))
       };
       
-      console.error('Error de validación de PDF:', errorDetails);
+      console.error('Error de validación de PDF:', JSON.stringify(errorDetails, null, 2));
       
       return new NextResponse(
         JSON.stringify({
