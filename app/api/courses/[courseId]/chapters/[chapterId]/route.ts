@@ -227,11 +227,14 @@ export async function PATCH(
           throw new Error('El formato de los PDFs no es válido');
         }
         
-        // Serialize the PDF URLs array to a JSON string for storage
-        updateData.pdfUrls = JSON.stringify(processedPdfUrls);
+        // Store just the URLs as an array of strings in the database
+        updateData.pdfUrls = processedPdfUrls.map(pdf => pdf.url);
         
         // Update legacy pdfUrl with the first PDF URL for backward compatibility
         updateData.pdfUrl = processedPdfUrls[0]?.url || null;
+        
+        // Store the full PDF data in a temporary variable to include in the response
+        const pdfsForResponse = [...processedPdfUrls];
         
       } catch (error: unknown) {
         console.error('Error processing PDF data:', error);
@@ -264,27 +267,13 @@ export async function PATCH(
         }
       });
 
-      // Parse the stored pdfUrls if it's a string
-      let pdfUrls: Array<{url: string, name: string, ufsUrl?: string}> = [];
-      try {
-        if (updatedChapter.pdfUrls) {
-          pdfUrls = typeof updatedChapter.pdfUrls === 'string' 
-            ? JSON.parse(updatedChapter.pdfUrls)
-            : Array.isArray(updatedChapter.pdfUrls) 
-              ? updatedChapter.pdfUrls 
-              : [];
-        } else if (updatedChapter.pdfUrl) {
-          // Fallback for legacy format
-          pdfUrls = [{
-            url: updatedChapter.pdfUrl,
-            name: 'Documento 1',
-            ...(updatedChapter.pdfUrl.includes('utfs.io') ? { ufsUrl: updatedChapter.pdfUrl } : {})
-          }];
-        }
-      } catch (error) {
-        console.error('Error parsing pdfUrls:', error);
-        pdfUrls = [];
-      }
+      // Prepare the response with enriched PDF data
+      // If we have the full PDF data from the update, use it; otherwise, create basic objects
+      const pdfUrls = pdfsForResponse || updatedChapter.pdfUrls?.map(url => ({
+        url,
+        name: url.split('/').pop() || 'Documento',
+        ...(url.includes('utfs.io') ? { ufsUrl: url } : {})
+      })) || [];
       
       // Return the updated chapter data with properly formatted pdfUrls
       return NextResponse.json({
