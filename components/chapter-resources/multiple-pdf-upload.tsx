@@ -134,12 +134,18 @@ export const MultiplePdfUpload = ({
     try {
       setIsSaving(true);
       
-      // Prepare the data to send
+      // Prepare the data to send - ensure we're using the correct URL format
       const requestData = {
-        pdfUrls: updatedPdfs.map(pdf => ({
-          url: pdf.url,
-          name: pdf.name
-        }))
+        pdfUrls: updatedPdfs.map(pdf => {
+          // Use ufsUrl if available, otherwise fall back to url
+          const fileUrl = (pdf as any).ufsUrl || pdf.url;
+          return {
+            url: fileUrl,
+            name: pdf.name || `Documento ${index + 1}`,
+            // Include ufsUrl for backward compatibility
+            ...(fileUrl.includes('utfs.io') ? { ufsUrl: fileUrl } : {})
+          };
+        })
       };
       
       console.log('Sending PATCH request with data:', JSON.stringify(requestData, null, 2));

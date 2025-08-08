@@ -169,14 +169,21 @@ export async function PATCH(
                 throw new Error('Invalid PDF item format');
               }
               
-              // Clean and validate the URL
-              const url = item.url.trim();
+              // Clean and validate the URL - support both url and ufsUrl formats
+              let url = item.url || (item as any).ufsUrl;
               if (!url) throw new Error('Empty PDF URL');
+              url = url.trim();
               
               // Clean and validate the name
               const name = (item.name || `Documento ${index + 1}`).trim();
               
-              return { url, name };
+              // Return normalized object with only the fields we need
+              return { 
+                url, 
+                name,
+                // Keep the original URL for backward compatibility
+                ...(url.includes('utfs.io') ? { ufsUrl: url } : {})
+              };
               
             } catch (error: unknown) {
               const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
