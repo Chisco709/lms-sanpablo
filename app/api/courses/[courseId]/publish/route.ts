@@ -34,6 +34,22 @@ export async function PATCH(
       );
     }
 
+    // Debug: Verificar los capítulos publicados
+    const allPublishedChapters = await db.chapter.findMany({
+      where: {
+        courseId: courseId,
+        isPublished: true
+      },
+      select: {
+        id: true,
+        title: true,
+        pdfUrl: true,
+        pdfUrls: true
+      }
+    });
+
+    console.log('Todos los capítulos publicados:', JSON.stringify(allPublishedChapters, null, 2));
+
     // Verificar que el curso tenga al menos un capítulo con PDF (en pdfUrl o pdfUrls)
     const chapters = await db.chapter.findMany({
       where: {
@@ -54,15 +70,41 @@ export async function PATCH(
       },
       select: {
         id: true,
+        title: true,
         pdfUrl: true,
         pdfUrls: true
       }
     });
 
+    console.log('Capítulos con PDF encontrados:', JSON.stringify(chapters, null, 2));
+
     if (chapters.length === 0) {
+      // Agregar más detalles sobre el error para depuración
+      const errorDetails = {
+        message: "No se encontraron capítulos con PDF",
+        courseId,
+        publishedChaptersCount: allPublishedChapters.length,
+        publishedChapters: allPublishedChapters.map(c => ({
+          id: c.id,
+          title: c.title,
+          hasPdfUrl: !!c.pdfUrl,
+          hasPdfUrls: Array.isArray(c.pdfUrls) ? c.pdfUrls.length > 0 : false
+        }))
+      };
+      
+      console.error('Error de validación de PDF:', errorDetails);
+      
       return new NextResponse(
-        "Se requiere al menos un capítulo publicado con PDF para publicar el curso",
-        { status: 400 }
+        JSON.stringify({
+          error: "Se requiere al menos un capítulo publicado con PDF para publicar el curso",
+          details: errorDetails
+        }),
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
