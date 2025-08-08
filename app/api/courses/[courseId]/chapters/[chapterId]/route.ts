@@ -145,19 +145,33 @@ export async function PATCH(
 
     // Manejar PDFs
     if (values.pdfUrl !== undefined) {
-      // Si se envía un pdfUrl individual, lo convertimos a formato de array
+      // Si se envía un pdfUrl individual, lo convertimos al formato de objeto con nombre
       updateData.pdfUrl = values.pdfUrl;
-      updateData.pdfUrls = [values.pdfUrl];
+      const pdfName = typeof values.pdfUrl === 'string' ? 'Documento 1' : (values.pdfUrl.name || 'Documento 1');
+      updateData.pdfUrls = [{
+        url: values.pdfUrl,
+        name: pdfName
+      }];
     } else if (values.pdfUrls !== undefined) {
       // Si se envían múltiples PDFs
-      const existingPdfs = Array.isArray(currentChapter.pdfUrls) ? currentChapter.pdfUrls : [];
-      updateData.pdfUrls = Array.isArray(values.pdfUrls) ? values.pdfUrls : existingPdfs;
+      const existingPdfs = Array.isArray(currentChapter.pdfUrls) ? 
+        currentChapter.pdfUrls : 
+        (currentChapter.pdfUrl ? [{ url: currentChapter.pdfUrl, name: 'Documento 1' }] : []);
       
-      // Mantener el pdfUrl actualizado con el primer PDF
-      if (updateData.pdfUrls.length > 0) {
-        updateData.pdfUrl = updateData.pdfUrls[0];
-      } else {
-        updateData.pdfUrl = null;
+      // Asegurarse de que cada PDF tenga un nombre
+      updateData.pdfUrls = (Array.isArray(values.pdfUrls) ? values.pdfUrls : []).map((pdf: string | { url: string; name?: string }, index: number) => {
+        if (typeof pdf === 'string') {
+          return { url: pdf, name: `Documento ${index + 1}` };
+        }
+        return {
+          url: pdf.url,
+          name: pdf.name || `Documento ${index + 1}`
+        };
+      });
+      
+      // Si no hay PDFs nuevos, mantener los existentes
+      if (updateData.pdfUrls.length === 0) {
+        updateData.pdfUrls = existingPdfs;
       }
     } else if (currentChapter.pdfUrl) {
       // Si no se envían PDFs, mantener los existentes

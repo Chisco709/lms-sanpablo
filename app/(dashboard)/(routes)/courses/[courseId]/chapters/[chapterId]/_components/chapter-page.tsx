@@ -408,30 +408,37 @@ const ChapterPage = ({
                 </p>
 
                 <div className="space-y-3 md:space-y-4">
-                  {/* Single PDF or first PDF in the array */}
+                  {/* Mostrar PDFs con nombres personalizados */}
                   {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && (
                     <div className="space-y-3">
-                      {[chapter.pdfUrl, ...(Array.isArray(chapter.pdfUrls) ? chapter.pdfUrls : [])]
-                        .filter((url): url is string => !!url)
-                        .map((pdfUrl, index) => (
+                      {[
+                        ...(chapter.pdfUrl ? [{ url: chapter.pdfUrl, name: 'Guía de Trabajo' }] : []),
+                        ...(Array.isArray(chapter.pdfUrls) ? chapter.pdfUrls : [])
+                      ]
+                        .filter((pdf): pdf is { url: string; name: string } => {
+                        if (!pdf) return false;
+                        const pdfUrl = typeof pdf === 'string' ? pdf : pdf.url;
+                        return !!pdfUrl;
+                      })
+                        .map((pdf, index) => (
                           <div key={index} className="space-y-2">
-                            {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 && (
-                              <span className="text-white text-sm font-medium">
-                                Documento {index + 1}
-                              </span>
-                            )}
+                            <h4 className="text-white text-sm font-medium">
+                              {pdf.name || `Documento ${index + 1}`}
+                            </h4>
                             <div className="flex flex-col sm:flex-row gap-2">
                               <a
-                                href={`/api/view-pdf?url=${encodeURIComponent(pdfUrl)}`}
+                                href={`/api/view-pdf?url=${encodeURIComponent(typeof pdf === 'string' ? pdf : pdf.url)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
                               >
-                                👀 Ver {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 ? '' : 'Guía'}
+                                👀 Ver Guía
                               </a>
                               
                               <a
-                                href={`/api/download-pdf?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(`${chapter.title.replace(/\s+/g, '_')}_${index + 1}.pdf`)}`}
+                                href={`/api/download-pdf?url=${encodeURIComponent(typeof pdf === 'string' ? pdf : pdf.url)}&filename=${encodeURIComponent(
+                                  (pdf.name || `Guia_${index + 1}`).replace(/[^\w\s]/gi, '').replace(/\s+/g, '_') + '.pdf'
+                                )}`}
                                 className="flex-1 px-4 py-3 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
                               >
                                 📥 Descargar
