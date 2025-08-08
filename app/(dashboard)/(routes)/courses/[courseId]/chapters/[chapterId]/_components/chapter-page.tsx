@@ -203,21 +203,21 @@ const ChapterPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-x-hidden">
+    <div className="min-h-screen bg-black/95 relative overflow-x-hidden">
       {/* Luces de fondo globales - Optimizadas para móvil */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute left-[-30%] top-[-20%] w-[300px] h-[300px] sm:left-[-15%] sm:top-[-15%] sm:w-[400px] sm:h-[400px] bg-green-500/30 rounded-full blur-[80px] sm:blur-[120px] opacity-70" />
-        <div className="absolute right-[-20%] bottom-[-15%] w-[250px] h-[250px] sm:right-[-10%] sm:bottom-[-10%] sm:w-[300px] sm:h-[300px] bg-yellow-400/20 rounded-full blur-[70px] sm:blur-[100px] opacity-60" />
-        <div className="absolute right-[5%] top-[5%] w-[120px] h-[120px] sm:right-[10%] sm:top-[10%] sm:w-[180px] sm:h-[180px] bg-white/10 rounded-full blur-[40px] sm:blur-[60px] opacity-20" />
+        <div className="absolute left-[-30%] top-[-20%] w-[300px] h-[300px] sm:left-[-15%] sm:top-[-15%] sm:w-[400px] sm:h-[400px] bg-green-500/20 rounded-full blur-[60px] sm:blur-[100px] opacity-50" />
+        <div className="absolute right-[-20%] bottom-[-15%] w-[250px] h-[250px] sm:right-[-10%] sm:bottom-[-10%] sm:w-[300px] sm:h-[300px] bg-yellow-400/10 rounded-full blur-[50px] sm:blur-[80px] opacity-40" />
+        <div className="absolute right-[5%] top-[5%] w-[120px] h-[120px] sm:right-[10%] sm:top-[10%] sm:w-[180px] sm:h-[180px] bg-white/5 rounded-full blur-[30px] sm:blur-[50px] opacity-15" />
       </div>
       {/* HEADER - MOBILE OPTIMIZADO */}
-      <div className="bg-black/90 backdrop-blur-sm border-b-4 border-green-400/20 p-3 md:p-4 sticky top-0 z-30">
+      <div className="bg-black/80 backdrop-blur-sm border-b border-green-400/10 p-3 md:p-4 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <Link 
             href="/student"
             className="flex items-center gap-2 text-green-400 hover:text-yellow-400 transition-all duration-300 group flex-shrink-0"
           >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/60 group-hover:bg-green-400/10 rounded-2xl flex items-center justify-center transition-all duration-300 border border-green-400/30">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 group-hover:bg-green-400/5 rounded-2xl flex items-center justify-center transition-all duration-300 border border-green-400/20">
               <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
             <div className="hidden sm:block min-w-0">
@@ -237,9 +237,9 @@ const ChapterPage = ({
           </div>
           
           {isCompleted && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 rounded-2xl border border-green-500/30">
-              <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-              <span className="text-green-400 font-bold text-sm sm:text-base hidden xs:inline">¡Listo!</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 rounded-2xl border border-green-500/20">
+              <CheckCircle className="h-5 w-5 text-green-400/90 flex-shrink-0" />
+              <span className="text-green-400/90 font-medium text-sm sm:text-base hidden xs:inline">¡Listo!</span>
             </div>
           )}
         </div>
@@ -247,9 +247,9 @@ const ChapterPage = ({
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
         {/* Progress Indicator - Mobile Optimized */}
         <div className="mb-6 sm:mb-8">
-          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-green-400 to-yellow-400 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-green-400/80 to-yellow-400/80 transition-all duration-500"
               style={{ width: isCompleted ? '100%' : '0%' }}
             />
           </div>
@@ -259,7 +259,7 @@ const ChapterPage = ({
           </div>
         </div>
         {/* VIDEO - MOBILE OPTIMIZADO */}
-        <div className="mb-8 sm:mb-12 bg-black/50 rounded-2xl overflow-hidden border border-green-400/20">
+        <div className="mb-8 sm:mb-12 bg-black/40 rounded-2xl overflow-hidden border border-green-400/10">
           <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
             {isLocked ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 md:p-12 bg-yellow-400/10">
