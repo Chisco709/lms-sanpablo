@@ -165,6 +165,8 @@ export async function PATCH(
     }
 
     // Handle PDFs
+    let pdfsForResponse: Array<{ url: string; name: string; ufsUrl?: string }> = [];
+    
     if (values.pdfUrls !== undefined) {
       try {
         console.log('=== PROCESSING PDFS ===');
@@ -233,8 +235,8 @@ export async function PATCH(
         // Update legacy pdfUrl with the first PDF URL for backward compatibility
         updateData.pdfUrl = processedPdfUrls[0]?.url || null;
         
-        // Store the full PDF data in a temporary variable to include in the response
-        const pdfsForResponse = [...processedPdfUrls];
+        // Store the full PDF data for the response
+        pdfsForResponse = [...processedPdfUrls];
         
       } catch (error: unknown) {
         console.error('Error processing PDF data:', error);
