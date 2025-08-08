@@ -128,9 +128,20 @@ const ChapterPage = ({
   const isCompleted = !!userProgress?.isCompleted;
   
   // Handle both single videoUrl and videoUrls array
-  const videoUrls: string[] = Array.isArray(chapter.videoUrls) ? [...chapter.videoUrls] : [];
-  if (chapter.videoUrl && typeof chapter.videoUrl === 'string' && !videoUrls.includes(chapter.videoUrl)) {
-    videoUrls.unshift(chapter.videoUrl); // Add legacy videoUrl to the beginning
+  const videoUrls: string[] = [];
+  
+  // Add videoUrl if it exists and is a string
+  if (chapter.videoUrl && typeof chapter.videoUrl === 'string') {
+    videoUrls.push(chapter.videoUrl);
+  }
+  
+  // Add all videoUrls from the array if it exists
+  if (Array.isArray(chapter.videoUrls)) {
+    chapter.videoUrls.forEach(url => {
+      if (url && typeof url === 'string' && !videoUrls.includes(url)) {
+        videoUrls.push(url);
+      }
+    });
   }
   
   // Get embed URLs for all videos
@@ -312,41 +323,65 @@ const ChapterPage = ({
         <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
           
           {/* GUÍA PDF - MOBILE OPTIMIZADO */}
-        {chapter.pdfUrl && hasAccess && (
+        {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && hasAccess && (
             <div className="bg-black/80 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-green-400/20">
               <div className="text-center">
                 <div className="text-4xl md:text-6xl mb-4 md:mb-6">📄</div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Guía de Trabajo</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">
+                  {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 ? 'Guías de Trabajo' : 'Guía de Trabajo'}
+                </h2>
                 <p className="text-white text-sm md:text-base mb-6 md:mb-8">
-                  Descarga esta guía para seguir la clase
-                  </p>
+                  {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 
+                    ? 'Descarga estas guías para seguir la clase' 
+                    : 'Descarga esta guía para seguir la clase'}
+                </p>
 
                 <div className="space-y-3 md:space-y-4">
-                  <a
-                    href={`/api/view-pdf?url=${encodeURIComponent(chapter.pdfUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-5 md:px-6 py-3 md:py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-                  >
-                    👀 Ver Guía
-                  </a>
-                  
-                  <a
-                    href={`/api/download-pdf?url=${encodeURIComponent(chapter.pdfUrl)}&filename=${encodeURIComponent(`${chapter.title.replace(/\s+/g, '_')}.pdf`)}`}
-                    className="block w-full px-5 md:px-6 py-3 md:py-4 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl md:rounded-3xl text-base md:text-lg transition-all duration-300 hover:scale-105"
-                  >
-                    📥 Descargar
-                  </a>
+                  {/* Single PDF or first PDF in the array */}
+                  {(chapter.pdfUrl || (Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 0)) && (
+                    <div className="space-y-3">
+                      {[chapter.pdfUrl, ...(Array.isArray(chapter.pdfUrls) ? chapter.pdfUrls : [])]
+                        .filter((url): url is string => !!url)
+                        .map((pdfUrl, index) => (
+                          <div key={index} className="space-y-2">
+                            {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 && (
+                              <span className="text-white text-sm font-medium">
+                                Documento {index + 1}
+                              </span>
+                            )}
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <a
+                                href={`/api/view-pdf?url=${encodeURIComponent(pdfUrl)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
+                              >
+                                👀 Ver {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 ? '' : 'Guía'}
+                              </a>
+                              
+                              <a
+                                href={`/api/download-pdf?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(`${chapter.title.replace(/\s+/g, '_')}_${index + 1}.pdf`)}`}
+                                className="flex-1 px-4 py-3 bg-green-400 hover:bg-green-300 text-black font-bold rounded-2xl text-center text-sm md:text-base transition-all duration-300 hover:scale-105"
+                              >
+                                📥 Descargar
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-4 md:mt-6 p-3 md:p-4 bg-yellow-400/20 rounded-xl md:rounded-2xl border border-yellow-400/30">
                   <p className="text-yellow-400 font-bold text-xs md:text-sm">
-                    💡 Lee la guía antes de ver el video
+                    💡 {Array.isArray(chapter.pdfUrls) && chapter.pdfUrls.length > 1 
+                      ? 'Revisa las guías antes de ver el video' 
+                      : 'Lee la guía antes de ver el video'}
                   </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
           {/* FORMULARIO DE GOOGLE - MOBILE OPTIMIZADO */}
         {chapter.googleFormUrl && hasAccess && (
