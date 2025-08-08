@@ -148,39 +148,42 @@ const ChapterPage = ({
     videoUrl: chapter.videoUrl,
     videoUrls: chapter.videoUrls,
     hasAccess,
-    rawChapter: chapter // Log the entire chapter object for debugging
+    rawChapter: JSON.parse(JSON.stringify(chapter)) // Log the entire chapter object for debugging
   });
   
   // Add all video URLs from both sources
   const allVideoSources = [
     ...(chapter.videoUrl ? [chapter.videoUrl] : []),
     ...(Array.isArray(chapter.videoUrls) ? chapter.videoUrls : [])
-  ];
+  ].filter(Boolean); // Remove any null/undefined values
   
   // Filter out duplicates and invalid URLs
   allVideoSources.forEach(url => {
-    if (url && typeof url === 'string' && url.trim() !== '' && !videoUrls.includes(url.trim())) {
-      console.log('Adding video URL:', url.trim());
-      videoUrls.push(url.trim());
+    if (url && typeof url === 'string' && url.trim() !== '') {
+      const trimmedUrl = url.trim();
+      if (!videoUrls.some(existingUrl => existingUrl.toLowerCase() === trimmedUrl.toLowerCase())) {
+        console.log('Adding video URL:', trimmedUrl);
+        videoUrls.push(trimmedUrl);
+      }
     }
   });
   
   console.log('Collected video URLs:', videoUrls);
   
   // Get embed URLs for all videos
-  const embedUrls: VideoUrl[] = videoUrls
-    .filter(url => {
-      const embedUrl = getYouTubeEmbedUrl(url);
-      if (!embedUrl) {
-        console.warn('Could not generate embed URL for:', url);
-        return false;
-      }
-      return true;
-    })
-    .map(url => ({
-      url: getYouTubeEmbedUrl(url)!,
-      originalUrl: url
-    }));
+  const embedUrls: VideoUrl[] = [];
+  
+  videoUrls.forEach(url => {
+    const embedUrl = getYouTubeEmbedUrl(url);
+    if (embedUrl) {
+      embedUrls.push({
+        url: embedUrl,
+        originalUrl: url
+      });
+    } else {
+      console.warn('Could not generate embed URL for:', url);
+    }
+  });
   
   console.log('Processed video URLs:', {
     videoUrls,

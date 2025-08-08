@@ -29,10 +29,22 @@ export async function GET(
         id: chapterId,
         courseId: courseId
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        videoUrl: true,
+        videoUrls: true,
+        pdfUrl: true,
+        pdfUrls: true,
+        position: true,
+        isPublished: true,
+        isFree: true,
+        googleFormUrl: true,
         course: {
           select: {
-            title: true
+            title: true,
+            id: true
           }
         },
         pensumTopic: {
@@ -41,6 +53,14 @@ export async function GET(
           }
         }
       }
+    });
+    
+    console.log('Chapter data from DB:', {
+      chapterId: chapterId,
+      videoUrl: chapter?.videoUrl,
+      videoUrls: chapter?.videoUrls,
+      pdfUrl: chapter?.pdfUrl,
+      pdfUrls: chapter?.pdfUrls
     });
 
     if (!chapter) return new NextResponse("Capítulo no encontrado", { status: 404 });
